@@ -27,6 +27,8 @@ $config = [
             // 'useFileTransport' to false and configure a transport
             // for the mailer to send real emails.
             'useFileTransport' => true,
+            'viewPath' => '@app/views/mail',
+            'htmlLayout' => false,
         ],
         'urlManager' => [
             'enablePrettyUrl' => true,
