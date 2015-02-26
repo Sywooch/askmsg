@@ -5,6 +5,9 @@ use yii\db\Migration;
 use app\models\Group;
 use app\models\User;
 use app\models\Usergroup;
+use app\models\Message;
+use app\models\Msgflags;
+use app\models\Msganswers;
 
 
 class m150225_140020_importusers extends Migration
@@ -19,6 +22,10 @@ class m150225_140020_importusers extends Migration
         $connection = \Yii::$app->db;
         $oldConnection = \Yii::$app->dbold;
 
+        /* ************************************************************************
+         * import user groups
+         *
+         */
         $sql = 'Select ID, ACTIVE, NAME, DESCRIPTION  From b_group';
         $aOldGroup = $oldConnection->createCommand($sql)->queryAll();
         $aGrMap = [];
@@ -56,6 +63,7 @@ class m150225_140020_importusers extends Migration
         }
         \Yii::info("Inserted " . count($aGrMap) . " to group table");
         echo "Inserted " . count($aGrMap) . " to group table\n";
+        unset($aOldGroup);
         /*
 
 CREATE TABLE `b_user` (
@@ -69,10 +77,17 @@ CREATE TABLE `b_user` (
 ) ENGINE=InnoDB AUTO_INCREMENT=87 DEFAULT CHARSET=utf8;
 
         */
+
+        /* ************************************************************************
+         * import users
+         *
+         */
         $sql = 'Select us.*, ug.*  From b_user us Left OUTER JOIN b_user_group ug On us.ID = ug.USER_ID';
         $aOldUsers = $oldConnection->createCommand($sql)->query();
         $nPrevUid = 0;
         $nPrint = 3;
+        $aUserMap = [];
+
         foreach($aOldUsers As $ad) {
             if( $nPrint-- > 0 ) {
                 \Yii::info('Migrate up to ' . User::tableName() . ' data ' . print_r($ad, true));
@@ -102,6 +117,9 @@ CREATE TABLE `b_user` (
                     \Yii::info("Error insert into user " . print_r($oUser->getErrors(), true) . ' ' . print_r($ad, true) );
                     echo 'Error insert into user : ' . print_r($oUser->getErrors(), true) . "\n";
                 }
+                else {
+                    $aUserMap[$ad['ID']] = $oUser->us_id;
+                }
             }
             if( !isset($aGrMap[$ad['GROUP_ID']]) ) {
                 \Yii::info('Not found group user->group : ' . $ad['GROUP_ID'] . ' : ' . print_r($oUserGr->getErrors(), true) . ' ' . print_r($ad, true) );
@@ -117,6 +135,113 @@ CREATE TABLE `b_user` (
             }
         }
 
+        echo 'import users finished' . "\n";
+
+
+        /* ************************************************************************
+         * import flags
+         *
+         */
+        $sql = 'Select ID, VALUE, SORT From b_iblock_property_enum';
+        $aOldFlags = $oldConnection->createCommand($sql)->queryAll();
+        $aFlagsMap = [];
+        foreach($aOldFlags As $ad) {
+            $oFlag = new Msgflags();
+            $oFlag->attributes = [
+                'fl_name' => $ad['VALUE'],
+                'fl_sort' => $ad['SORT'],
+            ];
+            if( !$oFlag->save() ) {
+                \Yii::info("Error insert into flags " . print_r($oFlag->getErrors(), true) . ' ' . print_r($ad, true) );
+                echo 'Error insert into flags : ' . print_r($oFlag->getErrors(), true) . "\n";
+            }
+            else {
+                $aFlagsMap[$ad['ID']] = $oFlag->fl_id;
+            }
+        }
+        unset($aOldFlags);
+        echo 'import flags finished' . "\n";
+
+        /* ************************************************************************
+         * import messages
+         *
+         */
+        $sql = 'Select m.ID As MSGID, m.*, p.*, a.*, a.VALUE As dopuser '
+              . 'From b_iblock_element_prop_s52 p, b_iblock_element m '
+              . 'Left Outer Join b_iblock_element_prop_m52 a On a.IBLOCK_ELEMENT_ID = m.ID '
+              . 'Where p.IBLOCK_ELEMENT_ID = m.ID';
+
+        $aMsg = $oldConnection->createCommand($sql)->query();
+        $nCount = $aMsg->count();
+        echo 'message get ' . $nCount . " records\n";
+        $nPrevMsg = 0;
+        $nPrint = 3;
+        $n = 0;
+        $nNewUser = 0;
+        foreach($aMsg As $ad) {
+            if( empty($ad['PREVIEW_TEXT']) ) {
+                continue;
+            }
+            if( $nPrint-- > 0 ) {
+                \Yii::info('Migrate up to ' . Message::tableName() . ' data ' . print_r($ad, true));
+            }
+            if( $n++ % 500 == 0 ) {
+                echo 'message read ' . $n . '/' . $nCount . " records\n";
+            }
+            if( $nPrevMsg != $ad['MSGID'] ) {
+                if( $nNewUser++ % 500 == 0 ) {
+                    echo 'new message ' . $nNewUser . '/' . $n . " records\n";
+                }
+                $nPrevMsg = $ad['MSGID'];
+                $oMsg = new Message();
+                $oMsg->attributes = [
+                    'msg_id' => $ad['MSGID'],
+                    'msg_createtime' => $ad['DATE_CREATE'],
+                    'msg_active' => $ad['ACTIVE'] == 'Y' ? 1 : 0,
+                    'msg_pers_text' => $ad['PREVIEW_TEXT'],
+                    'msg_answer' => $ad['DETAIL_TEXT'],
+                    'msg_oldcomment' => $ad['TAGS'],
+                    'msg_pers_lastname' => $ad['PROPERTY_194'],
+                    'msg_pers_name' => $ad['PROPERTY_195'],
+                    'msg_pers_secname' => $ad['PROPERTY_196'],
+                    'msg_pers_email' => $ad['PROPERTY_197'],
+                    'msg_pers_phone' => $ad['PROPERTY_198'],
+                    'msg_pers_org' => mb_substr($ad['PROPERTY_199'], 0, 255, 'UTF-8'), // TODO: now text -> substring 255 ??????????
+                    'msg_pers_region' => $ad['PROPERTY_200'],
+                    'msg_flag' => isset($aFlagsMap[$ad['PROPERTY_201']]) ? $aFlagsMap[$ad['PROPERTY_201']] : 0,
+                    'msg_comment' => $ad['PROPERTY_202'],
+                    'msg_empl_id' => empty($ad['PROPERTY_207']) ? $ad['PROPERTY_207'] : $aUserMap[$ad['PROPERTY_207']],
+                    'msg_empl_command' => $ad['PROPERTY_215'],
+                    'msg_empl_remark' => $ad['PROPERTY_216'],
+                ];
+                if( !$oMsg->save() ) {
+                    \Yii::info("Error insert into message " . print_r($oMsg->getErrors(), true) . ' ' . print_r($ad, true) );
+                    echo 'Error insert into message : ' . print_r($oMsg->getErrors(), true) . "\n";
+                }
+                else {
+                    if( !empty($ad['dopuser']) ) {
+                        $oDop = new Msganswers();
+                        $oDop->ma_message_id = $oMsg->msg_id;
+                        $oDop->ma_user_id = $aUserMap[$ad['dopuser']];
+                        if( !$oDop->save() ) {
+                            \Yii::info("Error insert into dopanswer " . print_r($oDop->getErrors(), true) . ' ' . print_r($ad, true) );
+                            echo 'Error insert into dopanswer : ' . print_r($oDop->getErrors(), true) . "\n";
+                        }
+                    }
+                }
+            }
+            else {
+                if( !empty($ad['dopuser']) ) {
+                    $oDop = new Msganswers();
+                    $oDop->ma_message_id = $oMsg->msg_id;
+                    $oDop->ma_user_id = $aUserMap[$ad['dopuser']];
+                    if( !$oDop->save() ) {
+                        \Yii::info("Error insert into dopanswer " . print_r($oDop->getErrors(), true) . ' ' . print_r($ad, true) );
+                        echo 'Error insert into dopanswer : ' . print_r($oDop->getErrors(), true) . "\n";
+                    }
+                }
+            }
+        }
 
     }
 
@@ -124,9 +249,12 @@ CREATE TABLE `b_user` (
     {
 //        echo "m150225_140020_importusers cannot be reverted.\n";
         $a = [
+            Msganswers::tableName(),
+            Usergroup::tableName(),
+            Message::tableName(),
+            Msgflags::tableName(),
             Group::tableName(),
             User::tableName(),
-            Usergroup::tableName(),
         ];
         foreach($a As $v) {
             $nDel = \Yii::$app->db->createCommand('Delete From ' . $v)->execute();
