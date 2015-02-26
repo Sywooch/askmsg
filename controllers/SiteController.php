@@ -10,6 +10,8 @@ use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\SignupForm;
 use app\models\ConfirmEmailForm;
+use app\models\ResetPasswordForm;
+use app\models\PasswordResetRequestForm;
 
 class SiteController extends Controller
 {
@@ -51,7 +53,7 @@ class SiteController extends Controller
 
     public function actionIndex()
     {
-        return $this->render('index');
+        return $this->render('index1');
     }
 
     public function actionLogin()
@@ -121,7 +123,7 @@ class SiteController extends Controller
      * Форма сброса пароля
      *
      */
-    public function actionRequestPasswordReset()
+    public function actionRequestpasswordreset()
     {
         $model = new PasswordResetRequestForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
@@ -145,7 +147,7 @@ class SiteController extends Controller
      *
      *
      */
-    public function actionResetPassword($token)
+    public function actionResetpassword($token)
     {
         try {
             $model = new ResetPasswordForm($token);
