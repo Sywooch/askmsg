@@ -212,7 +212,7 @@ CREATE TABLE `b_iblock_element_prop_m52` (
             'msg_pers_phone' => Schema::TYPE_STRING . ' NOT NULL',
             'msg_pers_org' => Schema::TYPE_TEXT . ' NOT NULL',
             'msg_pers_region' => Schema::TYPE_INTEGER . ' Default NULL',
-            'msg_pers_text' => Schema::TYPE_TEXT . ' NOT NULL Default \'\'',
+            'msg_pers_text' => Schema::TYPE_TEXT . '',
             'ekis_id' => Schema::TYPE_BIGINT . ' Default NULL',
 
             'msg_comment' => Schema::TYPE_TEXT,
