@@ -2,43 +2,43 @@
 
 return [
     [
-        'reg_name' => 'et',
+        'reg_name' => 'id',
         'reg_active' => 1,
     ],
     [
-        'reg_name' => 'in',
+        'reg_name' => 'occaecati',
         'reg_active' => 1,
     ],
     [
-        'reg_name' => 'voluptatem',
+        'reg_name' => 'rerum',
         'reg_active' => 1,
     ],
     [
-        'reg_name' => 'beatae',
+        'reg_name' => 'debitis',
         'reg_active' => 1,
     ],
     [
-        'reg_name' => 'et',
+        'reg_name' => 'ducimus',
         'reg_active' => 1,
     ],
     [
-        'reg_name' => 'ut',
+        'reg_name' => 'maxime',
         'reg_active' => 1,
     ],
     [
-        'reg_name' => 'possimus',
+        'reg_name' => 'porro',
         'reg_active' => 1,
     ],
     [
-        'reg_name' => 'dolorum',
+        'reg_name' => 'aut',
         'reg_active' => 1,
     ],
     [
-        'reg_name' => 'explicabo',
+        'reg_name' => 'quia',
         'reg_active' => 1,
     ],
     [
-        'reg_name' => 'soluta',
+        'reg_name' => 'quia',
         'reg_active' => 1,
     ],
 ];

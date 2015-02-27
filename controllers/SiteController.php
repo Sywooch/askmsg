@@ -13,6 +13,10 @@ use app\models\ConfirmEmailForm;
 use app\models\ResetPasswordForm;
 use app\models\PasswordResetRequestForm;
 
+use app\models\User;
+use app\models\Message;
+use app\models\Regions;
+
 class SiteController extends Controller
 {
     public function behaviors()
@@ -186,6 +190,34 @@ class SiteController extends Controller
         }
 
         return $this->goHome();
+    }
+
+    /*
+     * Вставка фейковых записей
+     *
+     *
+     */
+    public function actionFakedata()
+    {
+        $sDir = \Yii::getAlias('@app') . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR . 'unit' . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR;
+        $a = [
+            User::classname() => 'user.php',
+            Regions::classname() => 'reg.php',
+            Message::classname() => 'msg.php',
+        ];
+        $sOut = '';
+        foreach ($a as $k => $v) {
+            
+            $data = require($sDir . $v);
+            foreach($data As $at) {
+                $o = new $k();
+                $o->attributes = $at;
+                if( !$o->save() ) {
+                    $sOut .= str_replace("\n", "<br />\n", print_r($o->getErrors(), true));
+                }
+            }
+        }
+        return $sOut;
     }
 
 }

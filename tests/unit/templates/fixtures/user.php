@@ -10,8 +10,8 @@ return [
     'us_lastname' => $faker->lastName,
     'us_login' => $faker->word . $index, 
     'us_email' => $faker->freeEmail,
-    'city' => $faker->city,
-    'us_workposition' => $faker->paragraph(8),
+    'us_regtime' => $faker->date . ' ' . $faker->time,
+    'us_workposition' => $faker->sentence(8),
 
     'us_password_hash' => Yii::$app->getSecurity()->generatePasswordHash('' . $index . $index . $index . $index),
     'auth_key' => Yii::$app->getSecurity()->generateRandomString(),
