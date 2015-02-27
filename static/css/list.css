@@ -1,0 +1,51 @@
+.listdata {
+    background-color: #fdf7f7;
+    border-radius: 5px;
+    clear: both;
+    padding: 1.4em;
+    margin: 0.5em;
+}
+
+.listdata .listdate {
+    font-size: 0.9em;
+    color: #999999;
+    float: left;
+}
+
+.listdata .listperson {
+    background-color: antiquewhite;
+    float: left;
+    margin-left: 1.4em;
+    padding-left: 1.4em;
+    padding-right: 1.4em;
+}
+
+.listdata .listtext {
+    background-color: transparent;
+    clear: both;
+    margin: 1.4em;
+    padding: 1.4em;
+}
+
+.listdata .listcommand {
+    background-color: antiquewhite;
+    clear: both;
+    margin: 1.4em;
+    padding: 0.5em 1.4em;
+    border: 1px solid #999999;
+    font-size: 0.8em;
+}
+
+.listdata .listemploee {
+    background-color: antiquewhite;
+    clear: both;
+    margin: 1.4em;
+    padding: 0.5em 1.4em;
+    border: 1px solid #999999;
+    font-size: 0.8em;
+}
+
+.listdata .listemploee span {
+    color: #666666;
+    display: block;
+}

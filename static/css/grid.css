@@ -1,0 +1,9 @@
+.griddate {
+    font-size: 0.9em;
+}
+
+.griddate span {
+    display: block;
+    font-size: 0.9em;
+    color: #999999;
+}

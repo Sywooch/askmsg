@@ -8,7 +8,7 @@ use app\models\Usergroup;
 use app\models\Message;
 use app\models\Msgflags;
 use app\models\Msganswers;
-
+use app\models\Regions;
 
 class m150225_140020_importusers extends Migration
 {
@@ -122,7 +122,7 @@ CREATE TABLE `b_user` (
                 }
             }
             if( !isset($aGrMap[$ad['GROUP_ID']]) ) {
-                \Yii::info('Not found group user->group : ' . $ad['GROUP_ID'] . ' : ' . print_r($oUserGr->getErrors(), true) . ' ' . print_r($ad, true) );
+                \Yii::info('Not found group user->group : ' . $ad['GROUP_ID'] . ' ' . print_r($ad, true) );
                 echo 'Not found group user->group : ' . $ad['GROUP_ID'] . "\n";
                 continue;
             }
@@ -137,6 +137,29 @@ CREATE TABLE `b_user` (
 
         echo 'import users finished' . "\n";
 
+        /* ************************************************************************
+         * import regions
+         *
+         */
+        $sql = 'Select ID, NAME, ACTIVE From b_iblock_region Order By SORT';
+        $aOldReg = $oldConnection->createCommand($sql)->queryAll();
+        $aGegMap = [];
+        foreach($aOldReg As $ad) {
+            $oReg = new Regions();
+            $oReg->attributes = [
+                'reg_name' => $ad['NAME'],
+                'reg_active' => $ad['ACTIVE'] == 'Y' ? 1 : 0,
+            ];
+            if( !$oReg->save() ) {
+                \Yii::info("Error insert into regions " . print_r($oReg->getErrors(), true) . ' ' . print_r($ad, true) );
+                echo 'Error insert into regions : ' . print_r($oReg->getErrors(), true) . "\n";
+            }
+            else {
+                $aGegMap[$ad['ID']] = $oReg->reg_id;
+            }
+        }
+        unset($aOldReg);
+        echo 'import regions finished' . "\n";
 
         /* ************************************************************************
          * import flags
@@ -186,14 +209,23 @@ CREATE TABLE `b_user` (
                 \Yii::info('Migrate up to ' . Message::tableName() . ' data ' . print_r($ad, true));
             }
             if( $n++ % 500 == 0 ) {
-                echo 'message read ' . $n . '/' . $nCount . " records\n";
+                echo date('H:i:s') . ' message read ' . $n . '/' . $nCount . " records\n";
             }
             if( $nPrevMsg != $ad['MSGID'] ) {
                 if( $nNewUser++ % 500 == 0 ) {
-                    echo 'new message ' . $nNewUser . '/' . $n . " records\n";
+                    echo date('H:i:s') . ' new message ' . $nNewUser . '/' . $n . " records\n";
                 }
                 $nPrevMsg = $ad['MSGID'];
                 $oMsg = new Message();
+                $oMsg->scenario = 'import';
+
+                if( isset($aGegMap[$ad['PROPERTY_200']]) ) {
+                    $ad['PROPERTY_200'] = $aGegMap[$ad['PROPERTY_200']];
+                }
+                else {
+                    echo 'Not found region : ' . $ad['PROPERTY_200'] . " [{$ad['MSGID']}]\n";
+                }
+
                 $oMsg->attributes = [
                     'msg_id' => $ad['MSGID'],
                     'msg_createtime' => $ad['DATE_CREATE'],
@@ -203,7 +235,7 @@ CREATE TABLE `b_user` (
                     'msg_oldcomment' => $ad['TAGS'],
                     'msg_pers_lastname' => $ad['PROPERTY_194'],
                     'msg_pers_name' => $ad['PROPERTY_195'],
-                    'msg_pers_secname' => $ad['PROPERTY_196'],
+                    'msg_pers_secname' => ($ad['PROPERTY_196'] === null) ? '' : $ad['PROPERTY_196'],
                     'msg_pers_email' => $ad['PROPERTY_197'],
                     'msg_pers_phone' => $ad['PROPERTY_198'],
                     'msg_pers_org' => mb_substr($ad['PROPERTY_199'], 0, 255, 'UTF-8'), // TODO: now text -> substring 255 ??????????

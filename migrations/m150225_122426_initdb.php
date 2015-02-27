@@ -203,10 +203,10 @@ CREATE TABLE `b_iblock_element_prop_m52` (
         // create message table
         $this->createTable('{{%message}}', [
             'msg_id' => Schema::TYPE_PK,
-            'msg_createtime' => Schema::TYPE_DATETIME . ' NOT NULL',
+            'msg_createtime' => Schema::TYPE_DATETIME . '',
             'msg_active' => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 0',
             'msg_pers_name' => Schema::TYPE_STRING . ' NOT NULL',
-            'msg_pers_secname' => Schema::TYPE_STRING . ' NOT NULL',
+            'msg_pers_secname' => Schema::TYPE_STRING . '',
             'msg_pers_lastname' => Schema::TYPE_STRING . ' NOT NULL',
             'msg_pers_email' => Schema::TYPE_STRING . ' NOT NULL',
             'msg_pers_phone' => Schema::TYPE_STRING . ' NOT NULL',
@@ -326,6 +326,13 @@ CREATE TABLE `b_iblock_element_prop_s52` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
  */
+
+        // create regions table
+        $this->createTable('{{%regions}}', [
+            'reg_id' => Schema::TYPE_PK,
+            'reg_name' => Schema::TYPE_STRING . ' NOT NULL',  // ---------------------> NAME
+            'reg_active' => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 0', // ---------------------> ACTIVE Y = 1, N = 0
+        ], $tableOptions);
     }
 
     public function down()
@@ -337,6 +344,7 @@ CREATE TABLE `b_iblock_element_prop_s52` (
         $this->dropTable('{{%msgflags}}');
         $this->dropTable('{{%msganswers}}');
         $this->dropTable('{{%message}}');
+        $this->dropTable('{{%regions}}');
 
         return true;
     }

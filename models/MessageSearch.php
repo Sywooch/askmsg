@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\Message;
+use app\models\Regions;
 
 /**
  * MessageSearch represents the model behind the search form about `app\models\Message`.
@@ -41,11 +42,28 @@ class MessageSearch extends Message
      */
     public function search($params)
     {
-        $query = Message::find()->with('employee');
+        $query = Message::find()
+            ->with('region');
+//            ->with('employee');
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort'=> [
+                'defaultOrder' => [
+                    'msg_createtime'=>SORT_DESC
+                ]
+            ]
         ]);
+
+/*
+//        $query = Message::find()->leftJoin(['employee' => function($query) { $query->from(['us' => User::tableName()]); }], 'us.us_id = msg_empl_id');
+//            ->leftJoin(User::tableName() . ' us', 'us.us_id = msg_empl_id')
+//            ->leftJoin(Regions::tableName() . ' reg', 'reg.reg_id = msg_pers_region')
+         $dataProvider->sort->attributes['tags'] = [
+            'asc' => ['reg.reg_name' => SORT_ASC],
+            'desc' => ['reg.reg_name' => SORT_DESC],
+        ];
+*/
 
         $this->load($params);
 

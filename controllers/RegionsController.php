@@ -3,19 +3,17 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\Message;
-use app\models\MessageSearch;
+use app\models\Regions;
+use app\models\RegionsSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * MessageController implements the CRUD actions for Message model.
+ * RegionsController implements the CRUD actions for Regions model.
  */
-class MessageController extends Controller
+class RegionsController extends Controller
 {
-    public $defaultAction = 'update';
-
     public function behaviors()
     {
         return [
@@ -29,12 +27,12 @@ class MessageController extends Controller
     }
 
     /**
-     * Lists all Message models.
+     * Lists all Regions models.
      * @return mixed
      */
-    public function actionAdmin()
+    public function actionIndex()
     {
-        $searchModel = new MessageSearch();
+        $searchModel = new RegionsSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -44,31 +42,7 @@ class MessageController extends Controller
     }
 
     /**
-     * Lists all Message models for users.
-     * @return mixed
-     */
-    public function actionIndex()
-    {
-        return $this->redirect(['update']);
-    }
-
-    /**
-     * Lists all Message models for users.
-     * @return mixed
-     */
-    public function actionList()
-    {
-        $searchModel = new MessageSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('list', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
-
-    /**
-     * Displays a single Message model.
+     * Displays a single Regions model.
      * @param integer $id
      * @return mixed
      */
@@ -80,17 +54,16 @@ class MessageController extends Controller
     }
 
     /**
-     * Creates a new Message model.
+     * Creates a new Regions model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Message();
-        $model->scenario = 'person';
+        $model = new Regions();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->msg_id]);
+            return $this->redirect(['view', 'id' => $model->reg_id]);
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -99,33 +72,26 @@ class MessageController extends Controller
     }
 
     /**
-     * Updates an existing Message model.
+     * Updates an existing Regions model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
      */
-    public function actionUpdate($id = 0)
+    public function actionUpdate($id)
     {
-        if( $id == 0 ) {
-            $model = new Message();
-            $model->scenario = 'person';
-        }
-        else {
-            $model = $this->findModel($id);
-            $model->scenario = 'answer';
-        }
+        $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->msg_id]);
+            return $this->redirect(['view', 'id' => $model->reg_id]);
         } else {
-            return $this->render('create', [
+            return $this->render('update', [
                 'model' => $model,
             ]);
         }
     }
 
     /**
-     * Deletes an existing Message model.
+     * Deletes an existing Regions model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -138,15 +104,15 @@ class MessageController extends Controller
     }
 
     /**
-     * Finds the Message model based on its primary key value.
+     * Finds the Regions model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Message the loaded model
+     * @return Regions the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Message::findOne($id)) !== null) {
+        if (($model = Regions::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

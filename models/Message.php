@@ -3,6 +3,10 @@
 namespace app\models;
 
 use Yii;
+use app\models\User;
+use app\models\Regions;
+use yii\db\Expression;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "{{%message}}".
@@ -26,12 +30,24 @@ use Yii;
  * @property string $msg_answertime
  * @property string $msg_oldcomment
  * @property integer $msg_flag
+ *
+ *
+ * @property string $employer
+ * @property string $asker
+ * @property string $askid
+ * @property string $askcontacts
+ * @property string $tags
+ *
  */
 class Message extends \yii\db\ActiveRecord
 {
     public $employer; // Ответчик
     public $asker; // Проситель
     public $askid; // Номер и дата
+    public $askcontacts; // Email и телефон
+    public $tags; // округ, контакты
+
+    public $_oldAttributes = [];
 
     /**
      * @inheritdoc
@@ -44,20 +60,54 @@ class Message extends \yii\db\ActiveRecord
     /**
      * @inheritdoc
      */
+    public function behaviors(){
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'createdAtAttribute' => 'msg_createtime',
+                'updatedAtAttribute' => null,
+                'value' => new Expression('NOW()'),
+            ],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
         return [
-            // , 'msg_pers_org'
             // , 'ekis_is'
-            // , 'msg_pers_secname'
-            [['msg_createtime', 'msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text'], 'required'],
+            [['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_org', 'msg_pers_region'], 'required'],
+            [['msg_answer'], 'required'],
+            [['msg_pers_secname'], 'required', 'on'=>['answer', 'person', 'moderator']],
             [['msg_createtime', 'msg_answertime'], 'safe'],
             [['msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag'], 'integer'],
             [['msg_pers_text', 'msg_answer', 'msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_pers_org'], 'string'],
             [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_oldcomment'], 'string', 'max' => 255],
 
-            [['employer', 'asker'], 'string', 'max' => 255],
+            [['employer', 'asker', 'askid', 'askcontacts', 'tags'], 'string', 'max' => 255],
         ];
+    }
+
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios['person'] = ['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_secname', 'msg_pers_org', 'msg_pers_region'];
+        $scenarios['answer'] = ['msg_answer'];
+        $scenarios['moderator'] = ['msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_empl_id', 'msg_flag', 'msg_active'];
+
+        return $scenarios;
+    }
+
+    public function getScenariosData()
+    { // TODO: отправить это все к конфиг
+        $a = [
+            'person' => ['title' => 'Создать обращение', 'form' => '_form'],
+            'answer' => ['title' => 'Написать ответ', 'form' => '_formanswer'],
+            'moderator' => ['title' => 'Направить обращение', 'form' => '_formmoderator'],
+        ];
+        return isset($a[$this->scenario]) ? $a[$this->scenario] : $a['person'];
     }
 
     /**
@@ -68,7 +118,7 @@ class Message extends \yii\db\ActiveRecord
         return [
             'msg_id' => 'ID',
             'msg_createtime' => 'Создано',
-            'msg_active' => 'Активно',
+            'msg_active' => 'Видимо',
             'msg_pers_name' => 'Имя',
             'msg_pers_secname' => 'Отчество',
             'msg_pers_lastname' => 'Фамилия',
@@ -89,6 +139,8 @@ class Message extends \yii\db\ActiveRecord
             'employer' => 'Ответчик',
             'asker' => 'Проситель',
             'askid' => 'Номер и дата',
+            'askcontacts' => 'Контакты',
+            'tags' => 'Теги',
         ];
     }
 
@@ -99,5 +151,15 @@ class Message extends \yii\db\ActiveRecord
     public function getEmployee() {
         return $this->hasOne(User::className(), ['us_id' => 'msg_empl_id']);
     }
+
+    /*
+     * Отношения к Региону
+     *
+     */
+    public function getRegion() {
+        return $this->hasOne(Regions::className(), ['reg_id' => 'msg_pers_region']);
+    }
+
+
 
 }

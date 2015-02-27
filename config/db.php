@@ -7,4 +7,6 @@ return [
     'password' => 'host04pass',
     'charset' => 'utf8',
     'tablePrefix' => 'educom_',
+    'enableSchemaCache' => true,
+    'schemaCacheDuration' => 3600,
 ];

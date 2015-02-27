@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use app\assets\GriddataAsset;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\MessageSearch */
@@ -9,6 +10,8 @@ use yii\grid\GridView;
 
 $this->title = 'Messages';
 $this->params['breadcrumbs'][] = $this->title;
+
+GriddataAsset::register($this);
 
 /*
      <p>
@@ -38,8 +41,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 'class' => 'yii\grid\DataColumn',
                 'attribute' => 'askid',
                 'content' => function ($model, $key, $index, $column) {
-                    return '№' . $model->msg_id . "<br />" . date('d.m.Y H:i:s', strtotime($model->msg_createtime));
+                    return '№ ' . $model->msg_id . '<span>' . date('d.m.Y H:i:s', strtotime($model->msg_createtime)) . '</span>';
                 },
+                'contentOptions' => [
+                    'class' => 'griddate',
+                ],
             ],
             [
                 'class' => 'yii\grid\DataColumn',
@@ -47,6 +53,26 @@ $this->params['breadcrumbs'][] = $this->title;
                 'content' => function ($model, $key, $index, $column) {
                     return Html::encode($model->msg_pers_lastname . ' ' . $model->msg_pers_name . ' ' . $model->msg_pers_secname );
                 },
+            ],
+            [
+                'class' => 'yii\grid\DataColumn',
+                'attribute' => 'askcontacts',
+                'content' => function ($model, $key, $index, $column) {
+                    return Html::encode($model->msg_pers_email) . '<span>' . $model->msg_pers_phone . '</span>';
+                },
+                'contentOptions' => [
+                    'class' => 'griddate',
+                ],
+            ],
+            [
+                'class' => 'yii\grid\DataColumn',
+                'attribute' => 'tags',
+                'content' => function ($model, $key, $index, $column) {
+                    return Html::encode($model->region->reg_name) . '<span>' . Html::encode($model->msg_oldcomment) . '</span>';
+                },
+                'contentOptions' => [
+                    'class' => 'griddate',
+                ],
             ],
             // 'msg_pers_email:email',
             // 'msg_pers_phone',
