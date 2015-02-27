@@ -3,12 +3,14 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use app\assets\GriddataAsset;
+use yii\bootstrap\Modal;
+use yii\web\View;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\MessageSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Messages';
+$this->title = 'Обращения';
 $this->params['breadcrumbs'][] = $this->title;
 
 GriddataAsset::register($this);
@@ -31,12 +33,6 @@ GriddataAsset::register($this);
         'filterModel' => $searchModel,
         'columns' => [
 //            ['class' => 'yii\grid\SerialColumn'],
-            // 'msg_id',
-            // 'msg_createtime',
-//            'msg_active',
-            // 'msg_pers_name',
-            // 'msg_pers_secname',
-//            'msg_pers_lastname',
             [
                 'class' => 'yii\grid\DataColumn',
                 'attribute' => 'askid',
@@ -97,8 +93,42 @@ GriddataAsset::register($this);
             // 'msg_oldcomment',
             // 'msg_flag',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+/*
+                'template'=>'{view} {delete}',
+                'buttons'=>[
+                    'view'=>function ($url, $model) {
+                        return Html::a( '<span class="glyphicon glyphicon-eye-open"></span>', $url,
+                            ['title' => 'Обращение № ' . $model->msg_id, 'class'=>'showinmodal']); // , 'data-pjax' => '0'
+//                            ['title' => Yii::t('yii', 'View'), 'class'=>'showinmodal']); // , 'data-pjax' => '0'
+                    }
+                ],
+*/
+            ],
         ],
     ]); ?>
+    <?php
+        // Окно для обращения
+    Modal::begin([
+        'header' => 'Обращение',
+        'id' => 'messagedata',
+    ]);
+    Modal::end();
+
+        $sJs =  <<<EOT
+console.log("Shownmodal: " + jQuery('.showinmodal').length);
+jQuery('.showinmodal').on("click", function (event){
+    event.preventDefault();
+
+    jQuery('#messagedata')
+        .modal('show')
+        .find('#modalContent')
+        .load($(this).attr('href'));
+    return false;
+});
+EOT;
+        $this->registerJs($sJs, View::POS_READY, 'showmodalmessage');
+    ?>
 
 </div>
