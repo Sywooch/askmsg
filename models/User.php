@@ -6,6 +6,7 @@ use Yii;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 use yii\helpers\ArrayHelper;
+use yii\base\NotSupportedException;
 use app\models\Group;
 
 /**
@@ -142,7 +143,10 @@ class User extends ActiveRecord  implements IdentityInterface
     public static function findIdentity($id)
     {
         if( static::$_model == null ) {
-            static::$_model = static::findOne(['us_id' => $id, 'us_active' => self::STATUS_ACTIVE]);
+//            static::$_model = static::findOne(['us_id' => $id, 'us_active' => self::STATUS_ACTIVE]);
+            static::$_model = static::find(['us_id' => $id, 'us_active' => self::STATUS_ACTIVE])
+                ->with('permissions')
+                ->one();
         }
         return static::$_model;
     }
