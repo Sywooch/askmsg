@@ -14,7 +14,7 @@ use yii\filters\VerbFilter;
  */
 class MessageController extends Controller
 {
-    public $defaultAction = 'update';
+    public $defaultAction = 'create';
 
     public function behaviors()
     {
@@ -86,6 +86,9 @@ class MessageController extends Controller
      */
     public function actionCreate()
     {
+        return $this->actionUpdate(0);
+/*
+
         $model = new Message();
         $model->scenario = 'person';
 
@@ -96,6 +99,7 @@ class MessageController extends Controller
                 'model' => $model,
             ]);
         }
+ */
     }
 
     /**
@@ -116,7 +120,17 @@ class MessageController extends Controller
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->msg_id]);
+            if( $model->scenario == 'person' ) {
+                return $this->render(
+                        'thankyou',
+                        [
+                            'model' => $model,
+                        ]
+                    );
+            }
+            else {
+                return $this->redirect(['admin']);
+            }
         } else {
             return $this->render('create', [
                 'model' => $model,
