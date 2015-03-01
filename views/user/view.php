@@ -2,12 +2,14 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\User */
 
-$this->title = $model->us_id;
-$this->params['breadcrumbs'][] = ['label' => 'Users', 'url' => ['index']];
+$sTitle = $model->us_lastname . ' ' .$model->us_name;
+$this->title = $sTitle;
+$this->params['breadcrumbs'][] = ['label' => 'Пользователи', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="user-view">
@@ -15,11 +17,11 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->us_id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->us_id], [
+        <?= Html::a('Изменить', ['update', 'id' => $model->us_id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Удалить', ['delete', 'id' => $model->us_id], [
             'class' => 'btn btn-danger',
             'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
+                'confirm' => 'Вы уверены, что хотите удалить пользователя?',
                 'method' => 'post',
             ],
         ]) ?>
@@ -29,11 +31,26 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'us_id',
-            'us_xtime',
+//            'us_xtime',
             'us_login',
-            'us_password_hash',
-            'us_chekword_hash',
-            'us_active',
+//            'us_password_hash',
+//            'us_chekword_hash',
+            [
+                'attribute' => 'us_active',
+                'value' => $model->us_active ? 'Да' : 'Нет',
+            ],
+            [
+                'attribute' => 'selectedGroups',
+                'value' => implode(
+                    ', ',
+                    ArrayHelper::getColumn(
+                        $model->permissions,
+                        'group_name'
+                    )
+                ),
+
+            ],
+//            'us_active',
             'us_name',
             'us_secondname',
             'us_lastname',
@@ -41,10 +58,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'us_logintime',
             'us_regtime',
             'us_workposition',
-            'us_checkwordtime',
-            'auth_key',
-            'email_confirm_token:email',
-            'password_reset_token',
+//            'us_checkwordtime',
+//            'auth_key',
+//            'email_confirm_token:email',
+//            'password_reset_token',
         ],
     ]) ?>
 

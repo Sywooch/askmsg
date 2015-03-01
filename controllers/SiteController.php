@@ -194,8 +194,10 @@ class SiteController extends Controller
 
     /*
      * Вставка фейковых записей
-     *
-     *
+     * сначала генерим фикстуры php yii fixture/generate-all --count=10
+     * потом выполняем этот экшен, чтобы получить тестовые данные
+     * https://github.com/fzaninotto/Faker - полный список вариантов
+     * https://github.com/yiisoft/yii2/tree/master/extensions/faker - как в yii запускать
      */
     public function actionFakedata()
     {

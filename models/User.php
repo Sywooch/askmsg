@@ -5,6 +5,8 @@ namespace app\models;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
+use yii\helpers\ArrayHelper;
+use app\models\Group;
 
 /**
  * This is the model class for table "{{%user}}".
@@ -33,6 +35,9 @@ class User extends ActiveRecord  implements IdentityInterface
     const STATUS_WAIT = 0;
     const STATUS_ACTIVE = 1;
 
+    public static $_model = null;
+    public $selectedGroups = null;
+
     /**
      * @inheritdoc
      */
@@ -46,13 +51,28 @@ class User extends ActiveRecord  implements IdentityInterface
      */
     public function rules()
     {
+        \Yii::info("rules: " . print_r(array_keys(Group::getActiveGroups()), true));
         return [
             [['us_xtime', 'us_logintime', 'us_regtime', 'us_checkwordtime'], 'safe'],
-            [['us_login', 'us_password_hash', 'us_name', 'us_email', 'us_regtime'], 'required'],
+            [['us_login', 'us_password_hash', 'us_name', 'us_email', 'us_password_hash', 'selectedGroups'], 'required'],
             [['us_active'], 'integer'],
+            [['selectedGroups'], 'in', 'range' => array_keys(Group::getActiveGroups()), 'allowArray' => true ],
             [['us_login', 'us_password_hash', 'us_chekword_hash', 'us_name', 'us_secondname', 'us_lastname', 'us_email', 'us_workposition', 'email_confirm_token', 'password_reset_token'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32]
         ];
+    }
+
+    /**
+     * Поля для проверки в разных сценариях
+     * @return array
+     */
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios['create'] = ['us_login', 'us_name', 'us_secondname', 'us_lastname', 'us_email', 'us_workposition',
+                                'us_active', 'selectedGroups'];
+        $scenarios['update'] = array_merge($scenarios['create'], []);
+        return $scenarios;
     }
 
     /**
@@ -66,7 +86,7 @@ class User extends ActiveRecord  implements IdentityInterface
             'us_login' => 'Логин',
             'us_password_hash' => 'Password Hash',
             'us_chekword_hash' => 'Chekword Hash',
-            'us_active' => 'Астивен',
+            'us_active' => 'Активен',
             'us_name' => 'Имя',
             'us_secondname' => 'Отчество',
             'us_lastname' => 'Фамилия',
@@ -78,7 +98,42 @@ class User extends ActiveRecord  implements IdentityInterface
             'auth_key' => 'Auth Key',
             'email_confirm_token' => 'Email Confirm Token',
             'password_reset_token' => 'Password Reset Token',
+
+            'selectedGroups' => 'Группы',
         ];
+    }
+
+    /**
+     *
+     */
+    public function getUsergroup() {
+        return $this->hasMany(
+                Usergroup::className(),
+                ['usgr_uid' => 'us_id']
+            );
+    }
+
+    /**
+     *
+     */
+    public function getPermissions() {
+//        return $this->hasMany(Answer::className(), ['id' => 'answer_id'])
+//            ->via('questionAnswers'); // Имя связи которая объявлена выше
+        return $this
+            ->hasMany(
+                Group::className(),
+                ['group_id' => 'usgr_gid'])
+            ->via('usergroup');
+    }
+
+    /**
+     *
+     */
+    public function getArrayGroups() {
+        if( $this->selectedGroups === null ) {
+            $this->selectedGroups = ArrayHelper::getColumn($this->usergroup, 'usgr_gid');
+        }
+        return $this->selectedGroups;
     }
 
     /**
@@ -86,7 +141,10 @@ class User extends ActiveRecord  implements IdentityInterface
      */
     public static function findIdentity($id)
     {
-        return static::findOne(['us_id' => $id, 'us_active' => self::STATUS_ACTIVE]);
+        if( static::$_model == null ) {
+            static::$_model = static::findOne(['us_id' => $id, 'us_active' => self::STATUS_ACTIVE]);
+        }
+        return static::$_model;
     }
 
     /**

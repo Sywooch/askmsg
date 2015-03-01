@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%group}}".
@@ -14,6 +15,7 @@ use Yii;
  */
 class Group extends \yii\db\ActiveRecord
 {
+    public static $_activeGroups = null;
     /**
      * @inheritdoc
      */
@@ -40,10 +42,50 @@ class Group extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'group_id' => 'Group ID',
-            'group_active' => 'Group Active',
-            'group_name' => 'Group Name',
-            'group_description' => 'Group Description',
+            'group_id' => 'ID',
+            'group_active' => 'активно',
+            'group_name' => 'Название',
+            'group_description' => 'Описание',
         ];
+    }
+
+    /**
+     *
+     */
+    public static function setActiveGroups() {
+        if( self::$_activeGroups === null ) {
+            self::$_activeGroups = Group::find()
+                 ->where(['group_active'=>1])
+                 ->orderBy(['group_name' => SORT_ASC])
+                 ->all();
+        }
+    }
+
+    /**
+     *
+     */
+    public static function getActiveGroups() {
+        self::setActiveGroups();
+        return ArrayHelper::map(
+                self::$_activeGroups,
+                'group_id',
+                'group_name'
+            );
+    }
+
+    /**
+     * @param $id
+     * @return array
+     */
+    public static function getGroupById($id) {
+        self::setActiveGroups();
+
+        foreach(self::$_activeGroups As $ob) {
+            if( $ob->group_id == $id ) {
+                return $ob;
+            }
+        }
+
+        return null;
     }
 }

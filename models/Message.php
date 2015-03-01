@@ -91,6 +91,10 @@ class Message extends \yii\db\ActiveRecord
         ];
     }
 
+    /**
+     * Поля для проверки в разных сценариях
+     * @return array
+     */
     public function scenarios()
     {
         $scenarios = parent::scenarios();

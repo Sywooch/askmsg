@@ -4,7 +4,8 @@ namespace app\controllers;
 
 use Yii;
 use app\models\User;
-use yii\data\ActiveDataProvider;
+use app\models\UserSearch;
+use app\models\Group;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -32,11 +33,11 @@ class UserController extends Controller
      */
     public function actionIndex()
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => User::find(),
-        ]);
+        $searchModel = new UserSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
+            'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
     }
@@ -61,6 +62,7 @@ class UserController extends Controller
     public function actionCreate()
     {
         $model = new User();
+        $model->scenario = 'create';
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->us_id]);
@@ -80,14 +82,31 @@ class UserController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $model->scenario = 'update';
+        $model->getArrayGroups();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->us_id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+            $model->unlinkAll('permissions', true);
+            Yii::info('model->selectedGroups = ' . print_r($model->selectedGroups, true));
+            foreach($model->selectedGroups As $gid) {
+                $oGroup = Group::getGroupById($gid);
+                if( $oGroup !== null ) {
+                    $model->link('permissions', $oGroup);
+                    Yii::info('Add group ' . $gid);
+                }
+                else {
+                    Yii::info("No group: {$gid}");
+                }
+            }
+//            return $this->redirect(['view', 'id' => $model->us_id]);
         }
+
+        return $this->render(
+            'update',
+            [
+                'model' => $model,
+            ]
+        );
     }
 
     /**
