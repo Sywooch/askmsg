@@ -5,6 +5,7 @@ use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 use app\components\widgets\Alert;
+use app\models\Rolesimport;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
@@ -25,7 +26,31 @@ AppAsset::register($this);
 
 <?php $this->beginBody() ?>
     <div class="wrap">
-        <?php
+<?php
+
+$isAdmin = \Yii::$app->user->can(Rolesimport::ROLE_ADMIN);
+$isModerate = \Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM);
+$isAnswer = \Yii::$app->user->can(Rolesimport::ROLE_ANSWER_DOGM);
+
+$aMenuItems = [
+    ['label' => 'Начало', 'url' => '/'],
+];
+
+if( $isAdmin || $isModerate ) {
+    $aMenuItems[] = ['label' => 'Модерировать', 'url' => ['message/moderatelist']];
+}
+
+if( $isAnswer || $isModerate ) {
+    $aMenuItems[] = ['label' => 'Отвечать', 'url' => ['message/answerlist']];
+}
+
+$aMenuItems[] = Yii::$app->user->isGuest ?
+    ['label' => 'Вход', 'url' => ['/site/login']] :
+    ['label' => 'Выход (' . Yii::$app->user->identity->us_login . ')',
+        'url' => ['/site/logout'],
+        'linkOptions' => ['data-method' => 'post']
+    ];
+
             NavBar::begin([
                 'brandLabel' => 'Вопросы/ответы',
                 'brandUrl' => Yii::$app->homeUrl,
@@ -35,16 +60,7 @@ AppAsset::register($this);
             ]);
             echo Nav::widget([
                 'options' => ['class' => 'navbar-nav navbar-right'],
-                'items' => [
-                    ['label' => 'Начало', 'url' => '/'],
-//                    ['label' => 'About', 'url' => ['/site/about']],
-                    ['label' => 'Контакт', 'url' => ['/site/contact']],
-                    Yii::$app->user->isGuest ?
-                        ['label' => 'Вход', 'url' => ['/site/login']] :
-                        ['label' => 'Выход (' . Yii::$app->user->identity->us_login . ')',
-                            'url' => ['/site/logout'],
-                            'linkOptions' => ['data-method' => 'post']],
-                ],
+                'items' => $aMenuItems,
             ]);
             NavBar::end();
         ?>

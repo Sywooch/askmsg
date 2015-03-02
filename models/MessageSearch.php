@@ -44,7 +44,6 @@ class MessageSearch extends Message
     {
         $query = Message::find()
             ->with('region');
-//            ->with('employee');
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

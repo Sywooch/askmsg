@@ -9,6 +9,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+use app\models\Rolesimport;
 
 /**
  * MessageController implements the CRUD actions for Message model.
@@ -20,6 +21,26 @@ class MessageController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['list', 'create', 'view'],
+                        'roles' => ['?', '@'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['index', 'update', 'delete', 'moderatelist'],
+                        'roles' => [Rolesimport::ROLE_MODERATE_DOGM],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['answerlist'],
+                        'roles' => [Rolesimport::ROLE_ANSWER_DOGM],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -38,7 +59,7 @@ class MessageController extends Controller
         $searchModel = new MessageSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('index', [
+        return $this->render('admin', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
@@ -50,7 +71,22 @@ class MessageController extends Controller
      */
     public function actionIndex()
     {
-        return $this->redirect(['update']);
+        return $this->actionList();
+    }
+
+    /**
+     * Lists all Message models for
+     * @return mixed
+     */
+    public function actionModeratelist()
+    {
+        $searchModel = new MessageSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('admin', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
     }
 
     /**
@@ -75,6 +111,12 @@ class MessageController extends Controller
      */
     public function actionView($id)
     {
+/*
+
+        if( Yii::$app->request->isAjax ) {
+            $this->layout = null;
+        }
+ */
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
@@ -88,19 +130,6 @@ class MessageController extends Controller
     public function actionCreate()
     {
         return $this->actionUpdate(0);
-/*
-
-        $model = new Message();
-        $model->scenario = 'person';
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->msg_id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
-        }
- */
     }
 
     /**

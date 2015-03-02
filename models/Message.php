@@ -4,7 +4,6 @@ namespace app\models;
 
 use Yii;
 use app\models\User;
-use app\models\Regions;
 use yii\db\Expression;
 use yii\behaviors\TimestampBehavior;
 
@@ -106,7 +105,7 @@ class Message extends \yii\db\ActiveRecord
     }
 
     public function getScenariosData()
-    { // TODO: отправить это все к конфиг
+    { // TODO: отправить это все в конфиг
         $a = [
             'person' => ['title' => 'Создать обращение', 'form' => '_form'],
             'answer' => ['title' => 'Написать ответ', 'form' => '_formanswer'],

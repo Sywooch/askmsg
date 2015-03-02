@@ -131,7 +131,7 @@ class User extends ActiveRecord  implements IdentityInterface
     }
 
     /**
-     *
+     *  Связь с табличкой, соединяющей пользователя и его группы
      */
     public function getUsergroup() {
         return $this->hasMany(
@@ -141,11 +141,9 @@ class User extends ActiveRecord  implements IdentityInterface
     }
 
     /**
-     *
+     *  Связь пользователя и его групп
      */
     public function getPermissions() {
-//        return $this->hasMany(Answer::className(), ['id' => 'answer_id'])
-//            ->via('questionAnswers'); // Имя связи которая объявлена выше
         return $this
             ->hasMany(
                 Group::className(),
@@ -168,9 +166,7 @@ class User extends ActiveRecord  implements IdentityInterface
      */
     public static function findIdentity($id)
     {
-//        Yii::info("findIdentity({$id})");
         if( static::$_model === null ) {
-//            static::$_model = static::findOne(['us_id' => $id, 'us_active' => self::STATUS_ACTIVE]);
             static::$_model = static::find()
                 ->where(['us_id' => $id, 'us_active' => self::STATUS_ACTIVE])
                 ->with('permissions')
@@ -265,7 +261,34 @@ class User extends ActiveRecord  implements IdentityInterface
      */
     public function validatePassword($password)
     {
-        return Yii::$app->security->validatePassword($password, $this->us_password_hash);
+        $bRet = Yii::$app->security->validatePassword($password, $this->us_password_hash);
+        if( !$bRet ) {
+            $bRet = $this->validateOldPassword($password);
+            if( $bRet ) {
+                // Перекодируем пароль новым алгоритмом
+                $this->setPassword($password);
+                $this->generateAuthKey();
+                if( !$this->save() ) {
+                    Yii::error("Can't save new password " . print_r($this->getErrors(), true));
+                }
+            }
+        }
+        return $bRet;
+    }
+
+    /**
+     * Validates old password
+     *     private function bitrix_check_hash($password,$hash){
+     *
+     * @param string $password password to validate
+     * @return boolean if password provided is valid for current user
+     */
+    public function validateOldPassword($password)
+    {
+        $hash = $this->us_password_hash;
+        $salt = substr($hash, 0, 8);
+        $checkToken = $salt . md5($salt . $password);
+        return ($checkToken==$hash);
     }
 
     /**

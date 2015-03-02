@@ -9,6 +9,7 @@ namespace app\components;
 use Yii;
 use app\models\User;
 use yii\rbac\PhpManager;
+use app\models\Rolesimport;
 
 class PhpextManager extends PhpManager {
 
@@ -17,7 +18,6 @@ class PhpextManager extends PhpManager {
      */
     public function checkAccess($userId, $permissionName, $params = []) {
         /** @var User $oUser */
-//        Yii::info("checkAccess({$userId}, {$permissionName}): params = " . print_r($params, true));
 
         $oUser = Yii::$app->user->identity;
         if( $oUser === null && $permissionName !== '?' ) {
@@ -25,7 +25,7 @@ class PhpextManager extends PhpManager {
         }
 
         foreach($oUser->permissions As $ob) {
-            if( $ob->group_id == $permissionName ) {
+            if( $ob->group_id == $permissionName || $ob->group_id == Rolesimport::ROLE_ADMIN ) {
                 return true;
             }
         }
