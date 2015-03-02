@@ -3,11 +3,15 @@
 namespace app\models;
 
 use Yii;
-use yii\db\ActiveRecord;
-use yii\web\IdentityInterface;
-use yii\helpers\ArrayHelper;
 use yii\base\NotSupportedException;
+use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
+use yii\db\Expression;
+use yii\helpers\ArrayHelper;
+use yii\web\IdentityInterface;
+
 use app\models\Group;
+use app\components\PasswordBehavior;
 
 /**
  * This is the model class for table "{{%user}}".
@@ -39,6 +43,27 @@ class User extends ActiveRecord  implements IdentityInterface
     public static $_model = null;
     public $selectedGroups = null;
 
+    public function behaviors()
+    {
+        return [
+            'passwordBehavior' => [
+                'class' => PasswordBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => true,
+                ]
+            ],
+            'timestampBehavior' => [
+                'class' => TimestampBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['us_regtime'],
+                    ActiveRecord::EVENT_BEFORE_UPDATE => [],
+                ],
+                'value' => new Expression('NOW()'),
+            ],
+        ];
+    }
+
+
     /**
      * @inheritdoc
      */
@@ -55,8 +80,9 @@ class User extends ActiveRecord  implements IdentityInterface
         \Yii::info("rules: " . print_r(array_keys(Group::getActiveGroups()), true));
         return [
             [['us_xtime', 'us_logintime', 'us_regtime', 'us_checkwordtime'], 'safe'],
-            [['us_login', 'us_password_hash', 'us_name', 'us_email', 'us_password_hash', 'selectedGroups'], 'required'],
+            [['us_login', 'us_password_hash', 'us_name', 'us_secondname', 'us_lastname', 'us_email', 'us_workposition', 'us_password_hash', 'selectedGroups'], 'required'],
             [['us_active'], 'integer'],
+            [['us_login', 'us_email'], 'unique'],
             [['selectedGroups'], 'in', 'range' => array_keys(Group::getActiveGroups()), 'allowArray' => true ],
             [['us_login', 'us_password_hash', 'us_chekword_hash', 'us_name', 'us_secondname', 'us_lastname', 'us_email', 'us_workposition', 'email_confirm_token', 'password_reset_token'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32]
@@ -142,9 +168,11 @@ class User extends ActiveRecord  implements IdentityInterface
      */
     public static function findIdentity($id)
     {
-        if( static::$_model == null ) {
+//        Yii::info("findIdentity({$id})");
+        if( static::$_model === null ) {
 //            static::$_model = static::findOne(['us_id' => $id, 'us_active' => self::STATUS_ACTIVE]);
-            static::$_model = static::find(['us_id' => $id, 'us_active' => self::STATUS_ACTIVE])
+            static::$_model = static::find()
+                ->where(['us_id' => $id, 'us_active' => self::STATUS_ACTIVE])
                 ->with('permissions')
                 ->one();
         }

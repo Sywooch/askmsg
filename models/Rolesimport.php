@@ -18,6 +18,20 @@ class Rolesimport {
     const ROLE_14 = 13; // Модератор сервиса "Сбор информации"
     const ROLE_15 = 14; // Панель управления
 
+    const ROLE_ADMIN = 1;
+    const ROLE_ALL_USERS = 2;
+    const ROLE_CHANGE_PROFILE = 3;
+    const ROLE_VOTE_RATING = 4;
+    const ROLE_VOTE_AUTORITY = 5;
+    const ROLE_EDITOR = 6;
+    const ROLE_EDITOR_LOWER = 7;
+    const ROLE_EDITOR_LICENSE = 8;
+    const ROLE_SHOW_STRUCT = 9;
+    const ROLE_MODERATE_DOGM = 10;
+    const ROLE_ANSWER_DOGM = 11;
+    const ROLE_EDITOR_SITE = 12;
+    const ROLE_MODERATE_COLLECT_INFO = 13;
+    const ROLE_ADMIN_PANEL = 14;
 
     static $roles = [
         self::ROLE_1 => 'Администраторы',
@@ -37,7 +51,7 @@ class Rolesimport {
     ];
 
     static public function getRoleName($id) {
-        return self:$roles[$id];
+        return self::$roles[$id];
     }
 
 }

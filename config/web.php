@@ -4,6 +4,7 @@ $params = require(__DIR__ . '/params.php');
 
 $config = [
     'id' => 'basic',
+    'name' => 'Обращения в Департамент образования',
     'basePath' => dirname(__DIR__),
     'language' => 'ru',
     'bootstrap' => ['log'],
@@ -20,7 +21,8 @@ $config = [
             'enableAutoLogin' => true,
         ],
         'authManager' => [
-            'class' => 'yii\rbac\PhpManager',
+//            'class' => 'yii\rbac\PhpManager',
+            'class' => 'app\components\PhpextManager',
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',

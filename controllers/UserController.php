@@ -3,21 +3,36 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\User;
-use app\models\UserSearch;
-use app\models\Group;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
+
+use app\models\User;
+use app\models\UserSearch;
+use app\models\Group;
+use app\models\Rolesimport;
 
 /**
  * UserController implements the CRUD actions for User model.
  */
 class UserController extends Controller
 {
+
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+//                'only' => ['index', 'create', 'update', 'delete'],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['index', 'create', 'update', 'delete', 'view'],
+                        'roles' => [Rolesimport::ROLE_ADMIN],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -62,9 +77,18 @@ class UserController extends Controller
     public function actionCreate()
     {
         $model = new User();
+        $model->us_active = User::STATUS_ACTIVE;
         $model->scenario = 'create';
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            $model->unlinkAll('permissions', true);
+            foreach($model->selectedGroups As $gid) {
+                $oGroup = Group::getGroupById($gid);
+                if( $oGroup !== null ) {
+                    $model->link('permissions', $oGroup);
+                    Yii::info('Add group ' . $gid);
+                }
+            }
             return $this->redirect(['view', 'id' => $model->us_id]);
         } else {
             return $this->render('create', [
@@ -87,7 +111,6 @@ class UserController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $model->unlinkAll('permissions', true);
-            Yii::info('model->selectedGroups = ' . print_r($model->selectedGroups, true));
             foreach($model->selectedGroups As $gid) {
                 $oGroup = Group::getGroupById($gid);
                 if( $oGroup !== null ) {

@@ -54,7 +54,7 @@ class m150225_140020_importusers extends Migration
                 . "class Rolesimport {\n\n"
                 . "{$sRoleData}\n\n"
                 . "    static \$roles = [\n{$sRoleArray}    ];\n\n"
-                . "    static public function getRoleName(\$id) {\n        return self:\$roles[\$id];\n    }\n\n"
+                . "    static public function getRoleName(\$id) {\n        return self::\$roles[\$id];\n    }\n\n"
                 . "}\n";
             $sf = \Yii::getAlias('@app') . DIRECTORY_SEPARATOR . 'runtime' . DIRECTORY_SEPARATOR . 'Rolesimport.php';
             $sf1 = \Yii::getAlias('@app') . DIRECTORY_SEPARATOR . 'models' . DIRECTORY_SEPARATOR . 'Rolesimport.php';

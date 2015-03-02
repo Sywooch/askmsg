@@ -41,7 +41,7 @@ AppAsset::register($this);
                     ['label' => 'Контакт', 'url' => ['/site/contact']],
                     Yii::$app->user->isGuest ?
                         ['label' => 'Вход', 'url' => ['/site/login']] :
-                        ['label' => 'Выход (' . Yii::$app->user->identity->us_name . ')',
+                        ['label' => 'Выход (' . Yii::$app->user->identity->us_login . ')',
                             'url' => ['/site/logout'],
                             'linkOptions' => ['data-method' => 'post']],
                 ],

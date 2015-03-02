@@ -8,6 +8,7 @@ use app\models\MessageSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 /**
  * MessageController implements the CRUD actions for Message model.
