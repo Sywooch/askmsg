@@ -2,10 +2,11 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
-use app\assets\GriddataAsset;
 use yii\bootstrap\Modal;
 use yii\web\View;
 
+use app\assets\GriddataAsset;
+use app\assets\ListdataAsset;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\MessageSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -14,7 +15,7 @@ $this->title = 'Обращения';
 $this->params['breadcrumbs'][] = $this->title;
 
 GriddataAsset::register($this);
-
+ListdataAsset::register($this);
 /*
      <p>
         <?= Html::a('Create Message', ['create'], ['class' => 'btn btn-success']) ?>
@@ -119,7 +120,7 @@ GriddataAsset::register($this);
     <?php
         // Окно для обращения
     Modal::begin([
-        'header' => 'Обращение',
+        'header' => '<span></span>',
         'id' => 'messagedata',
     ]);
     Modal::end();
@@ -131,10 +132,12 @@ params[$('meta[name=csrf-param]').prop('content')] = $('meta[name=csrf-token]').
 jQuery('.showinmodal').on("click", function (event){
     event.preventDefault();
 
-    jQuery('#messagedata')
-        .modal('show')
-        .find('.modal-body')
-        .load($(this).attr('href'), params);
+    var ob = jQuery('#messagedata'),
+        oLink = $(this);
+
+    ob.find('.modal-body').load(oLink.attr('href'), params);
+    ob.find('.modal-header span').text(oLink.attr('title'));
+    ob.modal('show');
     return false;
 });
 EOT;
