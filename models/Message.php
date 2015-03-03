@@ -68,6 +68,14 @@ class Message extends \yii\db\ActiveRecord
     {
         // Флаги сообщений для разных пользователей
         $_flagFilter = [
+            Rolesimport::ROLE_GUEST => [
+                Msgflags::MFLG_THANK,
+                Msgflags::MFLG_SHOW_REVIS,
+                Msgflags::MFLG_SHOW_NO_ANSWER,
+                Msgflags::MFLG_SHOW_ANSWER,
+                Msgflags::MFLG_SHOW_INSTR,
+                Msgflags::MFLG_SHOW_NEWANSWER,
+            ],
             Rolesimport::ROLE_MODERATE_DOGM => [
                 Msgflags::MFLG_NEW,
                 Msgflags::MFLG_INT_FIN_INSTR,
@@ -126,6 +134,7 @@ class Message extends \yii\db\ActiveRecord
                     ActiveRecord::EVENT_BEFORE_INSERT => 'msg_flag',
                 ],
                 'value' => function ($event) {
+                    Yii::info('--------------event = ' . print_r($event, true));
                     return Msgflags::MFLG_NEW;
                 },
 
@@ -166,7 +175,7 @@ class Message extends \yii\db\ActiveRecord
                                     $scenarios['person'],
                                     ['msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_empl_id', 'msg_flag', 'msg_active']
         );
-        $scenarios['answer'] = ['msg_answer', 'msg_answertime'];
+        $scenarios['answer'] = ['msg_answer', 'msg_answertime', 'msg_flag'];
 
         return $scenarios;
     }
@@ -200,7 +209,7 @@ class Message extends \yii\db\ActiveRecord
             'msg_pers_text' => 'Обращение',
             'msg_comment' => 'Комментарий',
             'msg_empl_id' => 'Ответчик',
-            'msg_empl_command' => 'Распоряжение ответчику',
+            'msg_empl_command' => 'Поручение ответчику',
             'msg_empl_remark' => 'Замечание ответчику',
             'msg_answer' => 'Ответ',
             'msg_answertime' => 'Дата ответа',
@@ -237,6 +246,13 @@ class Message extends \yii\db\ActiveRecord
      */
     public function getFlag() {
         return $this->hasOne(Msgflags::className(), ['fl_id' => 'msg_flag']);
+    }
+
+    /**
+     *  Полное имя просителя
+     */
+    public function getFullName() {
+        return $this->msg_pers_lastname . ' ' . $this->msg_pers_name . ' ' . $this->msg_pers_secname;
     }
 
 

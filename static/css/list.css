@@ -6,10 +6,14 @@
     margin: 0.5em;
 }
 
-.listdata .listdate {
+.listdata .listdate, .listdata .listregion {
     font-size: 0.9em;
     color: #999999;
     float: left;
+}
+
+.listdata .listregion {
+    float: right;
 }
 
 .listdata .listperson {

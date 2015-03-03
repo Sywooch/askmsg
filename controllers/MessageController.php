@@ -26,12 +26,12 @@ class MessageController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['list', 'create', 'view'],
+                        'actions' => ['index', 'list', 'create', 'view'],
                         'roles' => ['?', '@'],
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['index', 'update', 'delete', 'moderatelist'],
+                        'actions' => ['update', 'delete', 'moderatelist'],
                         'roles' => [Rolesimport::ROLE_MODERATE_DOGM],
                     ],
                     [
@@ -81,6 +81,7 @@ class MessageController extends Controller
     public function actionModeratelist()
     {
         $searchModel = new MessageSearch();
+        $searchModel->msgflags = Message::gerMessageFilters()[Rolesimport::ROLE_MODERATE_DOGM];
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('admin', [
@@ -117,6 +118,7 @@ class MessageController extends Controller
     public function actionList()
     {
         $searchModel = new MessageSearch();
+        $searchModel->msgflags = Message::gerMessageFilters()[Rolesimport::ROLE_GUEST];
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('list', [

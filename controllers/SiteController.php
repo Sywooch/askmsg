@@ -16,6 +16,7 @@ use app\models\PasswordResetRequestForm;
 use app\models\User;
 use app\models\Message;
 use app\models\Regions;
+use app\models\Rolesimport;
 
 class SiteController extends Controller
 {
@@ -68,6 +69,15 @@ class SiteController extends Controller
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
+            if( Yii::$app->user->can(Rolesimport::ROLE_ADMIN) ) {
+                return $this->redirect(['message/admin']);
+            } elseif( Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM) ) {
+                return $this->redirect(['message/moderatelist']);
+            } elseif( Yii::$app->user->can(Rolesimport::ROLE_ANSWER_DOGM) ) {
+                return $this->redirect(['message/answerlist']);
+            } else {
+                return $this->redirect(['message/list']);
+            }
             return $this->goBack();
         } else {
             return $this->render('login', [

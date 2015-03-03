@@ -8,6 +8,7 @@ use yii\web\View;
 use app\assets\GriddataAsset;
 use app\assets\ListdataAsset;
 use app\models\Rolesimport;
+use app\models\Regions;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\MessageSearch */
@@ -39,7 +40,8 @@ ListdataAsset::register($this);
 //            ['class' => 'yii\grid\SerialColumn'],
             [
                 'class' => 'yii\grid\DataColumn',
-                'attribute' => 'askid',
+                'attribute' => 'msg_id',
+                'header' => 'Номер и дата',
                 'content' => function ($model, $key, $index, $column) {
                     return '№ ' . $model->msg_id . '<span>' . date('d.m.Y H:i:s', strtotime($model->msg_createtime)) . '</span>';
                 },
@@ -49,7 +51,8 @@ ListdataAsset::register($this);
             ],
             [
                 'class' => 'yii\grid\DataColumn',
-                'attribute' => 'asker',
+                'attribute' => 'msg_pers_lastname',
+                'header' => 'Проситель',
                 'content' => function ($model, $key, $index, $column) {
                     return Html::encode($model->msg_pers_lastname . ' ' . $model->msg_pers_name . ' ' . $model->msg_pers_secname )
                         . '<span>' . ($model->msg_flag ? $model->flag->fl_name : '--')
@@ -72,7 +75,9 @@ ListdataAsset::register($this);
             ],
             [
                 'class' => 'yii\grid\DataColumn',
-                'attribute' => 'tags',
+                'attribute' => 'msg_pers_region',
+//                'header' => '',
+                'filter' => Regions::getListData(),
                 'content' => function ($model, $key, $index, $column) {
                     return Html::encode($model->region->reg_name) . '<span>' . Html::encode($model->msg_oldcomment) . '</span>';
                 },

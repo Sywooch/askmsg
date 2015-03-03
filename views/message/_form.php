@@ -140,6 +140,15 @@ use kartik\typeahead\Typeahead;
             ?>
         </div>
 
+        <?php if( !empty($model->msg_answer)  ): ?>
+        <div class="col-sm-12 thumbnail">
+            <label for="message-msg_pers_text" class="control-label col-sm-1">Ответ</label>
+            <div style="clear: both;">
+            <?= Html::encode($model->msg_answer) ?>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <div class="col-sm-6">
             <div class="form-group">
                 <label for="message-msg_pers_text" class="control-label col-sm-3">&nbsp;</label>

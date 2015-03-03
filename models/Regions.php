@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%regions}}".
@@ -13,6 +14,7 @@ use Yii;
  */
 class Regions extends \yii\db\ActiveRecord
 {
+    public static $_aListData = null;
     /**
      * @inheritdoc
      */
@@ -44,4 +46,23 @@ class Regions extends \yii\db\ActiveRecord
             'reg_active' => 'Reg Active',
         ];
     }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getListData()
+    {
+        if( self::$_aListData === null ) {
+            self::$_aListData = ArrayHelper::map(
+                self::find()
+                    ->where(['reg_active'=>1])
+                    ->orderBy(['reg_name' => SORT_ASC])
+                    ->all(),
+                'reg_id',
+                'reg_name'
+            );
+        }
+        return self::$_aListData;
+    }
+
 }

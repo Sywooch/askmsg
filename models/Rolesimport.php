@@ -18,6 +18,7 @@ class Rolesimport {
     const ROLE_14 = 13; // Модератор сервиса "Сбор информации"
     const ROLE_15 = 14; // Панель управления
 
+    const ROLE_GUEST = 0;
     const ROLE_ADMIN = 1;
     const ROLE_ALL_USERS = 2;
     const ROLE_CHANGE_PROFILE = 3;

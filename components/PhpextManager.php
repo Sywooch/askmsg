@@ -27,9 +27,10 @@ class PhpextManager extends PhpManager {
         }
 
         foreach($oUser->permissions As $ob) {
+            Yii::info("checkAccess(): [{$ob->group_id} ? = {$permissionName} || " . Rolesimport::ROLE_ADMIN . ']');
             if( ($ob->group_id == $permissionName) || ($ob->group_id == Rolesimport::ROLE_ADMIN) ) {
                 $bRet = true;
-//                Yii::info("checkAccess(): true [{$ob->group_id} ? = {$permissionName} || " . Rolesimport::ROLE_ADMIN . ']');
+                Yii::info("checkAccess(): true [{$ob->group_id} ? = {$permissionName} || " . Rolesimport::ROLE_ADMIN . ']');
                 break;
             }
         }

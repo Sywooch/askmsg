@@ -44,6 +44,29 @@ $aOp = array_reduce(
     ?>
 
 
+    <?php
+    if( strlen($model->msg_empl_command) > 0 ):
+        ?>
+        <div class="alert alert-warning" role="alert"><strong>Поручение:</strong> <?= Html::encode($model->msg_empl_command) ?></div>
+    <?php
+    endif;
+    ?>
+
+    <?php
+    if( strlen($model->msg_comment) > 0 ):
+        ?>
+        <div class="alert alert-warning" role="alert"><strong>Комментарий:</strong> <?= Html::encode($model->msg_comment) ?></div>
+    <?php
+    endif;
+    ?>
+
+    <?php
+    if( strlen($model->msg_empl_remark) > 0 ):
+        ?>
+        <div class="alert alert-danger" role="alert"><strong>Замечание:</strong> <?= Html::encode($model->msg_empl_remark) ?></div>
+    <?php
+    endif;
+    ?>
 
     <?= $form->field(
             $model,
@@ -69,7 +92,7 @@ $aOp = array_reduce(
         <div class="col-sm-6">
             <?php
             foreach($aOp As $k=>$aData):
-                ?>
+            ?>
                 <?= Html::submitButton(
                 'Сохранить и ' . $aData,
                 ['class' => 'btn btn-default changeflag', 'id' => 'buttonsave_' . $k, 'style' => 'margin-bottom: 1em;'])
