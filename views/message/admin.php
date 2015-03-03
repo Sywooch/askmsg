@@ -7,15 +7,18 @@ use yii\web\View;
 
 use app\assets\GriddataAsset;
 use app\assets\ListdataAsset;
+use app\models\Rolesimport;
+
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\MessageSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-
+/* @var $model app\models\Message */
 $this->title = 'Обращения';
 $this->params['breadcrumbs'][] = $this->title;
 
 GriddataAsset::register($this);
 ListdataAsset::register($this);
+
 /*
      <p>
         <?= Html::a('Create Message', ['create'], ['class' => 'btn btn-success']) ?>
@@ -48,8 +51,14 @@ ListdataAsset::register($this);
                 'class' => 'yii\grid\DataColumn',
                 'attribute' => 'asker',
                 'content' => function ($model, $key, $index, $column) {
-                    return Html::encode($model->msg_pers_lastname . ' ' . $model->msg_pers_name . ' ' . $model->msg_pers_secname );
+                    return Html::encode($model->msg_pers_lastname . ' ' . $model->msg_pers_name . ' ' . $model->msg_pers_secname )
+                        . '<span>' . ($model->msg_flag ? $model->flag->fl_name : '--')
+                        . (($model->msg_empl_id !== null) ? Html::encode(' ' . $model->employee->getFullName()) : '')
+                        . '</span>';
                 },
+                'contentOptions' => [
+                    'class' => 'griddate',
+                ],
             ],
             [
                 'class' => 'yii\grid\DataColumn',
@@ -105,12 +114,17 @@ ListdataAsset::register($this);
 //                            ['title' => Yii::t('yii', 'View'), 'class'=>'showinmodal']); // , 'data-pjax' => '0'
                     },
                     'update'=>function ($url, $model) {
-                        return Html::a( '<span class="glyphicon glyphicon-pencil"></span>', $url,
-                            ['title' => 'Изменить Обращение ' . $model->msg_id]);
+                        return Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM) ?
+                            Html::a( '<span class="glyphicon glyphicon-pencil"></span>', $url, ['title' => 'Изменить Обращение ' . $model->msg_id]) :
+                            '';
                    },
                     'answer'=>function ($url, $model) {
-                        return Html::a( '<span class="glyphicon glyphicon-refresh"></span>', $url,
+                        return Yii::$app->user->can(Rolesimport::ROLE_ANSWER_DOGM) ?
+                            Html::a( '<span class="glyphicon glyphicon-refresh"></span>', $url, ['title' => 'Изменить Обращение ' . $model->msg_id]) :
+                            '';
+/*                        return Html::a( '<span class="glyphicon glyphicon-refresh"></span>', $url,
                             ['title' => 'Изменить Обращение ' . $model->msg_id]);
+*/
                     },
                 ],
 

@@ -13,6 +13,7 @@ use app\models\Regions;
  */
 class MessageSearch extends Message
 {
+    public $msgflags = [];
     /**
      * @inheritdoc
      */
@@ -43,7 +44,9 @@ class MessageSearch extends Message
     public function search($params)
     {
         $query = Message::find()
-            ->with('region');
+            ->with('region')
+            ->with('employee')
+            ->with('flag');
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -80,7 +83,7 @@ class MessageSearch extends Message
             'msg_pers_region' => $this->msg_pers_region,
             'msg_empl_id' => $this->msg_empl_id,
             'msg_answertime' => $this->msg_answertime,
-            'msg_flag' => $this->msg_flag,
+            'msg_flag' => $this->msg_flag ? $this->msg_flag : $this->msgflags,
         ]);
 
         $query->andFilterWhere(['like', 'msg_pers_name', $this->msg_pers_name])

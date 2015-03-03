@@ -340,18 +340,18 @@ oButtons.on("click", function(event){
     event.preventDefault();
     var ob = jQuery(this),
         nFlag = parseInt(ob.attr("id").split("_")[1]);
-    console.log("id = " + ob.attr("id").split("_")[1]);
+//    console.log("id = " + ob.attr("id").split("_")[1]);
     oFlag.val(nFlag);
-//    jQuery("#message-form").submit();
+    jQuery("#message-form").submit();
     return true;
 });
 EOT;
 
     // Фильтруем видимость кнопок в зависимости от смены состояния полей замечаний и поручений
     // новая запись: оставляем кнопки с поручениями, если заполнено поручение
-    $nFlagNewMsg = Msgflags::MSGFLAG_NEW;
-    $nFlagInstr = Msgflags::MSGFLAG_SHOW_INSTR;
-    $nFlagInstrInt = Msgflags::MSGFLAG_INT_INSTR;
+    $nFlagNewMsg = Msgflags::MFLG_NEW;
+    $nFlagInstr = Msgflags::MFLG_SHOW_INSTR;
+    $nFlagInstrInt = Msgflags::MFLG_INT_INSTR;
     $sJs .=  <<<EOT
 var filterButtons = function() {
     if( {$nFlagNewMsg} == parseInt(oFlag.val()) ) {

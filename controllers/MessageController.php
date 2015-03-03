@@ -36,7 +36,7 @@ class MessageController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['answerlist'],
+                        'actions' => ['answerlist', 'answer'],
                         'roles' => [Rolesimport::ROLE_ANSWER_DOGM],
                     ],
                 ],
@@ -90,6 +90,27 @@ class MessageController extends Controller
     }
 
     /**
+     * Lists all Message models for
+     * @return mixed
+     */
+    public function actionAnswerlist()
+    {
+
+        $searchModel = new MessageSearch();
+
+        $searchModel->msgflags = Message::gerMessageFilters()[Rolesimport::ROLE_ANSWER_DOGM];
+        $searchModel->msg_empl_id = Yii::$app->user->identity->getId();
+
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+
+        return $this->render('admin', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    /**
      * Lists all Message models for users.
      * @return mixed
      */
@@ -133,6 +154,22 @@ class MessageController extends Controller
     }
 
     /**
+     * Answer
+     * @return mixed
+     */
+    public function actionAnswer($id)
+    {
+        $model = $this->findModel($id);
+        $model->scenario = 'answer';
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['answerlist']);
+        }
+        return $this->render('create', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
      * Updates an existing Message model.
      * If update is successful, the browser will be redirected to the 'view' page.
      *
@@ -150,7 +187,9 @@ class MessageController extends Controller
         else {
             $model = $this->findModel($id);
             $model->scenario = 'moderator';
-            $model->employer = $model->employee->getFullName();
+            if( $model->msg_empl_id !== null ) {
+                $model->employer = $model->employee->getFullName();
+            }
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {

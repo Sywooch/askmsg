@@ -15,18 +15,18 @@ use Yii;
 class Msgflags extends \yii\db\ActiveRecord
 {
 
-    const MSGFLAG_THANK = 1;            //	[110] Благодарности                      ** видимо посетителям
-    const MSGFLAG_INT_INSTR_FIN = 2;    //	[111] Выполненные внутренние поручения
-    const MSGFLAG_INT_NEWANSWER = 3;    //	[108] Внутренние ответы
-    const MSGFLAG_INT_INSTR_REVIS = 4;  //	[109] На доработку в.п.
-    const MSGFLAG_INT_INSTR = 5;        //	[107] Внутренние поручения
-    const MSGFLAG_NOSHOW = 6;           //	[106] Неопубликованные
-    const MSGFLAG_SHOW_REVIS = 7;       //	[104] На доработку                        ** видимо посетителям
-    const MSGFLAG_SHOW_NO_ANSWER = 8;   //	[105] Опубликованные без ответов          ** видимо посетителям
-    const MSGFLAG_SHOW_ANSWER = 9;      //	[103] Опубликованные ответы               ** видимо посетителям
-    const MSGFLAG_NEW = 10;             //	[100] Новые
-    const MSGFLAG_SHOW_INSTR = 11;      //	[101] Поручения                           ** видимо посетителям
-    const MSGFLAG_SHOW_NEWWANSWER = 12; //	[102] Ответы                              ** видимо посетителям
+    const MFLG_THANK = 1;            //	[110] Благодарности                      ** видимо посетителям
+    const MFLG_INT_FIN_INSTR = 2;    //	[111] Выполненные внутренние поручения
+    const MFLG_INT_NEWANSWER = 3;    //	[108] Внутренние ответы
+    const MFLG_INT_REVIS_INSTR = 4;  //	[109] На доработку в.п.
+    const MFLG_INT_INSTR = 5;        //	[107] Внутренние поручения
+    const MFLG_NOSHOW = 6;           //	[106] Неопубликованные
+    const MFLG_SHOW_REVIS = 7;       //	[104] На доработку                        ** видимо посетителям
+    const MFLG_SHOW_NO_ANSWER = 8;   //	[105] Опубликованные без ответов          ** видимо посетителям
+    const MFLG_SHOW_ANSWER = 9;      //	[103] Опубликованные ответы               ** видимо посетителям
+    const MFLG_NEW = 10;             //	[100] Новые
+    const MFLG_SHOW_INSTR = 11;      //	[101] Поручения                           ** видимо посетителям
+    const MFLG_SHOW_NEWANSWER = 12; //	[102] Ответы                              ** видимо посетителям
 
     public static $_aNames = null;
 
@@ -93,16 +93,16 @@ class Msgflags extends \yii\db\ActiveRecord
     public static function getStateTrans($nState = 0)
     {
         $aTrans = [
-            self::MSGFLAG_NEW => [self::MSGFLAG_SHOW_NO_ANSWER, self::MSGFLAG_SHOW_INSTR, self::MSGFLAG_INT_INSTR, self::MSGFLAG_NOSHOW, self::MSGFLAG_THANK, ],
-            self::MSGFLAG_NOSHOW => [self::MSGFLAG_NEW, ],
-            self::MSGFLAG_THANK => [self::MSGFLAG_NEW, ],
-            self::MSGFLAG_SHOW_NO_ANSWER => [self::MSGFLAG_SHOW_INSTR, ],
-            self::MSGFLAG_SHOW_INSTR => [self::MSGFLAG_SHOW_NEWWANSWER, ],
-            self::MSGFLAG_SHOW_NEWWANSWER => [self::MSGFLAG_SHOW_ANSWER, self::MSGFLAG_SHOW_REVIS, ],
-            self::MSGFLAG_SHOW_REVIS => [self::MSGFLAG_SHOW_NEWWANSWER, ],
-            self::MSGFLAG_INT_INSTR => [self::MSGFLAG_INT_NEWANSWER, ],
-            self::MSGFLAG_INT_NEWANSWER => [self::MSGFLAG_INT_INSTR_REVIS, self::MSGFLAG_INT_INSTR_FIN, ],
-            self::MSGFLAG_INT_INSTR_REVIS => [self::MSGFLAG_INT_NEWANSWER],
+            self::MFLG_NEW => [self::MFLG_SHOW_NO_ANSWER, self::MFLG_SHOW_INSTR, self::MFLG_INT_INSTR, self::MFLG_NOSHOW, self::MFLG_THANK, ],
+            self::MFLG_NOSHOW => [self::MFLG_NEW, ],
+            self::MFLG_THANK => [self::MFLG_NEW, ],
+            self::MFLG_SHOW_NO_ANSWER => [self::MFLG_SHOW_INSTR, ],
+            self::MFLG_SHOW_INSTR => [self::MFLG_SHOW_NEWANSWER, ],
+            self::MFLG_SHOW_NEWANSWER => [self::MFLG_SHOW_ANSWER, self::MFLG_SHOW_REVIS, ],
+            self::MFLG_SHOW_REVIS => [self::MFLG_SHOW_NEWANSWER, ],
+            self::MFLG_INT_INSTR => [self::MFLG_INT_FIN_INSTR, ],
+            self::MFLG_INT_NEWANSWER => [self::MFLG_INT_REVIS_INSTR, self::MFLG_INT_FIN_INSTR, ],
+            self::MFLG_INT_REVIS_INSTR => [self::MFLG_INT_NEWANSWER],
         ];
         return isset($aTrans[$nState]) ? array_merge($aTrans[$nState]) : [];
     }

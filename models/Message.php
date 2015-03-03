@@ -10,6 +10,7 @@ use yii\db\Expression;
 use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
 use yii\behaviors\AttributeBehavior;
+use app\models\Rolesimport;
 
 /**
  * This is the model class for table "{{%message}}".
@@ -52,16 +53,50 @@ class Message extends \yii\db\ActiveRecord
 
     public $_oldAttributes = [];
 
-    public static $_flagFilter = [
-
-    ];
-
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
         return '{{%message}}';
+    }
+
+    /**
+     *
+     */
+    public static function gerMessageFilters()
+    {
+        // Флаги сообщений для разных пользователей
+        $_flagFilter = [
+            Rolesimport::ROLE_MODERATE_DOGM => [
+                Msgflags::MFLG_NEW,
+                Msgflags::MFLG_INT_FIN_INSTR,
+                Msgflags::MFLG_INT_NEWANSWER,
+                Msgflags::MFLG_SHOW_NEWANSWER,
+            ],
+            Rolesimport::ROLE_ANSWER_DOGM => [
+//                Msgflags::MFLG_NEW,
+                Msgflags::MFLG_INT_INSTR,
+                Msgflags::MFLG_INT_REVIS_INSTR,
+                Msgflags::MFLG_SHOW_INSTR,
+                Msgflags::MFLG_SHOW_REVIS,
+            ],
+            Rolesimport::ROLE_ADMIN => [
+                Msgflags::MFLG_THANK,
+                Msgflags::MFLG_INT_FIN_INSTR,
+                Msgflags::MFLG_INT_NEWANSWER,
+                Msgflags::MFLG_INT_REVIS_INSTR,
+                Msgflags::MFLG_INT_INSTR,
+                Msgflags::MFLG_NOSHOW,
+                Msgflags::MFLG_SHOW_REVIS,
+                Msgflags::MFLG_SHOW_NO_ANSWER,
+                Msgflags::MFLG_SHOW_ANSWER,
+                Msgflags::MFLG_NEW,
+                Msgflags::MFLG_SHOW_INSTR,
+                Msgflags::MFLG_SHOW_NEWANSWER,
+            ],
+        ];
+        return $_flagFilter;
     }
 
     /**
@@ -91,7 +126,7 @@ class Message extends \yii\db\ActiveRecord
                     ActiveRecord::EVENT_BEFORE_INSERT => 'msg_flag',
                 ],
                 'value' => function ($event) {
-                    return Msgflags::MSGFLAG_NEW;
+                    return Msgflags::MFLG_NEW;
                 },
 
             ],
@@ -194,6 +229,14 @@ class Message extends \yii\db\ActiveRecord
      */
     public function getRegion() {
         return $this->hasOne(Regions::className(), ['reg_id' => 'msg_pers_region']);
+    }
+
+    /*
+     * Отношения к флагу
+     *
+     */
+    public function getFlag() {
+        return $this->hasOne(Msgflags::className(), ['fl_id' => 'msg_flag']);
     }
 
 
