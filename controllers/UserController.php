@@ -33,13 +33,6 @@ class UserController extends Controller
                         'roles' => [Rolesimport::ROLE_ADMIN],
                     ],
                 ],
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'actions' => ['answerlist'],
-                        'roles' => [Rolesimport::ROLE_MODERATE_DOGM],
-                    ],
-                ],
             ],
             'verbs' => [
                 'class' => VerbFilter::className(),

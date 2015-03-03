@@ -39,6 +39,11 @@ class MessageController extends Controller
                         'actions' => ['answerlist', 'answer'],
                         'roles' => [Rolesimport::ROLE_ANSWER_DOGM],
                     ],
+                    [
+                        'allow' => true,
+                        'actions' => ['admin'],
+                        'roles' => [Rolesimport::ROLE_ADMIN],
+                    ],
                 ],
             ],
             'verbs' => [
