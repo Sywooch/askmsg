@@ -135,6 +135,9 @@ class MessageController extends Controller
     /**
      * Updates an existing Message model.
      * If update is successful, the browser will be redirected to the 'view' page.
+     *
+     * Новое сообщение создает только посетитель, изменяет - модератор
+     *
      * @param integer $id
      * @return mixed
      */
@@ -146,7 +149,8 @@ class MessageController extends Controller
         }
         else {
             $model = $this->findModel($id);
-            $model->scenario = 'answer';
+            $model->scenario = 'moderator';
+            $model->employer = $model->employee->getFullName();
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {

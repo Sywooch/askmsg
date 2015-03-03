@@ -350,4 +350,11 @@ class User extends ActiveRecord  implements IdentityInterface
         $this->email_confirm_token = null;
     }
 
+    /**
+     *  Полное имя пользователя
+     */
+    public function getFullName() {
+        return $this->us_lastname . ' ' . $this->us_name . ' ' . $this->us_secondname;
+    }
+
 }

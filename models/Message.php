@@ -4,8 +4,12 @@ namespace app\models;
 
 use Yii;
 use app\models\User;
+use app\models\Msgflags;
+
 use yii\db\Expression;
+use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
+use yii\behaviors\AttributeBehavior;
 
 /**
  * This is the model class for table "{{%message}}".
@@ -67,6 +71,26 @@ class Message extends \yii\db\ActiveRecord
                 'updatedAtAttribute' => null,
                 'value' => new Expression('NOW()'),
             ],
+            [
+                'class' => AttributeBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => 'msg_active',
+                ],
+                'value' => function ($event) {
+                    return 1;
+                },
+
+            ],
+            [
+                'class' => AttributeBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => 'msg_flag',
+                ],
+                'value' => function ($event) {
+                    return Msgflags::MSGFLAG_NEW;
+                },
+
+            ],
         ];
     }
 
@@ -76,12 +100,13 @@ class Message extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            // , 'ekis_is'
+            // , 'ekis_id'
             [['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_org', 'msg_pers_region'], 'required'],
             [['msg_answer'], 'required'],
             [['msg_pers_secname'], 'required', 'on'=>['answer', 'person', 'moderator']],
             [['msg_createtime', 'msg_answertime'], 'filter', 'filter' => function($v){ return empty($v) ? new Expression('NOW()') : $v;  }],
             [['msg_createtime', 'msg_answertime'], 'safe'],
+            [['msg_flag'], 'required'],
             [['msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag'], 'integer'],
             [['msg_pers_text', 'msg_answer', 'msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_pers_org'], 'string'],
             [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_oldcomment'], 'string', 'max' => 255],
@@ -98,8 +123,11 @@ class Message extends \yii\db\ActiveRecord
     {
         $scenarios = parent::scenarios();
         $scenarios['person'] = ['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_secname', 'msg_pers_org', 'msg_pers_region', 'msg_createtime'];
+        $scenarios['moderator'] = array_merge(
+                                    $scenarios['person'],
+                                    ['msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_empl_id', 'msg_flag', 'msg_active']
+        );
         $scenarios['answer'] = ['msg_answer', 'msg_answertime'];
-        $scenarios['moderator'] = ['msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_empl_id', 'msg_flag', 'msg_active'];
 
         return $scenarios;
     }
@@ -108,8 +136,8 @@ class Message extends \yii\db\ActiveRecord
     { // TODO: отправить это все в конфиг
         $a = [
             'person' => ['title' => 'Создать обращение', 'form' => '_form'],
+            'moderator' => ['title' => 'Обработка обращения', 'form' => '_form'],
             'answer' => ['title' => 'Написать ответ', 'form' => '_formanswer'],
-            'moderator' => ['title' => 'Направить обращение', 'form' => '_formmoderator'],
         ];
         return isset($a[$this->scenario]) ? $a[$this->scenario] : $a['person'];
     }
@@ -138,7 +166,7 @@ class Message extends \yii\db\ActiveRecord
             'msg_answer' => 'Ответ',
             'msg_answertime' => 'Дата ответа',
             'msg_oldcomment' => 'Старые теги',
-            'msg_flag' => 'Флаг обращения',
+            'msg_flag' => 'Состояние',
 
             'employer' => 'Ответчик',
             'asker' => 'Проситель',

@@ -7,11 +7,13 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
 
 use app\models\User;
 use app\models\UserSearch;
 use app\models\Group;
 use app\models\Rolesimport;
+use app\models\Usergroup;
 
 /**
  * UserController implements the CRUD actions for User model.
@@ -32,6 +34,13 @@ class UserController extends Controller
                         'roles' => [Rolesimport::ROLE_ADMIN],
                     ],
                 ],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['answerlist'],
+                        'roles' => [Rolesimport::ROLE_MODERATE_DOGM],
+                    ],
+                ],
             ],
             'verbs' => [
                 'class' => VerbFilter::className(),
@@ -40,6 +49,43 @@ class UserController extends Controller
                 ],
             ],
         ];
+    }
+
+    /**
+     * Lists all Answer users.
+     * @return mixed
+     */
+    public function actionAnswerlist()
+    {
+        $sQuery = Yii::$app->request->get('query');
+        $a = explode(' ', $sQuery);
+        if( count($a) > 1 ) {
+            $sQuery = $a[0];
+        }
+
+        $aData = ArrayHelper::map(
+            User::find()
+                ->select(User::tableName() . '.*, ' . Usergroup::tableName() . '.*')
+                ->innerJoin(Usergroup::tableName(), 'us_id = usgr_uid')
+                ->where([
+                    'and',
+                    ['or', ['like', 'us_lastname', $sQuery], ['like', 'us_name', $sQuery], ['like', 'us_secondname', $sQuery]],
+                    ['usgr_gid' => Rolesimport::ROLE_ANSWER_DOGM],
+                ])
+                ->orderBy(['us_lastname' => SORT_ASC, 'us_name' => SORT_ASC, 'us_secondname' => SORT_ASC])
+                ->all(),
+            'us_id',
+            function($ob) {
+                return [
+                    'id' => $ob->us_id,
+                    'val' => $ob->getFullName(),
+                    'pos' => $ob->us_workposition,
+                ];
+            }
+        );
+
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        return $aData;
     }
 
     /**

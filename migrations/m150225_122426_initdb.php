@@ -158,6 +158,7 @@ CREATE TABLE `b_user_group` (
         $this->createTable('{{%msgflags}}', [
             'fl_id' => Schema::TYPE_PK,
             'fl_name' => Schema::TYPE_STRING . ' NOT NULL',
+            'fl_command' => Schema::TYPE_STRING,
             'fl_sort' => Schema::TYPE_INTEGER . ' NOT NULL Default 0',
         ], $tableOptions);
 
