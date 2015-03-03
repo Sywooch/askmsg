@@ -26,7 +26,6 @@ class UserController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-//                'only' => ['index', 'create', 'update', 'delete'],
                 'rules' => [
                     [
                         'allow' => true,
@@ -69,7 +68,8 @@ class UserController extends Controller
                 ->innerJoin(Usergroup::tableName(), 'us_id = usgr_uid')
                 ->where([
                     'and',
-                    ['or', ['like', 'us_lastname', $sQuery], ['like', 'us_name', $sQuery], ['like', 'us_secondname', $sQuery]],
+//                    ['or', ['like', 'us_lastname', $sQuery], ['like', 'us_name', $sQuery], ['like', 'us_secondname', $sQuery]],
+                    ['like', 'us_lastname', $sQuery],
                     ['usgr_gid' => Rolesimport::ROLE_ANSWER_DOGM],
                 ])
                 ->orderBy(['us_lastname' => SORT_ASC, 'us_name' => SORT_ASC, 'us_secondname' => SORT_ASC])

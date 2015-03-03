@@ -18,18 +18,23 @@ class PhpextManager extends PhpManager {
      */
     public function checkAccess($userId, $permissionName, $params = []) {
         /** @var User $oUser */
+        $bRet = false;
 
         $oUser = Yii::$app->user->identity;
-        if( $oUser === null && $permissionName !== '?' ) {
-            return false;
+
+        if( ($oUser === null) && ($permissionName !== '?') ) {
+            return $bRet;
         }
 
         foreach($oUser->permissions As $ob) {
-            if( $ob->group_id == $permissionName || $ob->group_id == Rolesimport::ROLE_ADMIN ) {
-                return true;
+            if( ($ob->group_id == $permissionName) || ($ob->group_id == Rolesimport::ROLE_ADMIN) ) {
+                $bRet = true;
+//                Yii::info("checkAccess(): true [{$ob->group_id} ? = {$permissionName} || " . Rolesimport::ROLE_ADMIN . ']');
+                break;
             }
         }
-        return false;
+        Yii::info("checkAccess(): ret = " . ($bRet ? 'true' : 'false'));
+        return $bRet;
 
     }
 }

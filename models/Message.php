@@ -52,6 +52,10 @@ class Message extends \yii\db\ActiveRecord
 
     public $_oldAttributes = [];
 
+    public static $_flagFilter = [
+
+    ];
+
     /**
      * @inheritdoc
      */
