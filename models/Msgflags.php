@@ -104,7 +104,7 @@ class Msgflags extends \yii\db\ActiveRecord
             self::MSGFLAG_INT_NEWANSWER => [self::MSGFLAG_INT_INSTR_REVIS, self::MSGFLAG_INT_INSTR_FIN, ],
             self::MSGFLAG_INT_INSTR_REVIS => [self::MSGFLAG_INT_NEWANSWER],
         ];
-        return isset($aTrans[$nState]) ? array_merge([$nState], $aTrans[$nState]) : [];
+        return isset($aTrans[$nState]) ? array_merge($aTrans[$nState]) : [];
     }
 
     /**

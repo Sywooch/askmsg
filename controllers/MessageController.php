@@ -163,7 +163,7 @@ class MessageController extends Controller
                     );
             }
             else {
-                return $this->redirect(['admin']);
+                return $this->redirect(['moderatelist']);
             }
         } else {
             return $this->render('create', [
