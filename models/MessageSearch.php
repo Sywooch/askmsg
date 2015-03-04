@@ -21,6 +21,7 @@ class MessageSearch extends Message
     {
         return [
             [['msg_id', 'msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag'], 'integer'],
+            [['askid', ], 'string'],
             [['msg_createtime', 'msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_org', 'msg_pers_text', 'msg_comment', 'msg_empl_command', 'msg_empl_remark', 'msg_answer', 'msg_answertime', 'msg_oldcomment'], 'safe'],
         ];
     }
@@ -67,7 +68,11 @@ class MessageSearch extends Message
         ];
 */
 
+//        $this->askid = '';
+//        Yii::info('scenario = ' . $this->scenario . ' isAttributeActive(askid) = ' . ($this->isAttributeActive('askid') ? 'true' : 'false'));
         $this->load($params);
+
+        $this->prepareDateFilter($query);
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to any records when validation fails
@@ -100,5 +105,50 @@ class MessageSearch extends Message
             ->andFilterWhere(['like', 'msg_oldcomment', $this->msg_oldcomment]);
 
         return $dataProvider;
+    }
+
+    /**
+     *
+     * Из поля пытаемся вытащить номер или дату и добавить их к фильтрам
+     *
+     * @param $query
+     *
+     */
+    public function prepareDateFilter(&$query) {
+        if( $this->askid != '' ) {
+            if( preg_match('|^[\\d]+$|', $this->askid) ) {
+                // только одни цифры - предполагаем номер
+                $this->msg_id = intval($this->askid);
+            }
+            elseif( preg_match('|^[\\d\\.]+\\.[\\d]{4}$|', $this->askid) ) {
+                // цифры с точками - предполагаем дату
+                $a = explode('.', strrev($this->askid));
+                $n = count($a);
+                $y = strrev($a[0]);
+                $m = 0;
+                $d = 0;
+                if($n > 1) {
+                    $m = strrev($a[1]);
+                }
+                if($n > 2) {
+                    $d = strrev($a[2]);
+                }
+                if( $m == 0) {
+                    $query
+                        ->andFilterWhere(['>', 'msg_createtime', date('Y-m-d 00:00:00', mktime(0, 0, 0, 1, 1, $y) - 1)])
+                        ->andFilterWhere(['<', 'msg_createtime', date('Y-m-d 00:00:00', mktime(23, 59, 59, 12, 31, $y) + 1)]);
+                }
+                elseif( $d == 0 ) {
+                    $query
+                        ->andFilterWhere(['>', 'msg_createtime', date('Y-m-d 00:00:00', mktime(0, 0, 0, $m, 1, $y) - 1)])
+                        ->andFilterWhere(['<', 'msg_createtime', date('Y-m-d 00:00:00', mktime(0, 0, 0, $m + 1, 1, $y))]);
+                }
+                else {
+                    $query
+                        ->andFilterWhere(['>', 'msg_createtime', date('Y-m-d 00:00:00', mktime(0, 0, 0, $m, $d, $y) - 1)])
+                        ->andFilterWhere(['<', 'msg_createtime', date('Y-m-d 00:00:00', mktime(23, 59, 59, $m, $d, $y) + 1)]);
+                }
+            }
+        }
     }
 }

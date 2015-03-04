@@ -43,7 +43,8 @@ ListdataAsset::register($this);
 //            ['class' => 'yii\grid\SerialColumn'],
             [
                 'class' => 'yii\grid\DataColumn',
-                'attribute' => 'msg_id',
+//                'attribute' => 'msg_id',
+                'attribute' => 'askid',
                 'header' => 'Номер и дата',
                 'filterOptions' => ['class' => 'gridwidth7'],
                 'content' => function ($model, $key, $index, $column) {
