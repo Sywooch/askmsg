@@ -357,4 +357,51 @@ class User extends ActiveRecord  implements IdentityInterface
         return $this->us_lastname . ' ' . $this->us_name . ' ' . $this->us_secondname;
     }
 
+    /**
+     *
+     *  Поиск пользователей по их группе
+     *
+     * @param $idGroup
+     * @param string $sQuery
+     * @param string $format
+     * @return array
+     *
+     */
+    public static function getGroupUsers($idGroup, $sQuery = '', $format = '') {
+        $aWhere = ['usgr_gid' => $idGroup];
+        if( $sQuery !== '' ) {
+            $aWhere = array_merge(
+                ['and'],
+                $aWhere,
+//                ['or', ['like', 'us_lastname', $sQuery], ['like', 'us_name', $sQuery], ['like', 'us_secondname', $sQuery]],
+                ['like', 'us_lastname', $sQuery]
+            );
+        }
+
+        $aUsers =  User::find()
+            ->select(User::tableName() . '.*, ' . Usergroup::tableName() . '.*')
+            ->innerJoin(Usergroup::tableName(), 'us_id = usgr_uid')
+            ->where($aWhere)
+            ->orderBy(['us_lastname' => SORT_ASC, 'us_name' => SORT_ASC, 'us_secondname' => SORT_ASC])
+            ->all();
+
+        $aData = ArrayHelper::map(
+            $aUsers,
+            'us_id',
+            function($ob) use ($format) {
+                return ( $format === '' ) ? [
+                    'id' => $ob->us_id,
+                    'val' => $ob->getFullName(),
+                    'pos' => $ob->us_workposition,
+                ] :
+                str_replace(
+                    array('{{id}}', '{{val}}', '{{pos}}'),
+                    array($ob->us_id, $ob->getFullName(), $ob->us_workposition),
+                    $format
+                );
+            }
+        );
+        return $aData;
+    }
+
 }

@@ -95,16 +95,18 @@ GriddataAsset::register($this);
 
             [
                 'class' => 'yii\grid\ActionColumn',
-/*
-                'template'=>'{view} {delete}',
-                'buttons'=>[
-                    'view'=>function ($url, $model) {
-                        return Html::a( '<span class="glyphicon glyphicon-eye-open"></span>', $url,
-                            ['title' => 'Обращение № ' . $model->msg_id, 'class'=>'showinmodal']); // , 'data-pjax' => '0'
-//                            ['title' => Yii::t('yii', 'View'), 'class'=>'showinmodal']); // , 'data-pjax' => '0'
-                    }
-                ],
-*/
+                'contentOptions' => ['class' => 'commandcell'],
+
+                /*
+                                'template'=>'{view} {delete}',
+                                'buttons'=>[
+                                    'view'=>function ($url, $model) {
+                                        return Html::a( '<span class="glyphicon glyphicon-eye-open"></span>', $url,
+                                            ['title' => 'Обращение № ' . $model->msg_id, 'class'=>'showinmodal']); // , 'data-pjax' => '0'
+                //                            ['title' => Yii::t('yii', 'View'), 'class'=>'showinmodal']); // , 'data-pjax' => '0'
+                                    }
+                                ],
+                */
             ],
         ],
     ]); ?>

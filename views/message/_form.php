@@ -9,8 +9,12 @@ use yii\widgets\MaskedInput;
 use yii\web\JsExpression;
 use yii\web\View;
 
+use kartik\select2\Select2;
+
 use app\models\Regions;
 use app\models\Msgflags;
+use app\models\User;
+use app\models\Rolesimport;
 
 use kartik\typeahead\Typeahead;
 
@@ -85,8 +89,7 @@ use kartik\typeahead\Typeahead;
             ?>
         </div>
 */
-?>
-
+/*
         <div class="col-sm-6">
             <?= $form->field($model, 'employer')->widget(
                 Typeahead::classname(),
@@ -115,8 +118,31 @@ use kartik\typeahead\Typeahead;
                     ],
                 ]
             ) ?>
-            <?= $form->field($model, 'msg_empl_id', ['template' => "{input}", 'options' => ['tag' => 'span']])->hiddenInput();  ?>
-            <?= $form->field($model, 'msg_flag', ['template' => "{input}", 'options' => ['tag' => 'span']])->hiddenInput();  ?>
+        </div>
+*/
+?>
+        <?= $form->field($model, 'msg_empl_id', ['template' => "{input}", 'options' => ['tag' => 'span']])->hiddenInput();  ?>
+        <?= $form->field($model, 'msg_flag', ['template' => "{input}", 'options' => ['tag' => 'span']])->hiddenInput();  ?>
+
+
+        <div class="col-sm-6">
+            <?= $model->employer . ' ' . $model->msg_empl_id ?>
+            <?= $form
+                ->field($model, 'employer')
+                ->widget(Select2::classname(), [
+                    'data' => array_merge(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}')),
+                    'language' => 'ru',
+                    'options' => ['placeholder' => 'Выберите ответчика ...'],
+                    'pluginOptions' => [
+                        'allowClear' => true,
+//                        'formatResult' => new JsExpression('function(object, container, query){ console.log("format: ", object, container, query); container.append(object.text);  }'),
+                    ],
+                    'pluginEvents' => [
+                        'change' => 'function(event) { jQuery("#'.Html::getInputId($model, 'msg_empl_id').'").val(event.val); console.log("change", event); }',
+//                        'select2-selecting' => 'function(event) { console.log("select2-selecting", event); }',
+                    ],
+                ]);
+            ?>
         </div>
 
         <div class="col-sm-6">
@@ -292,18 +318,16 @@ use kartik\typeahead\Typeahead;
     </div>
     <div class="col-sm-4">
         <div class="form-group" style="margin-top: 2em;">
-                    <?php
+                <?php
                         foreach($aOp As $k=>$aData):
-                    ?>
+                ?>
                             <?= Html::submitButton(
                                 'Сохранить и ' . $aData,
                                 ['class' => 'btn btn-default changeflag', 'id' => 'buttonsave_' . $k, 'style' => 'margin-bottom: 1em;'])
                             ?>
                             <?= '' /*Html::a('Сохранить и ' . $aData, '#', ['class' => 'btn btn-primary changeflag', 'id' => 'buttonsave_' . $k])*/ ?>
-                    <?php
-                        endforeach;
-                    ?>
                 <?php
+                        endforeach;
                 /**
                  *
                  * Окончание кнопок модератора
@@ -313,7 +337,7 @@ use kartik\typeahead\Typeahead;
                 ?>
                     <label for="message-msg_pers_text" class="control-label col-sm-1">&nbsp;</label>
                     <div class="col-sm-6">
-                        <?= Html::submitButton($model->isNewRecord ? 'Создать' : 'Изменить', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+                        <?= Html::submitButton($model->isNewRecord ? 'Отправить' : 'Сохранить', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
                     </div>
                 <?php
                     endif; // if( $model->scenario == 'moderator' ):

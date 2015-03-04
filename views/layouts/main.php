@@ -11,6 +11,7 @@ use app\models\Rolesimport;
 /* @var $content string */
 
 AppAsset::register($this);
+
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -31,16 +32,19 @@ AppAsset::register($this);
 $isAdmin = \Yii::$app->user->can(Rolesimport::ROLE_ADMIN);
 $isModerate = \Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM);
 $isAnswer = \Yii::$app->user->can(Rolesimport::ROLE_ANSWER_DOGM);
+$isGuest = \Yii::$app->user->isGuest;
 
 $aMenuItems = [
     ['label' => 'Начало', 'url' => '/'],
 ];
 
+$aMenuItems[] = ['label' => 'Обращения', 'url' => ['message/index']];
+
 if( $isAdmin || $isModerate ) {
     $aMenuItems[] = ['label' => 'Модерировать', 'url' => ['message/moderatelist']];
 }
 
-if( $isAnswer || $isModerate ) {
+if( $isAdmin || $isAnswer ) {
     $aMenuItems[] = ['label' => 'Отвечать', 'url' => ['message/answerlist']];
 }
 

@@ -110,7 +110,7 @@ ListdataAsset::register($this);
 
             [
                 'class' => 'yii\grid\ActionColumn',
-
+                'contentOptions' => ['class' => 'commandcell'],
                 'template'=>'{view} {update} {answer} {delete}',
                 'buttons'=>[
                     'view'=>function ($url, $model) {
