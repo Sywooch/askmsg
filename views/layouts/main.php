@@ -35,7 +35,7 @@ $isAnswer = \Yii::$app->user->can(Rolesimport::ROLE_ANSWER_DOGM);
 $isGuest = \Yii::$app->user->isGuest;
 
 $aMenuItems = [
-    ['label' => 'Начало', 'url' => '/'],
+    ['label' => 'Главная', 'url' => '/'],
 ];
 
 $aMenuItems[] = ['label' => 'Обращения', 'url' => ['message/index']];

@@ -5,6 +5,7 @@ use yii\web\View;
 use yii\bootstrap\ActiveForm;
 use app\assets\ListdataAsset;
 use yii\bootstrap\Modal;
+use vova07\imperavi\Widget;
 
 use app\models\Msgflags;
 
@@ -68,10 +69,25 @@ $aOp = array_reduce(
     endif;
     ?>
 
+    <?php /*
+ = $form->field(
+            $model,
+            'msg_answer')
+        ->textarea(['rows' => 6]) */ ?>
     <?= $form->field(
             $model,
             'msg_answer')
-        ->textarea(['rows' => 6]) ?>
+        ->widget(Widget::className(), [
+            'settings' => [
+                'lang' => 'ru',
+                'minHeight' => 200,
+                'buttons' => ['formatting', 'bold', 'italic', 'deleted', 'unorderedlist', 'orderedlist', 'link', 'alignment'], // 'outdent', 'indent', 'image',
+                'plugins' => [
+//                    'clips',
+                    'fullscreen',
+                ]
+            ]
+            ]) ?>
     <?= $form->field($model, 'msg_flag', ['template' => "{input}", 'options' => ['tag' => 'span']])->hiddenInput();  ?>
 
     <div class="form-group">

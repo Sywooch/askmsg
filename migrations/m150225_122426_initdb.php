@@ -8,8 +8,10 @@ class m150225_122426_initdb extends Migration
     public function up()
     {
         $tableOptions = null;
+        $tableOptionsMyISAM = null;
         if ($this->db->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
+            $tableOptionsMyISAM = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=MyISAM';
         }
 
         // create user table
@@ -111,7 +113,7 @@ CREATE TABLE `b_user` (
             'group_active' => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 0',
             'group_name' => Schema::TYPE_STRING . ' NOT NULL',
             'group_description' => Schema::TYPE_STRING . ' NOT NULL',
-        ], $tableOptions);
+        ], $tableOptionsMyISAM);
 
         $this->createIndex('idx_group_name', '{{%group}}', 'group_name');
 
@@ -137,7 +139,7 @@ CREATE TABLE `b_group` (
             'usgr_id' => Schema::TYPE_PK,
             'usgr_uid' => Schema::TYPE_INTEGER . ' NOT NULL',
             'usgr_gid' => Schema::TYPE_INTEGER . ' NOT NULL',
-        ], $tableOptions);
+        ], $tableOptionsMyISAM);
 
         $this->createIndex('idx_usgr_uid', '{{%usergroup}}', 'usgr_uid');
         $this->createIndex('idx_usgr_gid', '{{%usergroup}}', 'usgr_gid');
@@ -160,7 +162,9 @@ CREATE TABLE `b_user_group` (
             'fl_name' => Schema::TYPE_STRING . ' NOT NULL',
             'fl_command' => Schema::TYPE_STRING,
             'fl_sort' => Schema::TYPE_INTEGER . ' NOT NULL Default 0',
-        ], $tableOptions);
+            'fl_glyth' => Schema::TYPE_STRING,
+            'fl_glyth_color' =>  Schema::TYPE_STRING . '(32) Default \'#ff9999\'',
+        ], $tableOptionsMyISAM);
 
 /*
          CREATE TABLE `b_iblock_property_enum` (
@@ -182,7 +186,7 @@ CREATE TABLE `b_user_group` (
             'ma_id' => Schema::TYPE_PK,
             'ma_message_id' => Schema::TYPE_INTEGER . ' NOT NULL',
             'ma_user_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-        ], $tableOptions);
+        ], $tableOptionsMyISAM);
 
         $this->createIndex('idx_msganswers_user', '{{%msganswers}}', 'ma_user_id');
         $this->createIndex('idx_msganswers_msg', '{{%msganswers}}', 'ma_message_id');
@@ -227,7 +231,7 @@ CREATE TABLE `b_iblock_element_prop_m52` (
 
             'msg_oldcomment' => Schema::TYPE_STRING,
             'msg_flag' => Schema::TYPE_INTEGER . ' NOT NULL Default 0',
-        ], $tableOptions);
+        ], $tableOptionsMyISAM);
 
         $this->createIndex('idx_message_flag', '{{%message}}', 'msg_flag');
         $this->createIndex('idx_message_empl', '{{%message}}', 'msg_empl_id');
@@ -333,7 +337,7 @@ CREATE TABLE `b_iblock_element_prop_s52` (
             'reg_id' => Schema::TYPE_PK,
             'reg_name' => Schema::TYPE_STRING . ' NOT NULL',  // ---------------------> NAME
             'reg_active' => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 0', // ---------------------> ACTIVE Y = 1, N = 0
-        ], $tableOptions);
+        ], $tableOptionsMyISAM);
     }
 
     public function down()

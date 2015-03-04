@@ -4,11 +4,13 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\bootstrap\Modal;
 use yii\web\View;
+use yii\helpers\ArrayHelper;
 
 use app\assets\GriddataAsset;
 use app\assets\ListdataAsset;
 use app\models\Rolesimport;
 use app\models\Regions;
+use app\models\Msgflags;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\MessageSearch */
@@ -21,16 +23,17 @@ GriddataAsset::register($this);
 ListdataAsset::register($this);
 
 /*
-     <p>
-        <?= Html::a('Create Message', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+     <h1><?= Html::encode($this->title) ?></h1>
+ */
 
-*/
 ?>
 <div class="message-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+    <?php
+        // echo $this->render('_search', ['model' => $searchModel]);
+//        $aFlags = Msgflags::getStateData();
+
+    ?>
 
 
     <?= GridView::widget([
@@ -42,8 +45,23 @@ ListdataAsset::register($this);
                 'class' => 'yii\grid\DataColumn',
                 'attribute' => 'msg_id',
                 'header' => 'Номер и дата',
+                'filterOptions' => ['class' => 'gridwidth7'],
                 'content' => function ($model, $key, $index, $column) {
-                    return '№ ' . $model->msg_id . '<span>' . date('d.m.Y H:i:s', strtotime($model->msg_createtime)) . '</span>';
+                    return Html::a('№ ' . $model->msg_id, ['message/view', 'id'=>$model->msg_id]) . '<span>' . date('d.m.Y H:i:s', strtotime($model->msg_createtime)) . '</span>';
+                },
+                'contentOptions' => [
+                    'class' => 'griddate',
+                ],
+            ],
+            [
+                'class' => 'yii\grid\DataColumn',
+                'header' => 'Состояние',
+                'attribute' => 'msg_flag',
+                'filter' => ArrayHelper::map(Msgflags::getStateData(), 'fl_id', 'fl_sname'),
+                'filterOptions' => ['class' => 'gridwidth7'],
+                'content' => function ($model, $key, $index, $column) {
+                    return '<span class="glyphicon glyphicon-'.$model->flag->fl_glyth.'" style="color: '.$model->flag->fl_glyth_color.'; font-size: 1.25em;"></span>' //  font-size: 1.25em;
+                    . '<span class="inline">' . $model->flag->fl_sname . '</span>';
                 },
                 'contentOptions' => [
                     'class' => 'griddate',
@@ -55,7 +73,7 @@ ListdataAsset::register($this);
                 'header' => 'Проситель',
                 'content' => function ($model, $key, $index, $column) {
                     return Html::encode($model->msg_pers_lastname . ' ' . $model->msg_pers_name . ' ' . $model->msg_pers_secname )
-                        . '<span>' . ($model->msg_flag ? $model->flag->fl_name : '--')
+                        . '<span>' // . ($model->msg_flag ? $model->flag->fl_name : '--')
                         . (($model->msg_empl_id !== null) ? Html::encode(' ' . $model->employee->getFullName()) : '')
                         . '</span>';
                 },
@@ -78,6 +96,8 @@ ListdataAsset::register($this);
                 'attribute' => 'msg_pers_region',
 //                'header' => '',
                 'filter' => Regions::getListData(),
+                'filterOptions' => ['class' => 'gridwidth7'],
+
                 'content' => function ($model, $key, $index, $column) {
                     return Html::encode($model->region->reg_name) . '<span>' . Html::encode($model->msg_oldcomment) . '</span>';
                 },
@@ -141,6 +161,7 @@ ListdataAsset::register($this);
     Modal::begin([
         'header' => '<span></span>',
         'id' => 'messagedata',
+        'size' => Modal::SIZE_LARGE,
     ]);
     Modal::end();
 
@@ -152,13 +173,17 @@ jQuery('.showinmodal').on("click", function (event){
     event.preventDefault();
 
     var ob = jQuery('#messagedata'),
+        oBody = ob.find('.modal-body'),
         oLink = $(this);
 
-    ob.find('.modal-body').load(oLink.attr('href'), params);
+    oBody.load(oLink.attr('href'), params);
     ob.find('.modal-header span').text(oLink.attr('title'));
     ob.modal('show');
+//    jQuery(".modal-content").css({'max-height': jQuery('window').height() * 0.7 + 'px'})
     return false;
 });
+
+
 EOT;
         $this->registerJs($sJs, View::POS_READY, 'showmodalmessage');
     ?>

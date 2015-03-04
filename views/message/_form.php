@@ -119,18 +119,22 @@ use kartik\typeahead\Typeahead;
                 ]
             ) ?>
         </div>
+        <?= $form->field($model, 'msg_empl_id', ['template' => "{input}", 'options' => ['tag' => 'span']])->hiddenInput();  ?>
+            <?= $model->employer . ' ' . $model->msg_empl_id ?>
 */
 ?>
-        <?= $form->field($model, 'msg_empl_id', ['template' => "{input}", 'options' => ['tag' => 'span']])->hiddenInput();  ?>
         <?= $form->field($model, 'msg_flag', ['template' => "{input}", 'options' => ['tag' => 'span']])->hiddenInput();  ?>
 
 
         <div class="col-sm-6">
-            <?= $model->employer . ' ' . $model->msg_empl_id ?>
+            <?php
+                $aAnsw = User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}');
+            ?>
             <?= $form
-                ->field($model, 'employer')
+                ->field($model, 'msg_empl_id')
+//                ->field($model, 'employer')
                 ->widget(Select2::classname(), [
-                    'data' => array_merge(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}')),
+                    'data' => $aAnsw,
                     'language' => 'ru',
                     'options' => ['placeholder' => 'Выберите ответчика ...'],
                     'pluginOptions' => [
@@ -138,7 +142,7 @@ use kartik\typeahead\Typeahead;
 //                        'formatResult' => new JsExpression('function(object, container, query){ console.log("format: ", object, container, query); container.append(object.text);  }'),
                     ],
                     'pluginEvents' => [
-                        'change' => 'function(event) { jQuery("#'.Html::getInputId($model, 'msg_empl_id').'").val(event.val); console.log("change", event); }',
+//                        'change' => 'function(event) { jQuery("#'.Html::getInputId($model, 'msg_empl_id').'").val(event.val); console.log("change", event); }',
 //                        'select2-selecting' => 'function(event) { console.log("select2-selecting", event); }',
                     ],
                 ]);

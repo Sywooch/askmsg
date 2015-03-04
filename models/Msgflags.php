@@ -11,6 +11,9 @@ use Yii;
  * @property string $fl_name
  * @property integer $fl_sort
  * @property string $fl_command
+ * @property string $fl_glyth
+ * @property string $fl_glyth_color
+ * @property string $fl_sname
  */
 class Msgflags extends \yii\db\ActiveRecord
 {
@@ -26,7 +29,7 @@ class Msgflags extends \yii\db\ActiveRecord
     const MFLG_SHOW_ANSWER = 9;      //	[103] Опубликованные ответы               ** видимо посетителям
     const MFLG_NEW = 10;             //	[100] Новые
     const MFLG_SHOW_INSTR = 11;      //	[101] Поручения                           ** видимо посетителям
-    const MFLG_SHOW_NEWANSWER = 12; //	[102] Ответы                              ** видимо посетителям
+    const MFLG_SHOW_NEWANSWER = 12;  //	[102] Ответ дан, но не виден              ** видимо посетителям
 
     public static $_aNames = null;
 
@@ -50,13 +53,11 @@ class Msgflags extends \yii\db\ActiveRecord
     {
         if( self::$_aNames === null ) {
             $aData = self::find()->asArray()->all();
-            Yii::info("getStateData(): aData = " . print_r($aData, true));
             self::$_aNames = [];
             foreach($aData As $a) {
                 $a['title'] = trim(preg_replace('|^\\[[^\\]]+\\]\\s+|', '', $a['fl_name']));
                 self::$_aNames[$a['fl_id']] = $a;
             }
-            Yii::info("getStateData(): self::_aNames = " . print_r(self::$_aNames, true));
         }
         return ($nState === null) ?
                     self::$_aNames :
@@ -77,7 +78,6 @@ class Msgflags extends \yii\db\ActiveRecord
     public static function getStateTitle($nState = null, $name = 'title')
     {
         $aData = self::getStateData($nState);
-        Yii::info("getStateTitle(): aData = " . print_r($aData, true));
         return (is_array($aData) && isset($aData[$name])) ?
                     $aData[$name] :
                     '';
@@ -115,7 +115,9 @@ class Msgflags extends \yii\db\ActiveRecord
         return [
             [['fl_name'], 'required'],
             [['fl_sort'], 'integer'],
-            [['fl_name', 'fl_command'], 'string', 'max' => 255]
+            [['fl_name', 'fl_command', 'fl_glyth'], 'string', 'max' => 255],
+            [['fl_glyth_color'], 'string', 'max' => 32],
+            [['fl_sname'], 'string', 'max' => 16],
         ];
     }
 
@@ -129,6 +131,9 @@ class Msgflags extends \yii\db\ActiveRecord
             'fl_name' => 'Имя',
             'fl_sort' => 'Сортировка',
             'fl_command' => 'Операция',
+            'fl_glyth' => 'Картинка из bootstrap',
+            'fl_glyth_color' => 'Цвет картинки',
+            'fl_sname' => 'Короткое имя',
         ];
     }
 }
