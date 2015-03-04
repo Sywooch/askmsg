@@ -125,29 +125,30 @@ class MessageSearch extends Message
                 $a = explode('.', strrev($this->askid));
                 $n = count($a);
                 $y = strrev($a[0]);
-                $m = 0;
-                $d = 0;
+                $m0 = $m1 = 0;
+                $d0 = $d1 = 0;
+
                 if($n > 1) {
-                    $m = strrev($a[1]);
-                }
-                if($n > 2) {
-                    $d = strrev($a[2]);
-                }
-                if( $m == 0) {
-                    $query
-                        ->andFilterWhere(['>', 'msg_createtime', date('Y-m-d 00:00:00', mktime(0, 0, 0, 1, 1, $y) - 1)])
-                        ->andFilterWhere(['<', 'msg_createtime', date('Y-m-d 00:00:00', mktime(23, 59, 59, 12, 31, $y) + 1)]);
-                }
-                elseif( $d == 0 ) {
-                    $query
-                        ->andFilterWhere(['>', 'msg_createtime', date('Y-m-d 00:00:00', mktime(0, 0, 0, $m, 1, $y) - 1)])
-                        ->andFilterWhere(['<', 'msg_createtime', date('Y-m-d 00:00:00', mktime(0, 0, 0, $m + 1, 1, $y))]);
+                    $m0 = strrev($a[1]);
+                    $m1 = $m0;
                 }
                 else {
-                    $query
-                        ->andFilterWhere(['>', 'msg_createtime', date('Y-m-d 00:00:00', mktime(0, 0, 0, $m, $d, $y) - 1)])
-                        ->andFilterWhere(['<', 'msg_createtime', date('Y-m-d 00:00:00', mktime(23, 59, 59, $m, $d, $y) + 1)]);
+                    $m0 = 1;
+                    $m1 = 12;
                 }
+
+                if($n > 2) {
+                    $d0 = strrev($a[2]);
+                    $d1 = $d0 + 1;
+                }
+                else {
+                    $d0 = $d1 = 1;
+                    $m1++;
+                }
+
+                $query
+                    ->andFilterWhere(['>', 'msg_createtime', date('Y-m-d H:i:s', mktime(0, 0, 0, $m0, $d0, $y) - 1)])
+                    ->andFilterWhere(['<', 'msg_createtime', date('Y-m-d H:i:s', mktime(0, 0, 0, $m1, $d1, $y))]);
             }
         }
     }
