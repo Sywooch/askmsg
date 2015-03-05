@@ -168,7 +168,7 @@ class Message extends \yii\db\ActiveRecord
     {
         return [
             // , 'ekis_id'
-            [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_org', 'msg_pers_region'], 'required'],
+            [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_org', 'msg_pers_region', 'msg_subject'], 'required'],
             [['msg_answer'], 'required'],
 //            [['msg_pers_secname'], 'required', 'on'=>['answer', 'person', 'moderator']],
             [['msg_createtime', 'msg_answertime'], 'filter', 'filter' => function($v){ return empty($v) ? new Expression('NOW()') : $v;  }],
@@ -195,6 +195,13 @@ class Message extends \yii\db\ActiveRecord
                                     $scenarios['person'],
                                     ['msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_empl_id', 'msg_flag', 'msg_active', 'answers']
         );
+
+        // у старых сообщений нет темы
+        $n = array_search('msg_subject', $scenarios['moderator'], true);
+        if( $n !== false ) {
+            $scenarios['moderator'][$n];
+        }
+
         $scenarios['answer'] = ['msg_answer', 'msg_answertime', 'msg_flag'];
 
         return $scenarios;
