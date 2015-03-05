@@ -36,6 +36,7 @@ use app\components\AttributewalkBehavior;
  * @property string $msg_answertime
  * @property string $msg_oldcomment
  * @property integer $msg_flag
+ * @property integer $msg_subject
  *
  *
  * @property string $employer
@@ -174,7 +175,7 @@ class Message extends \yii\db\ActiveRecord
             [['msg_createtime', 'msg_answertime'], 'safe'],
             [['msg_flag'], 'required'],
             [['answers'], 'safe'],
-            [['msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag'], 'integer'],
+            [['msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject'], 'integer'],
             [['msg_pers_text', 'msg_answer', 'msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_pers_org'], 'string'],
             [['msg_answer'], 'filter', 'filter' => function($v){ return strip_tags($v, '<p><a><li><ol><ul><strong><b><em><i><u><h1><h2><h3><h4><h5><blockquote><pre><del><br>');  }],
             [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_oldcomment'], 'string', 'max' => 255],
@@ -189,7 +190,7 @@ class Message extends \yii\db\ActiveRecord
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios['person'] = ['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_secname', 'msg_pers_org', 'msg_pers_region', 'msg_createtime'];
+        $scenarios['person'] = ['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_secname', 'msg_pers_org', 'msg_pers_region', 'msg_createtime', 'msg_subject'];
         $scenarios['moderator'] = array_merge(
                                     $scenarios['person'],
                                     ['msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_empl_id', 'msg_flag', 'msg_active', 'answers']
@@ -243,6 +244,7 @@ class Message extends \yii\db\ActiveRecord
             'msg_answertime' => 'Дата ответа',
             'msg_oldcomment' => 'Старые теги',
             'msg_flag' => 'Состояние',
+            'msg_subject' => 'Тема',
 
             'employer' => 'Ответчик',
             'asker' => 'Проситель',

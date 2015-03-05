@@ -231,6 +231,7 @@ CREATE TABLE `b_iblock_element_prop_m52` (
 
             'msg_oldcomment' => Schema::TYPE_STRING,
             'msg_flag' => Schema::TYPE_INTEGER . ' NOT NULL Default 0',
+            'msg_subject' => Schema::TYPE_INTEGER,
         ], $tableOptionsMyISAM);
 
         $this->createIndex('idx_message_flag', '{{%message}}', 'msg_flag');

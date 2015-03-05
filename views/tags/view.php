@@ -6,20 +6,21 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model app\models\Tags */
 
-$this->title = $model->tag_id;
-$this->params['breadcrumbs'][] = ['label' => 'Tags', 'url' => ['index']];
+$this->title = $model->tag_title;
+$this->params['breadcrumbs'][] = ['label' => 'Теги', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+/* <h1><?= Html::encode($this->title) ?></h1> */
+
+
 ?>
 <div class="tags-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->tag_id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->tag_id], [
+        <?= Html::a('Изменить', ['update', 'id' => $model->tag_id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Удалить', ['delete', 'id' => $model->tag_id], [
             'class' => 'btn btn-danger',
             'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
+                'confirm' => 'Вы уверены, что нужно удалить тег '.$model->tag_title.'?',
                 'method' => 'post',
             ],
         ]) ?>
@@ -28,7 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'tag_id',
+//            'tag_id',
             'tag_active',
             'tag_title',
         ],

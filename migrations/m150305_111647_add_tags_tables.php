@@ -16,11 +16,13 @@ class m150305_111647_add_tags_tables extends Migration
 
         $this->createTable('{{%tags}}', [
             'tag_id' => Schema::TYPE_PK,
-            'tag_active' => Schema::TYPE_SMALLINT . ' DEFAULT 1',
+            'tag_active' => Schema::TYPE_SMALLINT . ' DEFAULT 0',
+            'tag_type' => Schema::TYPE_INTEGER . ' NOT NULL',
             'tag_title' => Schema::TYPE_STRING,
         ], $tableOptionsMyISAM);
 
         $this->createIndex('idx_tags_title', '{{%tags}}', 'tag_title');
+        $this->createIndex('idx_tags_type', '{{%tags}}', 'tag_type');
 
         $this->createTable('{{%msgtags}}', [
             'mt_id' => Schema::TYPE_PK,
@@ -30,17 +32,18 @@ class m150305_111647_add_tags_tables extends Migration
 
         $this->createIndex('idx_msgtags_msgid', '{{%msgtags}}', 'mt_msg_id');
         $this->createIndex('idx_msgtags_tagid', '{{%msgtags}}', 'mt_tag_id');
+
     }
 
     public function down()
     {
 //        return true;
-
         $this->dropIndex('idx_msgtags_msgid', '{{%msgtags}}');
         $this->dropIndex('idx_msgtags_tagid', '{{%msgtags}}');
         $this->dropTable('{{%msgtags}}');
 
         $this->dropIndex('idx_tags_title', '{{%tags}}');
+        $this->dropIndex('idx_tags_type', '{{%tags}}');
         $this->dropTable('{{%tags}}');
 
         return true;

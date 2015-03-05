@@ -15,6 +15,7 @@ use app\models\Regions;
 use app\models\Msgflags;
 use app\models\User;
 use app\models\Rolesimport;
+use app\models\Tags;
 
 use kartik\typeahead\Typeahead;
 
@@ -236,6 +237,35 @@ use kartik\typeahead\Typeahead;
     <?php
     endif; // if( $model->scenario == 'moderator' ):
     ?>
+
+    <div class="col-sm-12">
+        <?= $form
+            ->field(
+                $model,
+                'msg_subject',
+                [
+//            'template' => "{input}\n{hint}\n{error}",
+                    'horizontalCssClasses' => [
+                    'label' => 'col-sm-1',
+                    'offset' => 'col-sm-offset-1',
+                    'wrapper' => 'col-sm-11',
+                ],
+            ])
+            ->widget(Select2::classname(), [
+                'data' => ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_SUBJECT), 'tag_id', 'tag_title'),
+                'language' => 'ru',
+                'options' => [
+//                    'multiple' => true,
+                    'placeholder' => 'Выберите тему сообщения ...',
+                ],
+                'pluginOptions' => [
+                    'allowClear' => true,
+                ],
+            ])
+
+        ?>
+    </div>
+
     <div class="col-sm-4">
         <?= $form->field($model, 'msg_pers_lastname')->textInput(['maxlength' => 255]) ?>
     </div>
@@ -304,7 +334,8 @@ use kartik\typeahead\Typeahead;
                 'offset' => 'col-sm-offset-1',
                 'wrapper' => 'col-sm-11',
             ],
-        ])->textarea(['rows' => 6]) ?>
+        ])
+        ->textarea(['rows' => 6]) ?>
     </div>
 
     <div class="clearfix"></div>

@@ -33,6 +33,8 @@ class TagsController extends Controller
     public function actionIndex()
     {
         $searchModel = new TagsSearch();
+        $searchModel->tag_active = 1;
+//        $searchModel->tag_type = Tags::TAGTYPE_TAG;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -56,14 +58,21 @@ class TagsController extends Controller
     /**
      * Creates a new Tags model.
      * If creation is successful, the browser will be redirected to the 'view' page.
+     * @param integer $type
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreate($type = 0)
     {
+        $type = intval($type);
+
         $model = new Tags();
+        if( in_array($type, array_keys(Tags::$_aTypes))  ) {
+            $model->tag_type = $type;
+        }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->tag_id]);
+            return $this->redirect(['index']);
+//            return $this->redirect(['view', 'id' => $model->tag_id]);
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -82,7 +91,8 @@ class TagsController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->tag_id]);
+            return $this->redirect(['index']);
+//            return $this->redirect(['view', 'id' => $model->tag_id]);
         } else {
             return $this->render('update', [
                 'model' => $model,
@@ -98,7 +108,10 @@ class TagsController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        /** @var  $model Tags */
+        $model = $this->findModel($id); // ->delete();
+        $model->tag_active = $model->tag_active == 1 ? 0 : 1;
+        $model->save();
 
         return $this->redirect(['index']);
     }
