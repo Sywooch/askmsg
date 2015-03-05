@@ -48,6 +48,8 @@ use app\components\AttributewalkBehavior;
  */
 class Message extends \yii\db\ActiveRecord
 {
+    const MAX_PERSON_TEXT_LENGTH = 4000;
+
     public $employer; // Ответчик
     public $asker; // Проситель
     public $askid; // Номер и дата
@@ -176,7 +178,8 @@ class Message extends \yii\db\ActiveRecord
             [['msg_flag'], 'required'],
             [['answers'], 'safe'],
             [['msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject'], 'integer'],
-            [['msg_pers_text', 'msg_answer', 'msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_pers_org'], 'string'],
+            [['msg_pers_text'], 'string', 'max' => self::MAX_PERSON_TEXT_LENGTH],
+            [['msg_answer', 'msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_pers_org'], 'string'],
             [['msg_answer'], 'filter', 'filter' => function($v){ return strip_tags($v, '<p><a><li><ol><ul><strong><b><em><i><u><h1><h2><h3><h4><h5><blockquote><pre><del><br>');  }],
             [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_oldcomment'], 'string', 'max' => 255],
             [['employer', 'asker', 'askid', 'askcontacts', 'tags'], 'string', 'max' => 255],

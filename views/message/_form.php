@@ -16,6 +16,7 @@ use app\models\Msgflags;
 use app\models\User;
 use app\models\Rolesimport;
 use app\models\Tags;
+use app\models\Message;
 
 use kartik\typeahead\Typeahead;
 
@@ -412,9 +413,31 @@ use kartik\typeahead\Typeahead;
     $sFlagId = Html::getInputId($model, 'msg_flag');
     $sCommandId = Html::getInputId($model, 'msg_empl_command');
     $sRemarkId = Html::getInputId($model, 'msg_empl_remark');
+    $sMsgTextId = Html::getInputId($model, 'msg_pers_text');
+    $nMsgTextLen = Message::MAX_PERSON_TEXT_LENGTH;
+
+// Показываем количество символов в сообщении
+    $sJs =  <<<EOT
+var oMsgTextField = jQuery("#{$sMsgTextId}"),
+    oLenIndicator = jQuery('<div>Осталось символов: </div>').addClass("textmsglength").append('<span />').insertAfter(oMsgTextField),
+    showTextLength = function() {
+        var sText = oMsgTextField.val(),
+            nLen = sText.length;
+        if( nLen > {$nMsgTextLen} ) {
+            sText = sText.substr(0, {$nMsgTextLen});
+            oMsgTextField.val(sText)
+            nLen = sText.length;
+        }
+        oLenIndicator.find('span').text({$nMsgTextLen} - nLen);
+    };
+showTextLength();
+oMsgTextField.on("keyup", function(event){
+    showTextLength();
+});
+EOT;
 
 // Показываем/скрываем сообщение пользователя
-    $sJs =  <<<EOT
+    $sJs .=  <<<EOT
 //var oUserPart = jQuery(".togglepart");
 jQuery(".togglepart").on("click", function(event){
     var ob = jQuery(this),
