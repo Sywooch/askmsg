@@ -27,7 +27,7 @@ class m150305_111647_add_tags_tables extends Migration
         $this->createTable('{{%msgtags}}', [
             'mt_id' => Schema::TYPE_PK,
             'mt_msg_id' => Schema::TYPE_INTEGER,
-            'mt_tag_id' => Schema::TYPE_STRING,
+            'mt_tag_id' => Schema::TYPE_INTEGER,
         ], $tableOptionsMyISAM);
 
         $this->createIndex('idx_msgtags_msgid', '{{%msgtags}}', 'mt_msg_id');

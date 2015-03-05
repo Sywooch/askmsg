@@ -5,6 +5,8 @@ namespace app\models;
 use Yii;
 use app\models\User;
 use app\models\Msgflags;
+use app\models\Msganswers;
+use app\models\Msgtags;
 
 use yii\db\Expression;
 use yii\db\ActiveRecord;
@@ -54,7 +56,7 @@ class Message extends \yii\db\ActiveRecord
     public $asker; // Проситель
     public $askid; // Номер и дата
     public $askcontacts; // Email и телефон
-    public $tags; // округ, контакты
+    public $tags; // округ, комментарии
 
     public $_oldAttributes = [];
 
@@ -176,7 +178,8 @@ class Message extends \yii\db\ActiveRecord
             [['msg_createtime', 'msg_answertime'], 'filter', 'filter' => function($v){ return empty($v) ? new Expression('NOW()') : $v;  }],
             [['msg_createtime', 'msg_answertime'], 'safe'],
             [['msg_flag'], 'required'],
-            [['answers'], 'safe'],
+//            [['answers'], 'safe'],
+            [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}'))],
             [['msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject'], 'integer'],
             [['msg_pers_text'], 'string', 'max' => self::MAX_PERSON_TEXT_LENGTH],
             [['msg_answer', 'msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_pers_org'], 'string'],
@@ -262,6 +265,7 @@ class Message extends \yii\db\ActiveRecord
             'askid' => 'Номер и дата',
             'askcontacts' => 'Контакты',
             'tags' => 'Теги',
+            'alltags' => 'Теги',
         ];
     }
 
@@ -319,6 +323,35 @@ class Message extends \yii\db\ActiveRecord
     }
 
     /**
+     *  Связь с табличкой, соединяющей сообщения и его теги
+     */
+    public function getMsgtags() {
+        return $this->hasMany(
+            Msgtags::className(),
+            ['mt_msg_id' => 'msg_id']
+        );
+    }
+
+    /**
+     *  Связь сообщения и его тегов
+     */
+    public function getAlltags() {
+        return $this
+            ->hasMany(
+                Tags::className(),
+                ['tags_id' => 'mt_tag_id'])
+            ->via('msgtags');
+    }
+
+    /**
+     *  Установка тегов
+     */
+    public function setAlltags($tags)
+    {
+        $this->alltags = $tags;
+    }
+
+    /**
      *  Полное имя просителя
      */
     public function getFullName() {
@@ -331,7 +364,30 @@ class Message extends \yii\db\ActiveRecord
      */
     public function saveCoanswers($event) {
         $model = $event->sender;
+        $model->saveRelateddata([
+            'eventname' => $event->name,
+            'reltableclass' => Msganswers::className(),
+            'msgidfield' => 'ma_message_id',
+            'relateidfield' => 'ma_user_id',
+            'relateidarray' => $model->answers,
+        ]);
+    }
+
+    /**
+     *  Сохраняем теги
+     * @param Event $event
+     */
+    public function saveAlltags($event) {
+        $model = $event->sender;
+        $model->saveRelateddata([
+            'eventname' => $event->name,
+            'reltableclass' => Msgtags::className(),
+            'msgidfield' => 'mt_msg_id',
+            'relateidfield' => 'mt_tag_id',
+            'relateidarray' => $model->alltags,
+        ]);
 //        Yii::info("event: {$event->name} -> " . print_r($model->answers, true) . print_r($this->answers, true));
+/*
         if( $event->name === ActiveRecord::EVENT_AFTER_UPDATE ) {
             $nCou = Msganswers::updateAll(['ma_message_id' => 0, 'ma_user_id' => 0], 'ma_message_id = ' . $model->msg_id);
             Yii::info('Clear soanswers: ' . $nCou);
@@ -348,16 +404,40 @@ class Message extends \yii\db\ActiveRecord
                         ->db
                         ->createCommand('Insert Into ' . Msganswers::tableName() . ' (ma_message_id, ma_user_id) Values (:ma_message_id,  :ma_user_id)', [':ma_message_id' => $model->msg_id, ':ma_user_id' => $id])
                         ->execute();
-//                    Yii::info('Insert answers : ['.$model->msg_id.', '.$id.']');
                 }
-/*
-                else {
-                    Yii::info('Update empty answers : ['.$model->msg_id.', '.$id.']');
-                }
+            }
+        }
 */
+    }
+
+    /**
+     *  Сохраняем соответствующие данные
+     * @param array $param
+     */
+    public function saveRelateddata($param) {
+        if( $param['eventname'] === ActiveRecord::EVENT_AFTER_UPDATE ) {
+            $nCou = $param['reltableclass']::updateAll([$param['msgidfield'] => 0, $param['relateidfield'] => 0], $param['msgidfield'] . ' = ' . $this->msg_id);
+            Yii::info('Clear soanswers: ' . $nCou);
+        }
+        if( is_array($param['relateidarray']) ) {
+            foreach($param['relateidarray'] As $id) {
+                // Msganswers::updateAll();
+                $nUpd = Yii::$app
+                    ->db
+                    ->createCommand('Update ' . $param['reltableclass']::tableName() . ' Set '.$param['msgidfield'].' = :ma_message_id, '.$param['relateidfield'].' = :ma_user_id Where '.$param['msgidfield'].' = 0 Limit 1', [':ma_message_id' => $this->msg_id, ':ma_user_id' => $id])
+                    ->execute();
+                if( $nUpd == 0 ) {
+                    Yii::$app
+                        ->db
+                        ->createCommand('Insert Into ' . $param['reltableclass']::tableName() . ' ('.$param['msgidfield'].', '.$param['relateidfield'].') Values (:ma_message_id,  :ma_user_id)', [':ma_message_id' => $this->msg_id, ':ma_user_id' => $id])
+                        ->execute();
+                    Yii::info('Insert saveRelateddata : ['.$this->msg_id.', '.$id.']');
+                }
+                else {
+                    Yii::info('Update saveRelateddata : ['.$this->msg_id.', '.$id.']');
+                }
             }
         }
     }
-
 
 }

@@ -70,61 +70,7 @@ use kartik\typeahead\Typeahead;
      *
      */
     if( $model->scenario == 'moderator' ):
-
-/*
-        <div class="col-sm-6">
-            <?= $form
-                ->field($model, 'msg_flag')
-                ->dropDownList(
-                    array_reduce(
-                        Msgflags::getStateTrans($model->msg_flag),
-                        function ( $carry , $item ) {
-                            $sTitle = Msgflags::getStateTitle($item, 'fl_command');
-                            if( $sTitle != '' ) {
-                                $carry[$item] = $sTitle;
-                            }
-                            return $carry;
-                        },
-                        []
-                    )
-                )
-            ?>
-        </div>
-*/
-/*
-        <div class="col-sm-6">
-            <?= $form->field($model, 'employer')->widget(
-                Typeahead::classname(),
-                [
-                    'scrollable' => true,
-                    'dataset' => [
-                        [
-                            'remote' => [
-                                'url' => Url::to(['user/answerlist', 'query'=>'QRY']),
-                                'wildcard' => 'QRY',
-                            ],
-                            'displayKey' => 'val',
-
-                            'templates' => [
-                                'suggestion' => new JsExpression("Handlebars.compile('<p>{{val}}<br /><span style=\"color: #777777;\">{{pos}}</span></p>')"),
-                            ],
-
-                        ]
-                    ],
-                    'pluginOptions' => [
-                        'highlight' => true,
-                        'minLength' => 2,
-                    ],
-                    'pluginEvents' => [
-                        'typeahead:selected' => 'function(event, ob) { jQuery("#'.Html::getInputId($model, 'msg_empl_id').'").val(ob.id); console.log("-- typeahead:selected --"); console.log(event); console.log(ob); }',
-                    ],
-                ]
-            ) ?>
-        </div>
-        <?= $form->field($model, 'msg_empl_id', ['template' => "{input}", 'options' => ['tag' => 'span']])->hiddenInput();  ?>
-            <?= $model->employer . ' ' . $model->msg_empl_id ?>
-*/
-?>
+    ?>
         <?= $form->field($model, 'msg_flag', ['template' => "{input}", 'options' => ['tag' => 'span']])->hiddenInput();  ?>
 
 
@@ -194,7 +140,7 @@ use kartik\typeahead\Typeahead;
             <div class="form-group">
                 <label for="message-msg_pers_text" class="control-label col-sm-3">&nbsp;</label>
                 <div class="col-sm-4">
-                    <a href="#" class="btn btn-default togglepart" id="toggle_userformpart">Обращение</a>
+                    <a href="#" class="btn btn-default togglepart" id="toggle_userformpart" style="margin-bottom: 14px;">Обращение</a>
                 </div>
 
         <?php if( !empty($model->msg_answer)  ): ?>
@@ -216,6 +162,24 @@ use kartik\typeahead\Typeahead;
         </div>
         <?php endif; ?>
 
+        <div class="col-sm-6">
+            <?= $form
+                ->field($model, 'alltags')
+                ->widget(Select2::classname(), [
+                    'data' => ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_title'),
+                    'language' => 'ru',
+                    'options' => [
+                        'multiple' => true,
+//                        'tags' => true,
+                        'placeholder' => 'Выберите теги ...',
+                    ],
+                    'pluginOptions' => [
+                        'allowClear' => true,
+                    ],
+                ])
+            //                ->dropDownList($aAnsw, ['multiple' => true])
+            ?>
+        </div>
     <?php
     endif; // if( $model->scenario == 'moderator' ):
     /**

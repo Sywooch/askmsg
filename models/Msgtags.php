@@ -27,8 +27,7 @@ class Msgtags extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['mt_msg_id'], 'integer'],
-            [['mt_tag_id'], 'string', 'max' => 255]
+            [['mt_msg_id', 'mt_tag_id'], 'integer'],
         ];
     }
 
@@ -38,9 +37,9 @@ class Msgtags extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'mt_id' => 'Mt ID',
-            'mt_msg_id' => 'Mt Msg ID',
-            'mt_tag_id' => 'Mt Tag ID',
+            'mt_id' => 'ID',
+            'mt_msg_id' => 'Message ID',
+            'mt_tag_id' => 'Tag ID',
         ];
     }
 }
