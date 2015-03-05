@@ -47,6 +47,7 @@ class MessageSearch extends Message
         $query = Message::find()
             ->with('region')
             ->with('employee')
+//            ->with('answers')
             ->with('flag');
 
         $dataProvider = new ActiveDataProvider([
@@ -82,12 +83,12 @@ class MessageSearch extends Message
 
 
         $query->andFilterWhere([
-            'msg_id' => $this->msg_id,
-            'msg_createtime' => $this->msg_createtime,
-            'msg_active' => $this->msg_active,
+//            'msg_id' => $this->msg_id,
+//            'msg_createtime' => $this->msg_createtime,
+//            'msg_active' => $this->msg_active,
             'msg_pers_region' => $this->msg_pers_region,
             'msg_empl_id' => $this->msg_empl_id,
-            'msg_answertime' => $this->msg_answertime,
+//            'msg_answertime' => $this->msg_answertime,
             'msg_flag' => $this->msg_flag ? $this->msg_flag : $this->msgflags,
         ]);
 
@@ -96,32 +97,34 @@ class MessageSearch extends Message
             ->andFilterWhere(['like', 'msg_pers_lastname', $this->msg_pers_lastname])
             ->andFilterWhere(['like', 'msg_pers_email', $this->msg_pers_email])
             ->andFilterWhere(['like', 'msg_pers_phone', $this->msg_pers_phone])
-            ->andFilterWhere(['like', 'msg_pers_org', $this->msg_pers_org])
-            ->andFilterWhere(['like', 'msg_pers_text', $this->msg_pers_text])
-            ->andFilterWhere(['like', 'msg_comment', $this->msg_comment])
-            ->andFilterWhere(['like', 'msg_empl_command', $this->msg_empl_command])
-            ->andFilterWhere(['like', 'msg_empl_remark', $this->msg_empl_remark])
-            ->andFilterWhere(['like', 'msg_answer', $this->msg_answer])
-            ->andFilterWhere(['like', 'msg_oldcomment', $this->msg_oldcomment]);
+            ->andFilterWhere(['like', 'msg_pers_org', $this->msg_pers_org]);
+//            ->andFilterWhere(['like', 'msg_pers_text', $this->msg_pers_text])
+//            ->andFilterWhere(['like', 'msg_comment', $this->msg_comment])
+//            ->andFilterWhere(['like', 'msg_empl_command', $this->msg_empl_command])
+//            ->andFilterWhere(['like', 'msg_empl_remark', $this->msg_empl_remark])
+//            ->andFilterWhere(['like', 'msg_answer', $this->msg_answer])
+//            ->andFilterWhere(['like', 'msg_oldcomment', $this->msg_oldcomment]);
 
         return $dataProvider;
     }
 
     /**
      *
-     * Из поля пытаемся вытащить номер или дату и добавить их к фильтрам
+     * Из поля пытаемся вытащить номер сообщения или дату и добавить их к фильтрам
      *
      * @param $query
      *
      */
     public function prepareDateFilter(&$query) {
+        Yii::info('this->askid = ' . $this->askid);
         if( $this->askid != '' ) {
             if( preg_match('|^[\\d]+$|', $this->askid) ) {
                 // только одни цифры - предполагаем номер
                 $this->msg_id = intval($this->askid);
             }
-            elseif( preg_match('|^[\\d\\.]+\\.[\\d]{4}$|', $this->askid) ) {
+            elseif( preg_match('|^[\\d\\.]*\\.[\\d]{4}$|', $this->askid) ) {
                 // цифры с точками - предполагаем дату
+                Yii::info('this->askid = date');
                 $a = explode('.', strrev($this->askid));
                 $n = count($a);
                 $y = strrev($a[0]);
@@ -129,22 +132,25 @@ class MessageSearch extends Message
                 $d0 = $d1 = 0;
 
                 if($n > 1) {
-                    $m0 = strrev($a[1]);
+                    $m0 = intval(strrev($a[1]));
                     $m1 = $m0;
                 }
-                else {
+                if( $m0 == 0 ) {
                     $m0 = 1;
                     $m1 = 12;
                 }
+                Yii::info("1. m = {$m0} .. {$m1} d = {$d0} .. {$d1}");
 
                 if($n > 2) {
-                    $d0 = strrev($a[2]);
+                    $d0 = intval(strrev($a[2]));
                     $d1 = $d0 + 1;
                 }
-                else {
+
+                if( $d0 == 0 ) {
                     $d0 = $d1 = 1;
                     $m1++;
                 }
+                Yii::info("2. m = {$m0} .. {$m1} d = {$d0} .. {$d1}");
 
                 $query
                     ->andFilterWhere(['>', 'msg_createtime', date('Y-m-d H:i:s', mktime(0, 0, 0, $m0, $d0, $y) - 1)])

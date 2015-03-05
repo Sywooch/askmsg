@@ -9,4 +9,7 @@ return [
     'tablePrefix' => 'educom_',
     'enableSchemaCache' => true,
     'schemaCacheDuration' => 3600,
+    'attributes' => [
+        PDO::ATTR_PERSISTENT => TRUE,
+    ],
 ];

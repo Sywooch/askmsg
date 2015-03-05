@@ -5,6 +5,8 @@ namespace app\controllers;
 use Yii;
 use app\models\Message;
 use app\models\MessageSearch;
+
+use yii\db\ActiveRecord;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -139,14 +141,15 @@ class MessageController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
         if( Yii::$app->request->isAjax ) {
             return $this->renderPartial('_view', [
-                    'model' => $this->findModel($id),
+                    'model' => $model,
                 ]);
         }
 
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
         ]);
     }
 
@@ -190,6 +193,8 @@ class MessageController extends Controller
         if( $id == 0 ) {
             $model = new Message();
             $model->scenario = 'person';
+            // поправим после сохранения сообщения всех соответчиков
+            $model->on(ActiveRecord::EVENT_AFTER_INSERT, [$model, 'saveCoanswers'] );
         }
         else {
             $model = $this->findModel($id);
@@ -197,7 +202,10 @@ class MessageController extends Controller
             if( $model->msg_empl_id !== null ) {
                 $model->employer = $model->employee->getFullName();
             }
+            // поправим после сохранения сообщения всех соответчиков
+            $model->on(ActiveRecord::EVENT_AFTER_UPDATE, [$model, 'saveCoanswers'] );
         }
+
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             if( $model->scenario == 'person' ) {
@@ -240,6 +248,9 @@ class MessageController extends Controller
      */
     protected function findModel($id)
     {
+        // TODO: тут нужно добавить в выборку флаги, разрешенные для пользователя, чтобы не выдавались сообщения,
+        //       которые на этом уровне доступа не нужны
+
         if (($model = Message::findOne($id)) !== null) {
             return $model;
         } else {

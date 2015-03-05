@@ -52,4 +52,16 @@ use app\models\Rolesimport;
         </div>
     <?php endif; ?>
 
+    <?php if( count($model->answers) > 0 ): ?>
+        <div class="listemploee">
+            <strong>Соответчики: </strong>
+            <?php foreach( $model->answers As $ob ): ?>
+                <br />
+                <?= $ob->getFullName() ?>
+                <span>
+                    <?= Html::encode($ob->us_workposition) ?>
+                </span>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
 </div>

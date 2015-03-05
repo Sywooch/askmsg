@@ -170,24 +170,50 @@ use kartik\typeahead\Typeahead;
             ?>
         </div>
 
-        <?php if( !empty($model->msg_answer)  ): ?>
-        <div class="col-sm-12 thumbnail">
-            <label for="message-msg_pers_text" class="control-label col-sm-1">Ответ</label>
-            <div style="clear: both;">
-            <?= Html::encode($model->msg_answer) ?>
-            </div>
+        <div class="col-sm-6">
+            <?= $form
+                ->field($model, 'answers')
+                ->widget(Select2::classname(), [
+                    'data' => $aAnsw,
+                    'language' => 'ru',
+                    'options' => [
+                        'multiple' => true,
+                        'placeholder' => 'Выберите соответчика ...',
+                    ],
+                    'pluginOptions' => [
+                        'allowClear' => true,
+                    ],
+                ])
+            //                ->dropDownList($aAnsw, ['multiple' => true])
+            ?>
         </div>
-        <?php endif; ?>
 
         <div class="col-sm-6">
             <div class="form-group">
                 <label for="message-msg_pers_text" class="control-label col-sm-3">&nbsp;</label>
-                <div class="col-sm-9">
-                    <a href="#" class="btn btn-default" id="toggleuserformpart">Сообщение пользователя</a>
+                <div class="col-sm-4">
+                    <a href="#" class="btn btn-default togglepart" id="toggle_userformpart">Обращение</a>
                 </div>
+
+        <?php if( !empty($model->msg_answer)  ): ?>
+                <div class="col-sm-4">
+                    <a href="#" class="btn btn-default togglepart" id="toggle_answer">Ответ</a>
+                </div>
+        <?php endif; ?>
+
             </div>
 
         </div>
+
+        <?php if( !empty($model->msg_answer)  ): ?>
+        <div class="col-sm-12 thumbnail " id="id_answer" style="display: none;">
+            <label for="message-msg_pers_text" class="control-label col-sm-1">Ответ</label>
+            <div style="clear: both;">
+            <?= $model->msg_answer ?>
+            </div>
+        </div>
+        <?php endif; ?>
+
     <?php
     endif; // if( $model->scenario == 'moderator' ):
     /**
@@ -206,7 +232,7 @@ use kartik\typeahead\Typeahead;
      */
     if( $model->scenario == 'moderator' ):
     ?>
-        <div id="hideuserformpart" style="display: none; clear: both; border: 1px solid #777777; border-radius: 4px; background-color: #eeeeee; padding-top: 2em; margin-bottom: 2em;">
+        <div id="id_userformpart" style="display: none; clear: both; border: 1px solid #777777; border-radius: 4px; background-color: #eeeeee; padding-top: 2em; margin-bottom: 2em;">
     <?php
     endif; // if( $model->scenario == 'moderator' ):
     ?>
@@ -358,10 +384,13 @@ use kartik\typeahead\Typeahead;
 
 // Показываем/скрываем сообщение пользователя
     $sJs =  <<<EOT
-var oUserPart = jQuery("#hideuserformpart");
-jQuery('#toggleuserformpart').on("click", function(event){
+//var oUserPart = jQuery(".togglepart");
+jQuery(".togglepart").on("click", function(event){
+    var ob = jQuery(this),
+        id = ob.attr("id"),
+        dest = id.split("_").pop();
     event.preventDefault();
-    oUserPart.toggle();
+    jQuery("#id_" + dest).toggle();
     return false;
 });
 EOT;

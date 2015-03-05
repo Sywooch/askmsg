@@ -184,8 +184,8 @@ CREATE TABLE `b_user_group` (
         // create message answers table
         $this->createTable('{{%msganswers}}', [
             'ma_id' => Schema::TYPE_PK,
-            'ma_message_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'ma_user_id' => Schema::TYPE_INTEGER . ' NOT NULL',
+            'ma_message_id' => Schema::TYPE_INTEGER, //  . ' NOT NULL',
+            'ma_user_id' => Schema::TYPE_INTEGER, //  . ' NOT NULL',
         ], $tableOptionsMyISAM);
 
         $this->createIndex('idx_msganswers_user', '{{%msganswers}}', 'ma_user_id');

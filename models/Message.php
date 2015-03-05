@@ -10,6 +10,7 @@ use yii\db\Expression;
 use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
 use yii\behaviors\AttributeBehavior;
+use yii\base\Event;
 use app\models\Rolesimport;
 
 /**
@@ -134,10 +135,8 @@ class Message extends \yii\db\ActiveRecord
                     ActiveRecord::EVENT_BEFORE_INSERT => 'msg_flag',
                 ],
                 'value' => function ($event) {
-                    Yii::info('--------------event = ' . print_r($event, true));
                     return Msgflags::MFLG_NEW;
                 },
-
             ],
         ];
     }
@@ -155,6 +154,7 @@ class Message extends \yii\db\ActiveRecord
             [['msg_createtime', 'msg_answertime'], 'filter', 'filter' => function($v){ return empty($v) ? new Expression('NOW()') : $v;  }],
             [['msg_createtime', 'msg_answertime'], 'safe'],
             [['msg_flag'], 'required'],
+            [['answers'], 'safe'],
             [['msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag'], 'integer'],
             [['msg_pers_text', 'msg_answer', 'msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_pers_org'], 'string'],
             [['msg_answer'], 'filter', 'filter' => function($v){ return strip_tags($v, '<p><a><li><ol><ul><strong><b><em><i><u><h1><h2><h3><h4><h5><blockquote><pre><del><br>');  }],
@@ -173,7 +173,7 @@ class Message extends \yii\db\ActiveRecord
         $scenarios['person'] = ['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_secname', 'msg_pers_org', 'msg_pers_region', 'msg_createtime'];
         $scenarios['moderator'] = array_merge(
                                     $scenarios['person'],
-                                    ['msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_empl_id', 'msg_flag', 'msg_active']
+                                    ['msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_empl_id', 'msg_flag', 'msg_active', 'answers']
         );
         $scenarios['answer'] = ['msg_answer', 'msg_answertime', 'msg_flag'];
 
@@ -183,9 +183,18 @@ class Message extends \yii\db\ActiveRecord
     public function getScenariosData()
     { // TODO: отправить это все в конфиг
         $a = [
-            'person' => ['title' => 'Создать обращение', 'form' => '_form'],
-            'moderator' => ['title' => 'Обработка обращения', 'form' => '_form'],
-            'answer' => ['title' => 'Написать ответ', 'form' => '_formanswer'],
+            'person' => [
+                'title' => 'Создать обращение',
+                'form' => '_form'
+            ],
+            'moderator' => [
+                'title' => 'Обработка обращения',
+                'form' => '_form'
+            ],
+            'answer' => [
+                'title' => 'Написать ответ',
+                'form' => '_formanswer'
+            ],
         ];
         return isset($a[$this->scenario]) ? $a[$this->scenario] : $a['person'];
     }
@@ -218,6 +227,7 @@ class Message extends \yii\db\ActiveRecord
 
             'employer' => 'Ответчик',
             'asker' => 'Проситель',
+            'answers' => 'Соответчики',
             'askid' => 'Номер и дата',
             'askcontacts' => 'Контакты',
             'tags' => 'Теги',
@@ -249,12 +259,74 @@ class Message extends \yii\db\ActiveRecord
     }
 
     /**
+     *  Связь с табличкой, соединяющей сообщения и его соответчиков
+     */
+    public function getUsers() {
+        return $this->hasMany(
+            Msganswers::className(),
+            ['ma_message_id' => 'msg_id']
+        );
+    }
+
+    /**
+     *  Связь сообщения и его ответчиков
+     */
+    public function getAnswers() {
+        return $this
+            ->hasMany(
+                User::className(),
+                ['us_id' => 'ma_user_id'])
+            ->via('users');
+    }
+
+    /**
+     *  Установка соответчиков
+     */
+    public function setAnswers($answers)
+    {
+        $this->answers = $answers;
+    }
+
+    /**
      *  Полное имя просителя
      */
     public function getFullName() {
         return $this->msg_pers_lastname . ' ' . $this->msg_pers_name . ' ' . $this->msg_pers_secname;
     }
 
+    /**
+     *  Сохраняем соответчиков
+     * @param Event $event
+     */
+    public function saveCoanswers($event) {
+        $model = $event->sender;
+//        Yii::info("event: {$event->name} -> " . print_r($model->answers, true) . print_r($this->answers, true));
+        if( $event->name === ActiveRecord::EVENT_AFTER_UPDATE ) {
+            $nCou = Msganswers::updateAll(['ma_message_id' => 0, 'ma_user_id' => 0], 'ma_message_id = ' . $model->msg_id);
+            Yii::info('Clear soanswers: ' . $nCou);
+        }
+        if( is_array($model->answers) ) {
+            foreach($model->answers As $id) {
+                // Msganswers::updateAll();
+                $nUpd = Yii::$app
+                    ->db
+                    ->createCommand('Update ' . Msganswers::tableName() . ' Set ma_message_id = :ma_message_id, ma_user_id = :ma_user_id Where ma_message_id = 0 Limit 1', [':ma_message_id' => $model->msg_id, ':ma_user_id' => $id])
+                    ->execute();
+                if( $nUpd == 0 ) {
+                    $nUpd = Yii::$app
+                        ->db
+                        ->createCommand('Insert Into ' . Msganswers::tableName() . ' (ma_message_id, ma_user_id) Values (:ma_message_id,  :ma_user_id)', [':ma_message_id' => $model->msg_id, ':ma_user_id' => $id])
+                        ->execute();
+//                    Yii::info('Insert answers : ['.$model->msg_id.', '.$id.']');
+                }
+/*
+                else {
+                    Yii::info('Update empty answers : ['.$model->msg_id.', '.$id.']');
+                }
+*/
+            }
+        }
+    }
 
 
 }
