@@ -101,17 +101,6 @@ CREATE TABLE `b_user` (
         $nPrint = 3;
         $aUserMap = [];
 
-        /*
-        Error insert into user->group : Array
-        (
-            [usgr_uid] => Array
-                (
-                    [0] => Usgr Uid cannot be blank.
-                )
-
-        )
-
-        */
         foreach($aOldUsers As $ad) {
             if( $nPrint-- > 0 ) {
                 \Yii::info('Migrate up to ' . User::tableName() . ' data ' . print_r($ad, true));
@@ -140,6 +129,7 @@ CREATE TABLE `b_user` (
                 if( !$oUser->save() ) {
                     \Yii::info("Error insert into user " . print_r($oUser->getErrors(), true) . ' ' . print_r($ad, true) );
                     echo 'Error insert into user : ' . print_r($oUser->getErrors(), true) . "\n";
+                    return false;
                 }
                 else {
                     $aUserMap[$ad['ID']] = $oUser->us_id;
@@ -157,6 +147,27 @@ CREATE TABLE `b_user` (
                 \Yii::info("Error insert into user->group " . print_r($oUserGr->getErrors(), true) . ' ' . print_r($ad, true) );
                 echo 'Error insert into user->group : ' . print_r($oUserGr->getErrors(), true) . "\n";
             }
+            /*
+
+            Error insert into user->group : Array
+    (
+        [usgr_uid] => Array
+            (
+                [0] => Usgr Uid cannot be blank.
+            )
+
+    )
+
+    Error insert into user : Array
+    (
+        [selectedGroups] => Array
+            (
+                [0] => Группы cannot be blank.
+            )
+
+    )
+
+            */
         }
 
         echo 'import users finished' . "\n";
