@@ -137,6 +137,25 @@ use kartik\typeahead\Typeahead;
         </div>
 
         <div class="col-sm-6">
+            <?= $form
+                ->field($model, 'alltags')
+                ->widget(Select2::classname(), [
+                    'data' => ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_title'),
+                    'language' => 'ru',
+                    'options' => [
+                        'multiple' => true,
+//                        'tags' => true,
+                        'placeholder' => 'Выберите теги ...',
+                    ],
+                    'pluginOptions' => [
+                        'allowClear' => true,
+                    ],
+                ])
+            //                ->dropDownList($aAnsw, ['multiple' => true])
+            ?>
+        </div>
+
+        <div class="col-sm-6">
             <div class="form-group">
                 <label for="message-msg_pers_text" class="control-label col-sm-3">&nbsp;</label>
                 <div class="col-sm-4">
@@ -162,24 +181,6 @@ use kartik\typeahead\Typeahead;
         </div>
         <?php endif; ?>
 
-        <div class="col-sm-6">
-            <?= $form
-                ->field($model, 'alltags')
-                ->widget(Select2::classname(), [
-                    'data' => ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_title'),
-                    'language' => 'ru',
-                    'options' => [
-                        'multiple' => true,
-//                        'tags' => true,
-                        'placeholder' => 'Выберите теги ...',
-                    ],
-                    'pluginOptions' => [
-                        'allowClear' => true,
-                    ],
-                ])
-            //                ->dropDownList($aAnsw, ['multiple' => true])
-            ?>
-        </div>
     <?php
     endif; // if( $model->scenario == 'moderator' ):
     /**

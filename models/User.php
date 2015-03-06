@@ -41,6 +41,7 @@ class User extends ActiveRecord  implements IdentityInterface
     const STATUS_ACTIVE = 1;
 
     public static $_model = null;
+    public static $_cache = [];
     public $selectedGroups = null;
 
     public function behaviors()
@@ -361,13 +362,18 @@ class User extends ActiveRecord  implements IdentityInterface
      *
      *  Поиск пользователей по их группе
      *
-     * @param $idGroup
+     * @param integer $idGroup
      * @param string $sQuery
      * @param string $format
      * @return array
      *
      */
     public static function getGroupUsers($idGroup, $sQuery = '', $format = '') {
+        $sKey = $idGroup .  $sQuery . $format;
+        if( isset(self::$_cache[$sKey]) ) {
+            return self::$_cache[$sKey];
+        }
+
         $aWhere = ['usgr_gid' => $idGroup];
         if( $sQuery !== '' ) {
             $aWhere = array_merge(
@@ -401,6 +407,7 @@ class User extends ActiveRecord  implements IdentityInterface
                 );
             }
         );
+        self::$_cache[$sKey] = $aData;
         return $aData;
     }
 

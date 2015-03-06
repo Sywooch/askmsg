@@ -155,7 +155,7 @@ class Message extends \yii\db\ActiveRecord
                     ActiveRecord::EVENT_BEFORE_INSERT => ['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname'],
                 ],
                 'value' => function ($event, $attribute) {
-                    // тут еще, конечно, можно предусмотреть хитрые имена-фамилии типа Кара-Мурза, но опка не буду
+                    // тут еще, конечно, можно предусмотреть хитрые имена-фамилии типа Кара-Мурза, но пока не буду
                     /** @var  $model Activerecord */
                     $model = $event->sender;
                     $s = $model->$attribute;
@@ -179,7 +179,7 @@ class Message extends \yii\db\ActiveRecord
             [['msg_createtime', 'msg_answertime'], 'safe'],
             [['msg_flag'], 'required'],
 //            [['answers'], 'safe'],
-            [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}'))],
+            [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}')), 'allowArray' => true],
             [['msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject'], 'integer'],
             [['msg_pers_text'], 'string', 'max' => self::MAX_PERSON_TEXT_LENGTH],
             [['msg_answer', 'msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_pers_org'], 'string'],
