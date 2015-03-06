@@ -101,6 +101,17 @@ CREATE TABLE `b_user` (
         $nPrint = 3;
         $aUserMap = [];
 
+        /*
+        Error insert into user->group : Array
+        (
+            [usgr_uid] => Array
+                (
+                    [0] => Usgr Uid cannot be blank.
+                )
+
+        )
+
+        */
         foreach($aOldUsers As $ad) {
             if( $nPrint-- > 0 ) {
                 \Yii::info('Migrate up to ' . User::tableName() . ' data ' . print_r($ad, true));
@@ -115,12 +126,12 @@ CREATE TABLE `b_user` (
                     'us_chekword_hash' => $ad['CHECKWORD'],
                     'us_active' => $ad['ACTIVE'] == 'Y' ? 1 : 0,
                     'us_name' => empty($ad['NAME']) ? $ad['LOGIN'] : $ad['NAME'] ,
-                    'us_secondname' => $ad['SECOND_NAME'],
-                    'us_lastname' => $ad['LAST_NAME'],
+                    'us_secondname' => empty($ad['SECOND_NAME']) ? $ad['LOGIN'] : $ad['SECOND_NAME'],
+                    'us_lastname' => empty($ad['LAST_NAME']) ? $ad['LOGIN'] : $ad['LAST_NAME'],
                     'us_email' => $ad['EMAIL'],
                     'us_logintime' => $ad['LAST_LOGIN'],
                     'us_regtime' => empty($ad['DATE_REGISTER']) ? date('YmdHis') : $ad['DATE_REGISTER'],
-                    'us_workposition' => $ad['WORK_POSITION'],
+                    'us_workposition' => empty($ad['WORK_POSITION']) ? $ad['LOGIN'] : $ad['WORK_POSITION'],
                     'us_checkwordtime' => $ad['CHECKWORD_TIME'],
                     'auth_key' => '',
                     'email_confirm_token' => '',
@@ -239,7 +250,6 @@ CREATE TABLE `b_user` (
                 else {
                     echo 'Not found region : ' . $ad['PROPERTY_200'] . " [{$ad['MSGID']}]\n";
                 }
-
                 $oMsg->attributes = [
                     'msg_id' => $ad['MSGID'],
                     'msg_createtime' => $ad['DATE_CREATE'],
