@@ -276,14 +276,102 @@ use kartik\typeahead\Typeahead;
         <?= $form->field(
             $model,
             'msg_pers_org'
-/*            ,
-            [
-//                'options' => [
-//                    'tag' => null,
-//                    // 'placeholder' => $model->getAttributeLabel('demo'),
-//                ],
-            ]*/)
-            ->textInput(['maxlength' => 255]) ?>
+        )
+        ->widget(Select2::classname(), [
+//            'data' => [],
+            'language' => 'ru',
+/*
+            'scrollable' => true,
+            'dataset' => [
+                [
+                    'remote' => [
+                        'url' => Url::to(['user/answerlist', 'query'=>'QRY']),
+                        'wildcard' => 'QRY',
+                    ],
+                    'displayKey' => 'val',
+
+                    'templates' => [
+                        'suggestion' => new JsExpression("Handlebars.compile('<p>{{val}}<br /><span style=\"color: #777777;\">{{pos}}</span></p>')"),
+                    ],
+
+                ]
+            ],
+
+
+   function repoFormatResult(repo) {
+      var markup = '<div class="row-fluid">' +
+         '<div class="span2"><img src="' + repo.owner.avatar_url + '" /></div>' +
+         '<div class="span10">' +
+            '<div class="row-fluid">' +
+               '<div class="span6">' + repo.full_name + '</div>' +
+               '<div class="span3"><i class="fa fa-code-fork"></i> ' + repo.forks_count + '</div>' +
+               '<div class="span3"><i class="fa fa-star"></i> ' + repo.stargazers_count + '</div>' +
+            '</div>';
+
+      if (repo.description) {
+         markup += '<div>' + repo.description + '</div>';
+      }
+
+      markup += '</div></div>';
+
+      return markup;
+   }
+
+*/
+            'pluginOptions' => [
+                'highlight' => true,
+                'minLength' => 2,
+                'allowClear' => true,
+                'ajax' =>[
+                    'method' => 'POST',
+                    'url' => "http://hastur.temocenter.ru/task/eo.search/forhost/ask.educom.ru",
+                    'dataType' => 'json',
+                    'data' => new JsExpression('function (term, page) {
+                        console.log("data("+term+", "+page+")");
+                        return {
+                            filters: {eo_name: term, eo_short_name: term},
+                            maskarade: {eo_id: "id", eo_short_name: "text", eo_district_name_id: "area_id", eo_subordination_name: "district"},
+                            fields: "eo_id;eo_short_name;eo_subordination_name_id",
+                            limit: 10,
+                            start: (page - 1) * 10,
+                            "_": (new Date()).getSeconds()
+                        };
+                    }'),
+/*
+*/
+                    'results' => new JsExpression('function (data, page) {
+                                console.log("results("+page+") data = ", data);
+                                var more = (page * 10) < data.total; // whether or not there are more results available
+                                return {results: data.list, more: more};
+//                                return { results: data.list };
+                             }'),
+                    'id' => new JsExpression(
+                        'function(item){return item.id;}'
+                    ),
+                ],
+                'formatResult' => new JsExpression(
+                    'function (item) {
+                        console.log("formatResult() item = ", item);
+                        var markup = \'<div class="row-fluid">\'
+                            + item.text
+                            + \'<div class="span3"><i class="fa fa-star"></i>\' + item.district + \'</div>\'
+                            + \'</div>\';
+                        return markup; // item.text;
+                    }'
+                ),
+                'escapeMarkup' => new JsExpression('function (m) { return m; }'),
+            ],
+            'options' => [
+//                    'multiple' => true,
+                'placeholder' => 'Выберите учреждение ...',
+            ],
+        ])
+        /*?>
+               <?= $form->field(
+                   $model,
+                   'msg_pers_org'
+                   )
+                   ->textInput(['maxlength' => 255])*/ ?>
     </div>
 
 
