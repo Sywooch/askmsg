@@ -46,6 +46,9 @@ class User extends ActiveRecord  implements IdentityInterface
 
     public function behaviors()
     {
+        if( $this->scenario == 'importdata' ) {
+            return [];
+        }
         return [
             'passwordBehavior' => [
                 'class' => PasswordBehavior::className(),
@@ -78,7 +81,7 @@ class User extends ActiveRecord  implements IdentityInterface
      */
     public function rules()
     {
-        \Yii::info("rules: " . print_r(array_keys(Group::getActiveGroups()), true));
+//        \Yii::info("rules: " . print_r(array_keys(Group::getActiveGroups()), true));
         return [
             [['us_xtime', 'us_logintime', 'us_regtime', 'us_checkwordtime'], 'safe'],
             [['us_login', 'us_password_hash', 'us_name', 'us_secondname', 'us_lastname', 'us_email', 'us_workposition', 'us_password_hash', 'selectedGroups'], 'required'],
@@ -100,7 +103,7 @@ class User extends ActiveRecord  implements IdentityInterface
         $scenarios['create'] = ['us_login', 'us_name', 'us_secondname', 'us_lastname', 'us_email', 'us_workposition',
                                 'us_active', 'selectedGroups'];
         $scenarios['update'] = array_merge($scenarios['create'], []);
-        $scenarios['import'] = ['us_login', 'us_name', 'us_email', 'us_workposition', 'us_active'];
+        $scenarios['importdata'] = ['us_login', 'us_name', 'us_email', 'us_workposition', 'us_active'];
         return $scenarios;
     }
 
