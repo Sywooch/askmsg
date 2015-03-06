@@ -171,8 +171,7 @@ class Message extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            // , 'ekis_id'
-            [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_org', 'msg_pers_region', 'msg_subject'], 'required'],
+            [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_org', 'msg_pers_region', 'msg_subject', 'ekis_id'], 'required'],
             [['msg_answer'], 'required'],
 //            [['msg_pers_secname'], 'required', 'on'=>['answer', 'person', 'moderator']],
             [['msg_createtime', 'msg_answertime'], 'filter', 'filter' => function($v){ return empty($v) ? new Expression('NOW()') : $v;  }],
@@ -180,7 +179,7 @@ class Message extends \yii\db\ActiveRecord
             [['msg_flag'], 'required'],
 //            [['answers'], 'safe'],
             [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}')), 'allowArray' => true],
-            [['msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject'], 'integer'],
+            [['msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject', 'ekis_id'], 'integer'],
             [['msg_pers_text'], 'string', 'max' => self::MAX_PERSON_TEXT_LENGTH],
             [['msg_answer', 'msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_pers_org'], 'string'],
             [['msg_answer'], 'filter', 'filter' => function($v){ return strip_tags($v, '<p><a><li><ol><ul><strong><b><em><i><u><h1><h2><h3><h4><h5><blockquote><pre><del><br>');  }],
@@ -196,16 +195,18 @@ class Message extends \yii\db\ActiveRecord
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios['person'] = ['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_secname', 'msg_pers_org', 'msg_pers_region', 'msg_createtime', 'msg_subject'];
+        $scenarios['person'] = ['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_secname', 'msg_pers_org', 'msg_pers_region', 'msg_createtime', 'msg_subject', 'ekis_id'];
         $scenarios['moderator'] = array_merge(
                                     $scenarios['person'],
                                     ['msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_empl_id', 'msg_flag', 'msg_active', 'answers']
         );
 
-        // у старых сообщений нет темы
-        $n = array_search('msg_subject', $scenarios['moderator'], true);
-        if( $n !== false ) {
-            $scenarios['moderator'][$n];
+        // у старых сообщений нет темы, ekis_id
+        foreach(['msg_subject', 'ekis_id'] As $v) {
+            $n = array_search($v, $scenarios['moderator'], true);
+            if( $n !== false ) {
+                $scenarios['moderator'][$n];
+            }
         }
 
         $scenarios['answer'] = ['msg_answer', 'msg_answertime', 'msg_flag'];
@@ -258,6 +259,7 @@ class Message extends \yii\db\ActiveRecord
             'msg_oldcomment' => 'Старые теги',
             'msg_flag' => 'Состояние',
             'msg_subject' => 'Тема',
+            'ekis_id' => 'Учреждение',
 
             'employer' => 'Ответчик',
             'asker' => 'Проситель',

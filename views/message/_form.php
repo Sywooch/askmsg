@@ -275,7 +275,7 @@ use kartik\typeahead\Typeahead;
     <div class="col-sm-4">
         <?= $form->field(
             $model,
-            'msg_pers_org'
+            'ekis_id'
         )
         ->widget(Select2::classname(), [
 //            'data' => [],
@@ -319,9 +319,29 @@ use kartik\typeahead\Typeahead;
 
 */
             'pluginOptions' => [
-                'highlight' => true,
-                'minLength' => 2,
                 'allowClear' => true,
+                'initSelection' => new JsExpression('function (element, callback) {
+                    if( element.val() > 0 ) {
+                        $.ajax({
+                            method: "POST",
+                            url: "http://hastur.temocenter.ru/task/eo.search/",
+                            dataType: "json",
+                            data: {
+                                filters: {
+                                    eo_id: element.val(),
+                                },
+                                maskarade: {
+                                    eo_id: "id",
+                                    eo_short_name: "text"
+                                },
+                                fields: ["eo_id", "eo_short_name"].join(";")
+                            },
+                            success: function (data) {
+                                callback(data.list.pop());
+                            }
+                        });
+                    }
+                }'),
                 'ajax' =>[
                     'method' => 'POST',
                     'url' => "http://hastur.temocenter.ru/task/eo.search/forhost/ask.educom.ru",
@@ -337,8 +357,7 @@ use kartik\typeahead\Typeahead;
                             "_": (new Date()).getSeconds()
                         };
                     }'),
-/*
-*/
+
                     'results' => new JsExpression('function (data, page) {
                                 console.log("results("+page+") data = ", data);
                                 var more = (page * 10) < data.total; // whether or not there are more results available
@@ -351,21 +370,35 @@ use kartik\typeahead\Typeahead;
                 ],
                 'formatResult' => new JsExpression(
                     'function (item) {
+                        return formatSelect(item, "text", "district");
+/*
                         console.log("formatResult() item = ", item);
                         var markup = \'<div class="row-fluid">\'
                             + item.text
                             + \'<div class="span3"><i class="fa fa-star"></i>\' + item.district + \'</div>\'
                             + \'</div>\';
                         return markup; // item.text;
+*/
                     }'
                 ),
                 'escapeMarkup' => new JsExpression('function (m) { return m; }'),
             ],
+
+            'pluginEvents' => [
+                'change' => 'function(event) { jQuery("#'.Html::getInputId($model, 'msg_pers_org').'").val(event.added.text); console.log("change", event); }',
+            ],
+
             'options' => [
 //                    'multiple' => true,
                 'placeholder' => 'Выберите учреждение ...',
             ],
         ])
+        . $form->field(
+            $model,
+            'msg_pers_org',
+            ['template' => "{input}", 'options' => ['tag' => 'span']]
+        )
+        ->hiddenInput()
         /*?>
                <?= $form->field(
                    $model,
@@ -489,7 +522,7 @@ oMsgTextField.on("keyup", function(event){
 });
 EOT;
 
-// Показываем/скрываем сообщение пользователя
+    // Показываем/скрываем сообщение пользователя
     $sJs .=  <<<EOT
 //var oUserPart = jQuery(".togglepart");
 jQuery(".togglepart").on("click", function(event){
@@ -502,7 +535,7 @@ jQuery(".togglepart").on("click", function(event){
 });
 EOT;
 
-// Меняем флаг сообщения в зависимости от нажатой кнопки
+    // Меняем флаг сообщения в зависимости от нажатой кнопки
     $sJs .=  <<<EOT
 var oButtons = jQuery('.changeflag'),
     oFlag = jQuery("#{$sFlagId}"),
@@ -553,6 +586,14 @@ oCommand.on("keyup", function(event){
 EOT;
 
         $this->registerJs($sJs, View::POS_READY, 'toggleuserpart');
+    // функция форматирования результатов в список для select2
+    $sJs =  <<<EOT
+var formatSelect = function(item, text, description) {
+    return  item[text] + "<span>" + item[description] + "</span>";
+}
+EOT;
+    $this->registerJs($sJs, View::POS_END , 'showselectpart');
+
     ?>
 
 </div>

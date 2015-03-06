@@ -220,6 +220,7 @@ class MessageController extends Controller
                 return $this->redirect(['moderatelist']);
             }
         } else {
+            Yii::info('MESSAGE ERROR: ' . print_r($model->getErrors(), true));
             return $this->render('create', [
                 'model' => $model,
             ]);
