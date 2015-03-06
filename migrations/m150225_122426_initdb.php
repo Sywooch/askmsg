@@ -164,6 +164,8 @@ CREATE TABLE `b_user_group` (
             'fl_sort' => Schema::TYPE_INTEGER . ' NOT NULL Default 0',
             'fl_glyth' => Schema::TYPE_STRING,
             'fl_glyth_color' =>  Schema::TYPE_STRING . '(32) Default \'#ff9999\'',
+            'fl_sname' =>  Schema::TYPE_STRING . '(16)',
+            'fl_duration' => Schema::TYPE_INTEGER . ' Default 14',
         ], $tableOptionsMyISAM);
 
 /*

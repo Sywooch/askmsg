@@ -18,7 +18,20 @@ class m150225_140020_importusers extends Migration
 //        $sf = \Yii::getAlias('@app') . DIRECTORY_SEPARATOR . 'runtime' . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . 'migration.log';
 //        $stime = date('d.m.Y H:i:s');
 //        file_put_contents($sf, $stime . "\t" .print_r($aGr, true), FILE_APPEND);
+/*
+16:11:37 Dumping educom_site (b_iblock_element_prop_m52, b_iblock_element_prop_s52, b_iblock_property_enum, b_user_group, b_user, b_group, b_iblock_element)
 
+Running: mysqldump.exe --defaults-file="c:\users\kozminva\appdata\local\temp\tmpmzao03.cnf"  --set-gtid-purged=OFF --user=viktor_educom --host=localhost --protocol=tcp --port=24891 --default-character-set=utf8 --single-transaction=TRUE --no-data --skip-triggers "educom_site"
+
+b_group
+b_iblock_element
+b_iblock_element_prop_m52
+b_iblock_element_prop_s52
+b_iblock_property_enum
+b_user
+b_user_group
+
+*/
         $connection = \Yii::$app->db;
         $oldConnection = \Yii::$app->dbold;
 
@@ -141,7 +154,8 @@ CREATE TABLE `b_user` (
          * import regions
          *
          */
-        $sql = 'Select ID, NAME, ACTIVE From b_iblock_region Order By SORT';
+        $sql = 'Select ID, NAME, ACTIVE From b_iblock_element Where IBLOCK_ID = 51 Order By SORT';
+//        $sql = 'Select ID, NAME, ACTIVE From b_iblock_region Order By SORT';
         $aOldReg = $oldConnection->createCommand($sql)->queryAll();
         $aGegMap = [];
         foreach($aOldReg As $ad) {
@@ -192,7 +206,7 @@ CREATE TABLE `b_user` (
         $sql = 'Select m.ID As MSGID, m.*, p.*, a.*, a.VALUE As dopuser '
               . 'From b_iblock_element_prop_s52 p, b_iblock_element m '
               . 'Left Outer Join b_iblock_element_prop_m52 a On a.IBLOCK_ELEMENT_ID = m.ID '
-              . 'Where p.IBLOCK_ELEMENT_ID = m.ID';
+              . 'Where m.IBLOCK_ID = 52 And p.IBLOCK_ELEMENT_ID = m.ID';
 
         $aMsg = $oldConnection->createCommand($sql)->query();
         $nCount = $aMsg->count();

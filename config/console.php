@@ -3,8 +3,6 @@
 Yii::setAlias('@tests', dirname(__DIR__) . '/tests');
 
 $params = require(__DIR__ . '/params.php');
-$db = require(__DIR__ . '/db.php');
-$dbold = require(__DIR__ . '/dbold.php');
 
 return [
     'id' => 'basic-console',
@@ -26,15 +24,7 @@ return [
             'class' => 'yii\caching\FileCache',
         ],
         'log' => [
-            'targets' => [
-                [
-                    'class' => 'yii\log\FileTarget',
-                    'levels' => ['error', 'warning', 'info'],
-                ],
-            ],
         ],
-        'db' => $db,
-        'dbold' => $dbold,
     ],
     'params' => $params,
 ];

@@ -114,7 +114,7 @@ class Msgflags extends \yii\db\ActiveRecord
     {
         return [
             [['fl_name'], 'required'],
-            [['fl_sort'], 'integer'],
+            [['fl_sort', 'fl_duration'], 'integer'],
             [['fl_name', 'fl_command', 'fl_glyth'], 'string', 'max' => 255],
             [['fl_glyth_color'], 'string', 'max' => 32],
             [['fl_sname'], 'string', 'max' => 16],
@@ -134,6 +134,7 @@ class Msgflags extends \yii\db\ActiveRecord
             'fl_glyth' => 'Картинка из bootstrap',
             'fl_glyth_color' => 'Цвет картинки',
             'fl_sname' => 'Короткое имя',
+            'fl_duration' => 'Макс. время в этом состоянии',
         ];
     }
 }

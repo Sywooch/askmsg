@@ -255,8 +255,9 @@ use kartik\typeahead\Typeahead;
         ]) ?>
     </div>
 
+<?php
+/*
     <div class="clearfix"></div>
-
     <div class="col-sm-4">
         <?= $form
             ->field($model, 'msg_pers_region')
@@ -271,6 +272,8 @@ use kartik\typeahead\Typeahead;
                 )
             ) ?>
     </div>
+*/
+?>
 
     <div class="col-sm-4">
         <?= $form->field(
