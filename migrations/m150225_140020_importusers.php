@@ -108,7 +108,6 @@ CREATE TABLE `b_user` (
             if( $nPrevUid != $ad['ID'] ) {
                 $nPrevUid = $ad['ID'];
                 $oUser = new User(['scenario' => 'importdata']);
-//                $oUser->scenario = 'importdata';
                 $oUser->attributes = [
                     'us_xtime' => $ad['TIMESTAMP_X'],
                     'us_login' => $ad['LOGIN'],
@@ -253,8 +252,7 @@ CREATE TABLE `b_user` (
                     echo date('H:i:s') . ' new message ' . $nNewUser . '/' . $n . " records\n";
                 }
                 $nPrevMsg = $ad['MSGID'];
-                $oMsg = new Message();
-                $oMsg->scenario = 'import';
+                $oMsg = new Message(['scenario' => 'importdata']);
 
                 if( isset($aGegMap[$ad['PROPERTY_200']]) ) {
                     $ad['PROPERTY_200'] = $aGegMap[$ad['PROPERTY_200']];

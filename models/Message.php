@@ -178,7 +178,8 @@ class Message extends \yii\db\ActiveRecord
             [['msg_createtime', 'msg_answertime'], 'safe'],
             [['msg_flag'], 'required'],
 //            [['answers'], 'safe'],
-            [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}')), 'allowArray' => true],
+            [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_12, '', '{{val}}')), 'allowArray' => true],
+//            [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}')), 'allowArray' => true],
             [['msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject', 'ekis_id'], 'integer'],
             [['msg_pers_text'], 'string', 'max' => self::MAX_PERSON_TEXT_LENGTH],
             [['msg_answer', 'msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_pers_org'], 'string'],
@@ -200,6 +201,8 @@ class Message extends \yii\db\ActiveRecord
                                     $scenarios['person'],
                                     ['msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_empl_id', 'msg_flag', 'msg_active', 'answers']
         );
+
+        $scenarios['import'] = ['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_secname', 'msg_pers_org', 'msg_pers_region', 'msg_createtime', 'msg_subject'];
 
         // у старых сообщений нет темы, ekis_id
         foreach(['msg_subject', 'ekis_id'] As $v) {
