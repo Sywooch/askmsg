@@ -84,7 +84,8 @@ class User extends ActiveRecord  implements IdentityInterface
 //        \Yii::info("rules: " . print_r(array_keys(Group::getActiveGroups()), true));
         return [
             [['us_xtime', 'us_logintime', 'us_regtime', 'us_checkwordtime'], 'safe'],
-            [['us_login', 'us_password_hash', 'us_name', 'us_secondname', 'us_lastname', 'us_email', 'us_workposition', 'us_password_hash', 'selectedGroups'], 'required'],
+            [['us_login', 'us_password_hash', 'us_name', 'us_email', 'us_workposition', 'us_password_hash', 'selectedGroups'], 'required'],
+            [['us_secondname', 'us_lastname'], 'required', 'on' => ['create', 'update']],
             [['us_active'], 'integer'],
             [['us_login', 'us_email'], 'unique', 'on' => 'create'],
             [['selectedGroups'], 'in', 'range' => array_keys(Group::getActiveGroups()), 'allowArray' => true ],
@@ -103,7 +104,19 @@ class User extends ActiveRecord  implements IdentityInterface
         $scenarios['create'] = ['us_login', 'us_name', 'us_secondname', 'us_lastname', 'us_email', 'us_workposition',
                                 'us_active', 'selectedGroups'];
         $scenarios['update'] = array_merge($scenarios['create'], []);
-        $scenarios['importdata'] = ['us_login', 'us_name', 'us_email', 'us_workposition', 'us_active'];
+        $scenarios['importdata'] = [
+            'us_login',
+            'us_name',
+            'us_secondname',
+            'us_lastname',
+            'us_email',
+            'us_workposition',
+            'us_active',
+            'us_regtime',
+            'us_logintime',
+            'us_checkwordtime',
+            'us_chekword_hash',
+        ];
         return $scenarios;
     }
 

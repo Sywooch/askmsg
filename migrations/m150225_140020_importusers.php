@@ -115,8 +115,8 @@ CREATE TABLE `b_user` (
                     'us_chekword_hash' => $ad['CHECKWORD'],
                     'us_active' => $ad['ACTIVE'] == 'Y' ? 1 : 0,
                     'us_name' => empty($ad['NAME']) ? $ad['LOGIN'] : $ad['NAME'] ,
-                    'us_secondname' => empty($ad['SECOND_NAME']) ? $ad['LOGIN'] : $ad['SECOND_NAME'],
-                    'us_lastname' => empty($ad['LAST_NAME']) ? $ad['LOGIN'] : $ad['LAST_NAME'],
+                    'us_secondname' => empty($ad['SECOND_NAME']) ? '' : trim($ad['SECOND_NAME']), // $ad['LOGIN']
+                    'us_lastname' => empty($ad['LAST_NAME']) ? '' : trim($ad['LAST_NAME']), // $ad['LOGIN']
                     'us_email' => $ad['EMAIL'],
                     'us_logintime' => $ad['LAST_LOGIN'],
                     'us_regtime' => empty($ad['DATE_REGISTER']) ? date('YmdHis') : $ad['DATE_REGISTER'],
@@ -126,6 +126,8 @@ CREATE TABLE `b_user` (
                     'email_confirm_token' => '',
                     'password_reset_token' => '',
                 ];
+                $oUser->generateAuthKey();
+
                 if( !$oUser->save() ) {
                     \Yii::info("Error insert into user " . print_r($oUser->getErrors(), true) . ' ' . print_r($ad, true) );
                     echo 'Error insert into user : ' . print_r($oUser->getErrors(), true) . "\n";
