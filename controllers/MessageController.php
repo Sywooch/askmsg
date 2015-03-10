@@ -88,7 +88,7 @@ class MessageController extends Controller
     public function actionModeratelist()
     {
         $searchModel = new MessageSearch();
-        $searchModel->msgflags = Message::gerMessageFilters()[Rolesimport::ROLE_MODERATE_DOGM];
+        $searchModel->msgflags = Message::getMessageFilters()[Rolesimport::ROLE_MODERATE_DOGM];
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('admin', [
@@ -106,7 +106,7 @@ class MessageController extends Controller
 
         $searchModel = new MessageSearch();
 
-        $searchModel->msgflags = Message::gerMessageFilters()[Rolesimport::ROLE_ANSWER_DOGM];
+        $searchModel->msgflags = Message::getMessageFilters()[Rolesimport::ROLE_ANSWER_DOGM];
         $searchModel->msg_empl_id = Yii::$app->user->identity->getId();
 
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -125,7 +125,7 @@ class MessageController extends Controller
     public function actionList()
     {
         $searchModel = new MessageSearch();
-        $searchModel->msgflags = Message::gerMessageFilters()[Rolesimport::ROLE_GUEST];
+        $searchModel->msgflags = Message::getMessageFilters()[Rolesimport::ROLE_GUEST];
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('list', [

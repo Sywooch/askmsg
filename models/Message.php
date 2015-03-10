@@ -71,7 +71,7 @@ class Message extends \yii\db\ActiveRecord
     /**
      *
      */
-    public static function gerMessageFilters()
+    public static function getMessageFilters()
     {
         // Флаги сообщений для разных пользователей
         $_flagFilter = [

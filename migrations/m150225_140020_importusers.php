@@ -203,6 +203,20 @@ CREATE TABLE `b_user` (
          * import flags
          *
          */
+        $aDop = [
+            '[100]' => ['comm' => 'Перенести в новые', 'glyth' => 'envelope', 'color' => '#ff0000', 'sname' =>'Новое'],
+            '[101]' => ['comm' => 'Отправить поручение', 'glyth' => 'comment', 'color' => '#ff4500', 'sname' =>'Поруч.'],
+            '[102]' => ['comm' => 'Отметить выполненный ответ', 'glyth' => 'comment', 'color' => '#ff1493', 'sname' =>'Ответ Поруч.'],
+            '[103]' => ['comm' => 'Опубликовать с ответом', 'glyth' => 'comment', 'color' => '#2e8b57', 'sname' =>'Выполн. Поруч.'],
+            '[104]' => ['comm' => 'Отправить на доработку', 'glyth' => 'comment', 'color' => '#ff0000', 'sname' =>'Дораб. Поруч'],
+            '[105]' => ['comm' => 'Опубликовать без ответа', 'glyth' => 'comment', 'color' => '#ff0000', 'sname' =>'Опубл.'],
+            '[106]' => ['comm' => 'Отправить в архив', 'glyth' => 'trash', 'color' => '#cccccc', 'sname' =>'Архив'],
+            '[107]' => ['comm' => 'Отправить внутреннее поручение', 'glyth' => 'list-alt', 'color' => '#ff4500', 'sname' =>'ВП'],
+            '[108]' => ['comm' => 'Отправить внутренний ответ', 'glyth' => 'list-alt', 'color' => '#ff1493', 'sname' =>'Ответ ВП'],
+            '[109]' => ['comm' => 'Отправить на дработку внутреннее поручение', 'glyth' => 'list-alt', 'color' => '#ff0000', 'sname' =>'Дораб. ВП'],
+            '[110]' => ['comm' => 'Перенести в благодарности', 'glyth' => 'heart', 'color' => '#99FF99', 'sname' =>'Благ.'],
+            '[111]' => ['comm' => 'Отчитаться о внутреннем поручении', 'glyth' => 'list-alt', 'color' => '#2e8b57', 'sname' =>'Выпол. ВП'],
+        ];
         $sql = 'Select ID, VALUE, SORT From b_iblock_property_enum';
         $aOldFlags = $oldConnection->createCommand($sql)->queryAll();
         $aFlagsMap = [];
@@ -212,6 +226,15 @@ CREATE TABLE `b_user` (
                 'fl_name' => $ad['VALUE'],
                 'fl_sort' => $ad['SORT'],
             ];
+            foreach($aDop As $k=>$v) {
+                if( strncmp(trim($ad['VALUE']), $k, strlen($k)) ) {
+                    $oFlag->attributes['fl_command'] = $v['comm'];
+                    $oFlag->attributes['fl_glyth'] = $v['glyth'];
+                    $oFlag->attributes['fl_glyth_color'] = $v['color'];
+                    $oFlag->attributes['fl_sname'] = $v['sname'];
+                    break;
+                }
+            }
             if( !$oFlag->save() ) {
                 \Yii::info("Error insert into flags " . print_r($oFlag->getErrors(), true) . ' ' . print_r($ad, true) );
                 echo 'Error insert into flags : ' . print_r($oFlag->getErrors(), true) . "\n";
