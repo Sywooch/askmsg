@@ -172,8 +172,8 @@ class Message extends \yii\db\ActiveRecord
     {
         return [
             [['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_region', 'msg_subject', 'ekis_id'], 'required'],
-            [['msg_answer'], 'required'],
-            [['msg_pers_org', 'msg_pers_secname'], 'required', 'on'=>'person'],
+            [['msg_answer'], 'required', 'on' => 'answer', ],
+            [['msg_pers_org', 'msg_pers_secname'], 'required', 'on'=>'person', ],
 //            [['msg_pers_secname'], 'required', 'on'=>['answer', 'person', 'moderator']],
             [['msg_createtime', 'msg_answertime'], 'filter', 'filter' => function($v){ return empty($v) ? new Expression('NOW()') : $v;  }],
             [['msg_createtime', 'msg_answertime'], 'safe'],
