@@ -107,8 +107,8 @@ CREATE TABLE `b_user` (
             }
             if( $nPrevUid != $ad['ID'] ) {
                 $nPrevUid = $ad['ID'];
-                $oUser = new User();
-                $oUser->scenario = 'importdata';
+                $oUser = new User(['scenario' => 'importdata']);
+//                $oUser->scenario = 'importdata';
                 $oUser->attributes = [
                     'us_xtime' => $ad['TIMESTAMP_X'],
                     'us_login' => $ad['LOGIN'],
