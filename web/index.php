@@ -7,6 +7,11 @@ defined('YII_ENV') or define('YII_ENV', 'dev');
 require(__DIR__ . '/../vendor/autoload.php');
 require(__DIR__ . '/../vendor/yiisoft/yii2/Yii.php');
 
+$sBower = $this->_vendorPath . DIRECTORY_SEPARATOR . 'bower-asset';
+if( is_dir($sBower) ) {
+    Yii::setAlias('@bower', $sBower);
+}
+
 $config = yii\helpers\ArrayHelper::merge(
 //    require(__DIR__ . '/../config/common.php'),
 //    require(__DIR__ . '/../config/common-local.php'),
