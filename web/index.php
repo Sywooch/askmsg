@@ -9,6 +9,8 @@ require(__DIR__ . '/../vendor/yiisoft/yii2/Yii.php');
 
 $sBower = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'bower-asset';
 
+Yii::info('Dir : ' . $sBower . ' ' . (is_dir($sBower) ? 'exists' : ' not exists'));
+
 if( is_dir($sBower) ) {
     Yii::setAlias('@bower', $sBower);
 }
