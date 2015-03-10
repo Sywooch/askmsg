@@ -260,7 +260,7 @@ CREATE TABLE `b_user` (
         $sql = 'Select m.ID As MSGID, m.*, p.*, a.*, a.VALUE As dopuser '
               . 'From b_iblock_element_prop_s52 p, b_iblock_element m '
               . 'Left Outer Join b_iblock_element_prop_m52 a On a.IBLOCK_ELEMENT_ID = m.ID '
-              . 'Where m.IBLOCK_ID = 52 And p.IBLOCK_ELEMENT_ID = m.ID';
+              . 'Where m.IBLOCK_ID = 52 And p.IBLOCK_ELEMENT_ID = m.ID And LENGTH(m.PREVIEW_TEXT) > 0';
 
         $aMsg = $oldConnection->createCommand($sql)->query();
         $nCount = $aMsg->count();
@@ -270,9 +270,11 @@ CREATE TABLE `b_user` (
         $n = 0;
         $nNewUser = 0;
         foreach($aMsg As $ad) {
+/*
             if( empty($ad['PREVIEW_TEXT']) ) {
                 continue;
             }
+ */
             if( $nPrint-- > 0 ) {
                 \Yii::info('Migrate up to ' . Message::tableName() . ' data ' . print_r($ad, true));
             }
