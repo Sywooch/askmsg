@@ -86,7 +86,7 @@ class User extends ActiveRecord  implements IdentityInterface
             [['us_xtime', 'us_logintime', 'us_regtime', 'us_checkwordtime'], 'safe'],
             [['us_login', 'us_password_hash', 'us_name', 'us_secondname', 'us_lastname', 'us_email', 'us_workposition', 'us_password_hash', 'selectedGroups'], 'required'],
             [['us_active'], 'integer'],
-            [['us_login', 'us_email'], 'unique'],
+            [['us_login', 'us_email'], 'unique', 'on' => 'create'],
             [['selectedGroups'], 'in', 'range' => array_keys(Group::getActiveGroups()), 'allowArray' => true ],
             [['us_login', 'us_password_hash', 'us_chekword_hash', 'us_name', 'us_secondname', 'us_lastname', 'us_email', 'us_workposition', 'email_confirm_token', 'password_reset_token'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32]
