@@ -227,7 +227,8 @@ CREATE TABLE `b_user` (
                 'fl_sort' => $ad['SORT'],
             ];
             foreach($aDop As $k=>$v) {
-                if( strncmp($k, trim($ad['VALUE']), strlen($k)) ) {
+                if( strncmp($k, trim($ad['VALUE']), mb_strlen($k, 'UTF-8')) ) {
+                    echo "{$k} : {$ad['VALUE']}\n";
                     $av = array_merge(
                         $av,
                         [
