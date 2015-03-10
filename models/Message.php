@@ -258,10 +258,31 @@ class Message extends \yii\db\ActiveRecord
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios['person'] = ['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_secname', 'msg_pers_org', 'msg_pers_region', 'msg_createtime', 'msg_subject', 'ekis_id'];
+        $scenarios['person'] = [
+            'msg_pers_name',
+            'msg_pers_lastname',
+            'msg_pers_email',
+            'msg_pers_phone',
+            'msg_pers_text',
+            'msg_pers_secname',
+            'msg_pers_org',
+            'msg_pers_region',
+            'msg_createtime',
+            'msg_subject',
+            'ekis_id'
+        ];
+
         $scenarios['moderator'] = array_merge(
                                     $scenarios['person'],
-                                    ['msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_empl_id', 'msg_flag', 'msg_active', 'answers']
+                                    [
+                                        'msg_empl_command',
+                                        'msg_empl_remark',
+                                        'msg_comment',
+                                        'msg_empl_id',
+                                        'msg_flag',
+                                        'msg_active',
+                                        'answers'
+                                    ]
         );
 
         $scenarios['importdata'] = [
@@ -286,10 +307,10 @@ class Message extends \yii\db\ActiveRecord
         ];
 
         // у старых сообщений нет темы, ekis_id
-        foreach(['msg_subject', 'ekis_id'] As $v) {
+        foreach(['msg_subject', 'ekis_id', 'msg_pers_org'] As $v) {
             $n = array_search($v, $scenarios['moderator'], true);
             if( $n !== false ) {
-                $scenarios['moderator'][$n];
+                unset($scenarios['moderator'][$n]);
             }
         }
 

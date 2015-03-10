@@ -65,6 +65,11 @@ echo '-->' . "\n";
             ],
     ]);
 
+
+    if( $model->scenario == 'moderator' ) {
+        echo $form->errorSummary([$model]);
+    }
+
 /*
     <div class="col-sm-4">
     </div>

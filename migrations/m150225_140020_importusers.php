@@ -19,7 +19,14 @@ class m150225_140020_importusers extends Migration
 //        $stime = date('d.m.Y H:i:s');
 //        file_put_contents($sf, $stime . "\t" .print_r($aGr, true), FILE_APPEND);
 /*
-16:11:37 Dumping educom_site (b_iblock_element_prop_m52, b_iblock_element_prop_s52, b_iblock_property_enum, b_user_group, b_user, b_group, b_iblock_element)
+16:11:37 Dumping educom_site (, , )
+b_group
+b_iblock_element
+b_iblock_element_prop_m52
+b_iblock_element_prop_s52
+b_iblock_property_enum
+b_user
+b_user_group
 
 Running: mysqldump.exe --defaults-file="c:\users\kozminva\appdata\local\temp\tmpmzao03.cnf"  --set-gtid-purged=OFF --user=viktor_educom --host=localhost --protocol=tcp --port=24891 --default-character-set=utf8 --single-transaction=TRUE --no-data --skip-triggers "educom_site"
 
@@ -138,8 +145,8 @@ CREATE TABLE `b_user` (
                 }
             }
             if( !isset($aGrMap[$ad['GROUP_ID']]) ) {
-                \Yii::info('Not found group user->group : ' . $ad['GROUP_ID'] . ' ' . print_r($ad, true) );
-                echo 'Not found group user->group : ' . $ad['GROUP_ID'] . "\n";
+                \Yii::info('Not found group user->group ['.$oUser->us_id.'] : ' . $ad['GROUP_ID'] . ' ' . print_r($ad, true) );
+                echo 'Not found group user->group ['.$oUser->us_id.'] : ' . $ad['GROUP_ID'] . "\n";
                 continue;
             }
             $oUserGr = new Usergroup();

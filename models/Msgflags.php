@@ -117,6 +117,7 @@ class Msgflags extends \yii\db\ActiveRecord
             self::MFLG_INT_INSTR => [self::MFLG_INT_FIN_INSTR, ],
             self::MFLG_INT_NEWANSWER => [self::MFLG_INT_REVIS_INSTR, self::MFLG_INT_FIN_INSTR, ],
             self::MFLG_INT_REVIS_INSTR => [self::MFLG_INT_NEWANSWER],
+            self::MFLG_INT_FIN_INSTR => [self::MFLG_SHOW_ANSWER, self::MFLG_NOSHOW],
         ];
         return isset($aTrans[$nState]) ? array_merge($aTrans[$nState]) : [];
     }
