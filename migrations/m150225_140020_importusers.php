@@ -120,7 +120,7 @@ CREATE TABLE `b_user` (
                     'us_email' => $ad['EMAIL'],
                     'us_logintime' => $ad['LAST_LOGIN'],
                     'us_regtime' => empty($ad['DATE_REGISTER']) ? date('YmdHis') : $ad['DATE_REGISTER'],
-                    'us_workposition' => empty($ad['WORK_POSITION']) ? $ad['LOGIN'] : $ad['WORK_POSITION'],
+                    'us_workposition' => empty($ad['WORK_POSITION']) ? '' : $ad['WORK_POSITION'], // $ad['LOGIN']
                     'us_checkwordtime' => $ad['CHECKWORD_TIME'],
                     'auth_key' => '',
                     'email_confirm_token' => '',

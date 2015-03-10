@@ -116,6 +116,7 @@ class User extends ActiveRecord  implements IdentityInterface
             'us_logintime',
             'us_checkwordtime',
             'us_chekword_hash',
+            'us_password_hash',
         ];
         return $scenarios;
     }
