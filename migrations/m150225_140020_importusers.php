@@ -217,7 +217,7 @@ CREATE TABLE `b_user` (
             '[110]' => ['comm' => 'Перенести в благодарности', 'glyth' => 'heart', 'color' => '#99FF99', 'sname' =>'Благ.'],
             '[111]' => ['comm' => 'Отчитаться о внутреннем поручении', 'glyth' => 'list-alt', 'color' => '#2e8b57', 'sname' =>'Выпол. ВП'],
         ];
-        $sql = 'Select ID, VALUE, SORT From b_iblock_property_enum';
+        $sql = 'Select ID, VALUE, SORT From b_iblock_property_enum Where PROPERTY_ID = 201';
         $aOldFlags = $oldConnection->createCommand($sql)->queryAll();
         $aFlagsMap = [];
         foreach($aOldFlags As $ad) {
@@ -227,7 +227,7 @@ CREATE TABLE `b_user` (
                 'fl_sort' => $ad['SORT'],
             ];
             foreach($aDop As $k=>$v) {
-                if( strncmp(trim($ad['VALUE']), $k, strlen($k)) ) {
+                if( strncmp($k, trim($ad['VALUE']), strlen($k)) ) {
                     $av = array_merge(
                         $av,
                         [
@@ -248,6 +248,7 @@ CREATE TABLE `b_user` (
             else {
                 $aFlagsMap[$ad['ID']] = $oFlag->fl_id;
             }
+            echo "flag: {$ad['ID']} -> {$oFlag->fl_id} : {$ad['VALUE']}\n";
         }
         unset($aOldFlags);
         echo 'import flags finished' . "\n";
