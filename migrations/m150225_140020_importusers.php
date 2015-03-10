@@ -70,7 +70,7 @@ b_user_group
                 . "    static public function getRoleName(\$id) {\n        return self::\$roles[\$id];\n    }\n\n"
                 . "}\n";
             $sf = \Yii::getAlias('@app') . DIRECTORY_SEPARATOR . 'runtime' . DIRECTORY_SEPARATOR . 'Rolesimport.php';
-            $sf1 = \Yii::getAlias('@app') . DIRECTORY_SEPARATOR . 'models' . DIRECTORY_SEPARATOR . 'Rolesimport.php';
+            $sf1 = \Yii::getAlias('@app') . DIRECTORY_SEPARATOR . 'models' . DIRECTORY_SEPARATOR . '_Rolesimport.php';
             file_put_contents($sf, $sRoleData);
             rename($sf, $sf1);
         }
@@ -272,7 +272,7 @@ CREATE TABLE `b_user` (
                     'msg_pers_secname' => ($ad['PROPERTY_196'] === null) ? '' : $ad['PROPERTY_196'],
                     'msg_pers_email' => $ad['PROPERTY_197'],
                     'msg_pers_phone' => $ad['PROPERTY_198'],
-                    'msg_pers_org' => mb_substr($ad['PROPERTY_199'], 0, 255, 'UTF-8'), // TODO: now text -> substring 255 ??????????
+                    'msg_pers_org' => $ad['PROPERTY_199'], // mb_substr($ad['PROPERTY_199'], 0, 255, 'UTF-8'),
                     'msg_pers_region' => $ad['PROPERTY_200'],
                     'msg_flag' => isset($aFlagsMap[$ad['PROPERTY_201']]) ? $aFlagsMap[$ad['PROPERTY_201']] : 0,
                     'msg_comment' => $ad['PROPERTY_202'],

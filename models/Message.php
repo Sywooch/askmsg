@@ -118,36 +118,7 @@ class Message extends \yii\db\ActiveRecord
      * @inheritdoc
      */
     public function behaviors(){
-        return [
-/*
-             [
-                'class' => TimestampBehavior::className(),
-                'createdAtAttribute' => 'msg_createtime',
-                'updatedAtAttribute' => null,
-                'value' => new Expression('NOW()'),
-            ],
-*/
-            // поставим флаг активности сообщения
-            [
-                'class' => AttributeBehavior::className(),
-                'attributes' => [
-                    ActiveRecord::EVENT_BEFORE_INSERT => 'msg_active',
-                ],
-                'value' => function ($event) {
-                    return 1;
-                },
-
-            ],
-            // поставим флаг нового сообщения
-            [
-                'class' => AttributeBehavior::className(),
-                'attributes' => [
-                    ActiveRecord::EVENT_BEFORE_INSERT => 'msg_flag',
-                ],
-                'value' => function ($event) {
-                    return Msgflags::MFLG_NEW;
-                },
-            ],
+        $a = [
             // сделаем первые буковки имени большими
             [
                 'class' => AttributewalkBehavior::className(),
@@ -163,6 +134,35 @@ class Message extends \yii\db\ActiveRecord
                 },
             ],
         ];
+
+        if( $this->scenario != 'importdata' ) {
+            $a = array_merge(
+                $a,
+                // поставим флаг нового сообщения
+                [[
+                    'class' => AttributeBehavior::className(),
+                    'attributes' => [
+                        ActiveRecord::EVENT_BEFORE_INSERT => 'msg_flag',
+                    ],
+                    'value' => function ($event) {
+                        return Msgflags::MFLG_NEW;
+                    },
+                ],
+                // поставим флаг активности сообщения
+                [
+                    'class' => AttributeBehavior::className(),
+                    'attributes' => [
+                        ActiveRecord::EVENT_BEFORE_INSERT => 'msg_active',
+                    ],
+                    'value' => function ($event) {
+                        return 1;
+                    },
+
+                ],]
+            );
+        }
+
+        return $a;
     }
 
     /**
@@ -181,7 +181,7 @@ class Message extends \yii\db\ActiveRecord
 //            [['answers'], 'safe'],
             [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_12, '', '{{val}}')), 'allowArray' => true],
 //            [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}')), 'allowArray' => true],
-            [['msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject', 'ekis_id'], 'integer'],
+            [['msg_id', 'msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject', 'ekis_id'], 'integer'],
             [['msg_pers_text'], 'string', 'max' => self::MAX_PERSON_TEXT_LENGTH, 'on' => 'person'],
             [['msg_answer', 'msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_pers_org'], 'string'],
             [['msg_answer'], 'filter', 'filter' => function($v){ return strip_tags($v, '<p><a><li><ol><ul><strong><b><em><i><u><h1><h2><h3><h4><h5><blockquote><pre><del><br>');  }],
@@ -203,7 +203,26 @@ class Message extends \yii\db\ActiveRecord
                                     ['msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_empl_id', 'msg_flag', 'msg_active', 'answers']
         );
 
-        $scenarios['importdata'] = ['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_secname', 'msg_pers_org', 'msg_pers_region', 'msg_createtime'];
+        $scenarios['importdata'] = [
+            'msg_id',
+            'msg_pers_name',
+            'msg_pers_lastname',
+            'msg_pers_email',
+            'msg_pers_phone',
+            'msg_pers_text',
+            'msg_pers_secname',
+            'msg_pers_org',
+            'msg_pers_region',
+            'msg_createtime',
+            'msg_active',
+            'msg_answer',
+            'msg_oldcomment',
+            'msg_flag',
+            'msg_comment',
+            'msg_empl_id',
+            'msg_empl_command',
+            'msg_empl_remark',
+        ];
 
         // у старых сообщений нет темы, ekis_id
         foreach(['msg_subject', 'ekis_id'] As $v) {
