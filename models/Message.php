@@ -15,6 +15,7 @@ use yii\behaviors\AttributeBehavior;
 use yii\base\Event;
 use app\models\Rolesimport;
 use app\components\AttributewalkBehavior;
+use app\components\NotificateBehavior;
 
 /**
  * This is the model class for table "{{%message}}".
@@ -115,6 +116,28 @@ class Message extends \yii\db\ActiveRecord
     }
 
     /**
+     *
+     */
+    public static function getNotificationFlags($sUserRole)
+    {
+        // Флаги сообщений для разных пользователей
+        $_flagFilter = [
+            Rolesimport::ROLE_GUEST => [
+                Msgflags::MFLG_THANK,
+                Msgflags::MFLG_SHOW_NO_ANSWER,
+                Msgflags::MFLG_SHOW_ANSWER,
+                Msgflags::MFLG_SHOW_INSTR,
+            ],
+            Rolesimport::ROLE_MODERATE_DOGM => [
+                Msgflags::MFLG_NEW,
+                Msgflags::MFLG_INT_NEWANSWER,
+                Msgflags::MFLG_SHOW_NEWANSWER,
+            ],
+        ];
+        return isset($_flagFilter[$sUserRole]) ? $_flagFilter[$sUserRole] : [];
+    }
+
+    /**
      * @inheritdoc
      */
     public function behaviors(){
@@ -139,26 +162,64 @@ class Message extends \yii\db\ActiveRecord
             $a = array_merge(
                 $a,
                 // поставим флаг нового сообщения
-                [[
-                    'class' => AttributeBehavior::className(),
-                    'attributes' => [
-                        ActiveRecord::EVENT_BEFORE_INSERT => 'msg_flag',
-                    ],
-                    'value' => function ($event) {
-                        return Msgflags::MFLG_NEW;
-                    },
-                ],
-                // поставим флаг активности сообщения
                 [
-                    'class' => AttributeBehavior::className(),
-                    'attributes' => [
-                        ActiveRecord::EVENT_BEFORE_INSERT => 'msg_active',
+                    [
+                        'class' => AttributeBehavior::className(),
+                        'attributes' => [
+                            ActiveRecord::EVENT_BEFORE_INSERT => 'msg_flag',
+                        ],
+                        'value' => function ($event) {
+                            return Msgflags::MFLG_NEW;
+                        },
                     ],
-                    'value' => function ($event) {
-                        return 1;
-                    },
+                    // поставим флаг активности сообщения
+                    [
+                        'class' => AttributeBehavior::className(),
+                        'attributes' => [
+                            ActiveRecord::EVENT_BEFORE_INSERT => 'msg_active',
+                        ],
+                        'value' => function ($event) {
+                            return 1;
+                        },
 
-                ],]
+                    ],
+                    // сохраним предыдущие аттрибуты
+                    [
+                        'class' => AttributeBehavior::className(),
+                        'attributes' => [
+                            ActiveRecord::EVENT_AFTER_FIND => '_oldAttributes',
+                        ],
+                        'value' => function ($event) {
+                            return [
+                                'msg_flag' => $event->sender->msg_flag,
+                            ];
+                        },
+
+                    ],
+                    // отправим оповещения
+                    [
+                        'class' => NotificateBehavior::className(),
+                        'allevents' => [
+                            ActiveRecord::EVENT_AFTER_INSERT,
+                            ActiveRecord::EVENT_AFTER_UPDATE,
+                        ],
+                        'value' => function ($event, $model) {
+                            /** @var */
+                            if( !isset($model->_oldAttributes['msg_flag'])
+                                || ( isset($model->_oldAttributes['msg_flag'])
+                                    && $model->_oldAttributes['msg_flag'] != $model->msg_flag )
+                                && in_array($model->msg_flag, $model->getNotificationFlags(Rolesimport::ROLE_GUEST)) ) {
+
+                                Yii::$app->mailer->compose('notificateUser', ['model' => $model, 'flag' => $model->_oldAttributes['msg_flag']])
+                                    ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+                                    ->setTo($model->msg_pers_email)
+                                    ->setSubject('Обращение №' . $model->msg_id)
+                                    ->send();
+
+                            }
+                        },
+                    ],
+                ]
             );
         }
 
@@ -384,6 +445,17 @@ class Message extends \yii\db\ActiveRecord
     }
 
     /**
+     *  Имя просителя без фамилии
+     */
+    public function getShortName() {
+        $s = trim($this->msg_pers_name . ' ' . $this->msg_pers_secname);
+        if( $s == '' ) {
+            $s = $this->msg_pers_lastname;
+        }
+        return $s;
+    }
+
+    /**
      *  Сохраняем соответчиков
      * @param Event $event
      */
@@ -446,7 +518,6 @@ class Message extends \yii\db\ActiveRecord
         }
         if( is_array($param['relateidarray']) ) {
             foreach($param['relateidarray'] As $id) {
-                // Msganswers::updateAll();
                 $nUpd = Yii::$app
                     ->db
                     ->createCommand('Update ' . $param['reltableclass']::tableName() . ' Set '.$param['msgidfield'].' = :ma_message_id, '.$param['relateidfield'].' = :ma_user_id Where '.$param['msgidfield'].' = 0 Limit 1', [':ma_message_id' => $this->msg_id, ':ma_user_id' => $id])

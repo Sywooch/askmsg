@@ -62,7 +62,7 @@ ListdataAsset::register($this);
                 'filterOptions' => ['class' => 'gridwidth7'],
                 'content' => function ($model, $key, $index, $column) {
                     return '<span class="glyphicon glyphicon-'.$model->flag->fl_glyth.'" style="color: '.$model->flag->fl_glyth_color.'; font-size: 1.25em;"></span>' //  font-size: 1.25em;
-                    . '<span class="inline">' . $model->flag->fl_sname . ' ' . $model->msg_flag . '</span>';
+                    . '<span class="inline">' . $model->flag->fl_sname . '</span>'; //  . ' ' . $model->msg_flag
                 },
                 'contentOptions' => [
                     'class' => 'griddate',

@@ -31,6 +31,7 @@ class Msgflags extends \yii\db\ActiveRecord
     const MFLG_SHOW_INSTR = 11;      //	[101] Поручения                           ** видимо посетителям
     const MFLG_SHOW_NEWANSWER = 12;  //	[102] Ответ дан, но не виден              ** видимо посетителям
 */
+
     const MFLG_THANK = 11;           //	[110] Благодарности                      ** видимо посетителям
     const MFLG_INT_FIN_INSTR = 12;   //	[111] Выполненные внутренние поручения
     const MFLG_INT_NEWANSWER = 9;    //	[108] Внутренние ответы
