@@ -202,7 +202,7 @@ class Message extends \yii\db\ActiveRecord
                                     ['msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_empl_id', 'msg_flag', 'msg_active', 'answers']
         );
 
-        $scenarios['importdata'] = ['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_secname', 'msg_pers_org', 'msg_pers_region', 'msg_createtime', 'msg_subject'];
+        $scenarios['importdata'] = ['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_secname', 'msg_pers_org', 'msg_pers_region', 'msg_createtime'];
 
         // у старых сообщений нет темы, ekis_id
         foreach(['msg_subject', 'ekis_id'] As $v) {
