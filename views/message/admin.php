@@ -30,7 +30,7 @@ ListdataAsset::register($this);
 <div class="message-index">
 
     <?php
-        // echo $this->render('_search', ['model' => $searchModel]);
+        echo $this->render('_search', ['model' => $searchModel]);
 //        $aFlags = Msgflags::getStateData();
 
     ?>

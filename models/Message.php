@@ -352,7 +352,7 @@ class Message extends \yii\db\ActiveRecord
             'msg_pers_lastname' => 'Фамилия',
             'msg_pers_email' => 'Email',
             'msg_pers_phone' => 'Телефон',
-            'msg_pers_org' => 'Школа',
+            'msg_pers_org' => 'Учреждение',
             'msg_pers_region' => 'Район',
             'msg_pers_text' => 'Обращение',
             'msg_comment' => 'Комментарий',

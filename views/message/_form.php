@@ -624,15 +624,6 @@ var formatSelect = function(item, text, description) {
     return  item[text] + "<span>" + item[description] + "</span>";
 }
 
-var setDistrict = function(text) {
-$.ajax({
-    type: "POST",
-    dataType: "json",
-    url: url,
-    data: {},
-    success: function(data) {}
-});
-}
 EOT;
     $this->registerJs($sJs, View::POS_END , 'showselectpart');
 
