@@ -37,6 +37,15 @@ use kartik\typeahead\Typeahead;
     <?= $form->field($model, 'msg_flag')->textInput() ?>
 
 */
+
+echo '<!-- ';
+if( $model->hasErrors() ) {
+    echo str_replace("\n", "<br />\n", print_r($model->getErrors(), true));
+}
+else {
+    echo "No errors";
+}
+echo '-->' . "\n";
 ?>
 
 <div class="message-form">
@@ -55,6 +64,7 @@ use kartik\typeahead\Typeahead;
                 ],
             ],
     ]);
+
 /*
     <div class="col-sm-4">
     </div>
@@ -320,6 +330,7 @@ use kartik\typeahead\Typeahead;
       return markup;
    }
 
+
 */
             'pluginOptions' => [
                 'allowClear' => true,
@@ -337,7 +348,7 @@ use kartik\typeahead\Typeahead;
                                     eo_id: "id",
                                     eo_short_name: "text"
                                 },
-                                fields: ["eo_id", "eo_short_name"].join(";")
+                                fields: ["eo_id", "eo_short_name", "eo_district_name_id"].join(";")
                             },
                             success: function (data) {
                                 callback(data.list.pop());
@@ -349,12 +360,13 @@ use kartik\typeahead\Typeahead;
                     'method' => 'POST',
                     'url' => "http://hastur.temocenter.ru/task/eo.search/forhost/ask.educom.ru",
                     'dataType' => 'json',
+                    'withCredentials' => true,
                     'data' => new JsExpression('function (term, page) {
-                        console.log("data("+term+", "+page+")");
+//                        console.log("data("+term+", "+page+")");
                         return {
                             filters: {eo_name: term, eo_short_name: term},
                             maskarade: {eo_id: "id", eo_short_name: "text", eo_district_name_id: "area_id", eo_subordination_name: "district"},
-                            fields: "eo_id;eo_short_name;eo_subordination_name_id",
+                            fields: "eo_id;eo_short_name;eo_subordination_name_id;eo_district_name_id",
                             limit: 10,
                             start: (page - 1) * 10,
                             "_": (new Date()).getSeconds()
@@ -388,7 +400,13 @@ use kartik\typeahead\Typeahead;
             ],
 
             'pluginEvents' => [
-                'change' => 'function(event) { jQuery("#'.Html::getInputId($model, 'msg_pers_org').'").val(event.added.text); console.log("change", event); }',
+                'change' => 'function(event) {
+                    var sIdReg = "'.Html::getInputId($model, 'msg_pers_region').'";
+                    jQuery("#'.Html::getInputId($model, 'msg_pers_org').'").val(event.added.text);
+                    jQuery("#"+sIdReg).val(event.added.area_id);
+//                    console.log("change", event);
+//                    console.log("set " + sIdReg + " = " + event.added.area_id);
+                }',
             ],
 
             'options' => [
@@ -400,14 +418,20 @@ use kartik\typeahead\Typeahead;
             $model,
             'msg_pers_org',
             ['template' => "{input}", 'options' => ['tag' => 'span']]
-        )
-        ->hiddenInput()
+        )->hiddenInput()
+        . $form->field(
+            $model,
+            'msg_pers_region',
+            ['template' => "{input}", 'options' => ['tag' => 'span']]
+        )->hiddenInput()
         /*?>
                <?= $form->field(
                    $model,
                    'msg_pers_org'
                    )
-                   ->textInput(['maxlength' => 255])*/ ?>
+                   ->textInput(['maxlength' => 255])
+        */
+        ?>
     </div>
 
 
@@ -593,6 +617,16 @@ EOT;
     $sJs =  <<<EOT
 var formatSelect = function(item, text, description) {
     return  item[text] + "<span>" + item[description] + "</span>";
+}
+
+var setDistrict = function(text) {
+$.ajax({
+    type: "POST",
+    dataType: "json",
+    url: url,
+    data: {},
+    success: function(data) {}
+});
 }
 EOT;
     $this->registerJs($sJs, View::POS_END , 'showselectpart');
