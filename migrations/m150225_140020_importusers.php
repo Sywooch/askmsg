@@ -222,19 +222,25 @@ CREATE TABLE `b_user` (
         $aFlagsMap = [];
         foreach($aOldFlags As $ad) {
             $oFlag = new Msgflags();
-            $oFlag->attributes = [
+            $av = [
                 'fl_name' => $ad['VALUE'],
                 'fl_sort' => $ad['SORT'],
             ];
             foreach($aDop As $k=>$v) {
                 if( strncmp(trim($ad['VALUE']), $k, strlen($k)) ) {
-                    $oFlag->attributes['fl_command'] = $v['comm'];
-                    $oFlag->attributes['fl_glyth'] = $v['glyth'];
-                    $oFlag->attributes['fl_glyth_color'] = $v['color'];
-                    $oFlag->attributes['fl_sname'] = $v['sname'];
+                    $av = array_merge(
+                        $av,
+                        [
+                            'fl_command' => $v['comm'],
+                            'fl_glyth' => $v['glyth'],
+                            'fl_glyth_color' => $v['color'],
+                            'fl_sname' => $v['sname'],
+                        ]
+                    );
                     break;
                 }
             }
+            $oFlag->attributes = $av;
             if( !$oFlag->save() ) {
                 \Yii::info("Error insert into flags " . print_r($oFlag->getErrors(), true) . ' ' . print_r($ad, true) );
                 echo 'Error insert into flags : ' . print_r($oFlag->getErrors(), true) . "\n";
