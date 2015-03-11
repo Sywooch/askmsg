@@ -23,7 +23,7 @@ class MessageSearch extends Message
         return [
             [['msg_id', 'msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag'], 'integer'],
             [['askid', ], 'string'],
-            [['msg_createtime', 'msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_org', 'msg_pers_text', 'msg_comment', 'msg_empl_command', 'msg_empl_remark', 'msg_answer', 'msg_answertime', 'msg_oldcomment'], 'safe'],
+            [['msg_subject', 'msg_createtime', 'msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_org', 'msg_pers_text', 'msg_comment', 'msg_empl_command', 'msg_empl_remark', 'msg_answer', 'msg_answertime', 'msg_oldcomment'], 'safe'],
         ];
     }
 
@@ -95,7 +95,7 @@ class MessageSearch extends Message
         $query->andFilterWhere([
             'msg_id' => $this->msg_id,
 //            'msg_createtime' => $this->msg_createtime,
-//            'msg_active' => $this->msg_active,
+            'msg_subject' => $this->msg_subject,
             'msg_pers_region' => $this->msg_pers_region,
             'msg_empl_id' => $this->msg_empl_id,
 //            'msg_answertime' => $this->msg_answertime,
