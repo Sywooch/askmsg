@@ -465,7 +465,8 @@ echo '-->' . "\n";
                             function ( $carry , $item ) {
                                 $sTitle = Msgflags::getStateTitle($item, 'fl_command');
                                 if( $sTitle != '' ) {
-                                    $carry[$item] = $sTitle;
+                                    $aFlagData = Msgflags::getStateData($item);
+                                    $carry[$item] = ['title' => $sTitle, 'hint' => isset($aFlagData['fl_hint']) ? $aFlagData['fl_hint'] : '--'];
                                 }
                                 return $carry;
                             },
@@ -500,11 +501,11 @@ echo '-->' . "\n";
                             <div id="<?= "buttongroup_" . $k ?>">
                                 <div class="col-sm-4">
                                 <?= Html::submitButton(
-                                'Сохранить и ' . $aData,
+                                'Сохранить и ' . $aData['title'],
                                 ['class' => 'btn btn-default changeflag', 'id' => 'buttonsave_' . $k, 'style' => 'margin-bottom: 1em;']) ?>
                                 </div>
-                                <div class="col-sm-8">
-                                    <?= 'Описание кнопки' ?>
+                                <div class="col-sm-8 help-block">
+                                    <?= $aData['hint'] ?>
                                 </div>
                                 <div class="clearfix"></div>
                             </div>
