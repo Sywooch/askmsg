@@ -207,16 +207,16 @@
         },
         {
             "name": "bower-asset/yii2-pjax",
-            "version": "v2.0.2",
+            "version": "v2.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/jquery-pjax.git",
-                "reference": "fb92be865c0fd6583714475cb7d629020749d73f"
+                "reference": "3f20897307cca046fca5323b318475ae9dac0ca0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/jquery-pjax/zipball/fb92be865c0fd6583714475cb7d629020749d73f",
-                "reference": "fb92be865c0fd6583714475cb7d629020749d73f",
+                "url": "https://api.github.com/repos/yiisoft/jquery-pjax/zipball/3f20897307cca046fca5323b318475ae9dac0ca0",
+                "reference": "3f20897307cca046fca5323b318475ae9dac0ca0",
                 "shasum": ""
             },
             "require": {
@@ -233,20 +233,23 @@
                     "script/",
                     "test/"
                 ]
-            }
+            },
+            "license": [
+                "MIT"
+            ]
         },
         {
             "name": "cebe/markdown",
-            "version": "1.0.1",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cebe/markdown.git",
-                "reference": "9d6c36d6623497523ed421a31d940bc1d7435578"
+                "reference": "f681fee8303310415b746f3758eeda0a7ad08bda"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cebe/markdown/zipball/9d6c36d6623497523ed421a31d940bc1d7435578",
-                "reference": "9d6c36d6623497523ed421a31d940bc1d7435578",
+                "url": "https://api.github.com/repos/cebe/markdown/zipball/f681fee8303310415b746f3758eeda0a7ad08bda",
+                "reference": "f681fee8303310415b746f3758eeda0a7ad08bda",
                 "shasum": ""
             },
             "require": {
@@ -293,7 +296,7 @@
                 "markdown",
                 "markdown-extra"
             ],
-            "time": "2014-10-25 16:16:49"
+            "time": "2015-03-06 05:21:16"
         },
         {
             "name": "ezyang/htmlpurifier",
@@ -1607,56 +1610,60 @@
         },
         {
             "name": "vova07/yii2-imperavi-widget",
-            "version": "1.1.12",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vova07/yii2-imperavi-widget.git",
-                "reference": "9689f9fcf0072f85970a123bc05905270253a265"
+                "reference": "bfe47768acaa7612a4c4158d2c2626681b82d993"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vova07/yii2-imperavi-widget/zipball/9689f9fcf0072f85970a123bc05905270253a265",
-                "reference": "9689f9fcf0072f85970a123bc05905270253a265",
+                "url": "https://api.github.com/repos/vova07/yii2-imperavi-widget/zipball/bfe47768acaa7612a4c4158d2c2626681b82d993",
+                "reference": "bfe47768acaa7612a4c4158d2c2626681b82d993",
                 "shasum": ""
             },
             "require": {
                 "yiisoft/yii2": "*"
             },
+            "require-dev": {
+                "phpunit/phpunit": "4.*"
+            },
             "type": "yii2-extension",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
             "autoload": {
                 "psr-4": {
-                    "vova07\\imperavi\\": ""
+                    "vova07\\imperavi\\": "src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "proprietary"
+                "BSD-3-Clause"
             ],
             "authors": [
                 {
                     "name": "Crudu Vasile",
-                    "email": "bazillio07@yandex.ru"
-                },
-                {
-                    "name": "Veaceslav Medvedev",
-                    "email": "slavcopost@gmail.com"
-                },
-                {
-                    "name": "Alexander Makarov",
-                    "email": "sam@rmcreative.ru",
-                    "homepage": "http://rmcreative.ru/"
+                    "email": "bazillio07@yandex.ru",
+                    "homepage": "https://github.com/vova07",
+                    "role": "Developer"
                 }
             ],
-            "description": "The imperavi redactor widget for Yii framework.",
+            "description": "The imperavi redactor widget for Yii 2 framework.",
+            "homepage": "https://github.com/vova07/yii2-imperavi-widget",
             "keywords": [
                 "Redactor",
+                "extension",
                 "imperavi",
                 "widget",
                 "wysiwyg",
+                "yii",
                 "yii 2",
                 "yii2"
             ],
-            "time": "2015-03-02 15:52:15"
+            "time": "2015-03-08 17:22:24"
         },
         {
             "name": "yiisoft/yii2",

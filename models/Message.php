@@ -210,7 +210,7 @@ class Message extends \yii\db\ActiveRecord
                                     && $model->_oldAttributes['msg_flag'] != $model->msg_flag )
                                 && in_array($model->msg_flag, $model->getNotificationFlags(Rolesimport::ROLE_GUEST)) ) {
 
-                                Yii::$app->mailer->compose('notificateUser', ['model' => $model, 'flag' => $model->_oldAttributes['msg_flag']])
+                                Yii::$app->mailer->compose('notificateUser', ['model' => $model, 'flag' => isset($model->_oldAttributes['msg_flag']) ? $model->_oldAttributes['msg_flag'] : 0])
                                     ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
                                     ->setTo($model->msg_pers_email)
                                     ->setSubject('Обращение №' . $model->msg_id)

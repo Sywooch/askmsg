@@ -311,6 +311,7 @@ if( !isset($action) ) {
     <div class="col-sm-12">
         <!-- div class="form-group" -->
         <?= Html::a('Сбросить настройки', $action, ['class' => 'btn btn-default pull-right']) ?>
+
         <?= Html::submitButton('Искать', ['class' => 'btn btn-success pull-right']) ?>
         <!-- /div -->
     </div>
