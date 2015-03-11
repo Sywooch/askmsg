@@ -1,5 +1,6 @@
 <?php
 
+
 $params = require(__DIR__ . '/params.php');
 
 $config = [
@@ -9,6 +10,23 @@ $config = [
     'language' => 'ru',
     'bootstrap' => ['log'],
     'defaultRoute' => 'message/create',
+    'modules' => [
+        'datecontrol' =>  [
+            'class' => 'kartik\datecontrol\Module',
+             // format settings for displaying each date attribute (ICU format example)
+            'displaySettings' => [
+                kartik\datecontrol\Module::FORMAT_DATE => 'dd.MM.yyyy',
+                kartik\datecontrol\Module::FORMAT_TIME => 'HH:mm:ss a',
+                kartik\datecontrol\Module::FORMAT_DATETIME => 'dd.MM.yyyy HH:mm:ss a',
+            ],
+            // format settings for saving each date attribute (PHP format example)
+            'saveSettings' => [
+                kartik\datecontrol\Module::FORMAT_DATE => 'php:Y-m-d',
+                kartik\datecontrol\Module::FORMAT_TIME => 'php:H:i:s',
+                kartik\datecontrol\Module::FORMAT_DATETIME => 'php:Y-m-d H:i:s',
+            ],
+        ]
+    ],
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation

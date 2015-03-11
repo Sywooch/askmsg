@@ -69,6 +69,7 @@ class MessageController extends Controller
         return $this->render('admin', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'action' => ['admin'],
         ]);
     }
 
@@ -94,6 +95,7 @@ class MessageController extends Controller
         return $this->render('admin', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'action' => ['moderatelist'],
         ]);
     }
 
@@ -115,6 +117,7 @@ class MessageController extends Controller
         return $this->render('admin', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'action' => ['answerlist'],
         ]);
     }
 

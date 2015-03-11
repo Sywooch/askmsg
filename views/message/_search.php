@@ -6,37 +6,138 @@ use yii\bootstrap\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\web\JsExpression;
 use yii\web\View;
+use yii\jui\DatePicker;
 
 use kartik\select2\Select2;
+//use kartik\date\DatePicker;
+use kartik\datecontrol\DateControl;
 
 use app\models\Tags;
 use app\models\Rolesimport;
 use app\models\User;
+use app\models\Msgflags;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\MessageSearch */
 /* @var $form yii\widgets\ActiveForm */
+
+if( !isset($action) ) {
+    $action = ['admin'];
+}
+
 ?>
 
-<div class="message-search">
+<div class="message-search" id="idsearchpanel" <?= $model->isEmpty() ? ' style="display: none;"' : '' ?>>
 
     <?php $form = ActiveForm::begin([
-        'action' => ['index'],
+        'action' => $action,
         'method' => 'get',
+        'id' => 'filter-message-form',
+        'layout' => 'horizontal',
+        'fieldConfig' => [
+//                'template' => "{label}\n{beginWrapper}\n{input}\n{hint}\n{error}\n{endWrapper}",
+            'horizontalCssClasses' => [
+                'label' => 'col-sm-3',
+                'offset' => 'col-sm-offset-3',
+                'wrapper' => 'col-sm-9',
+//                    'error' => '',
+//                    'hint' => '',
+            ],
+        ],
     ]); ?>
 
+    <div class="col-sm-4">
     <?= $form->field($model, 'msg_id') ?>
+    </div>
 
-    <?= $form->field($model, 'msg_pers_email') ?>
+    <div class="col-sm-4">
+        <?= $form->field($model, 'msg_pers_email') ?>
+    </div>
 
-    <?= $form->field($model, 'msg_createtime') ?>
+    <div class="col-sm-4">
+        <?php
+/*
+            $sDateFld = DatePicker::widget([
+                'model' => $model,
+                'attribute' => 'msg_createtime',
+                'language' => 'ru',
+                //'dateFormat' => 'yyyy-MM-dd',
+            ]);
+*/
+            echo $form
+                ->field(
+                    $model,
+                    'msg_createtime'
+                )
+                ->widget(
+                    DatePicker::className(),
+                    [
+                        'model' => $model,
+                        'attribute' => 'msg_createtime',
+                        'language' => 'ru',
+                        'dateFormat' => 'dd.MM.yyyy',
+                        'options' => ['class' => 'form-control',],
+                    ]
+                );
+/*
+            ->widget(DateControl::classname(), [
+                'type'=>DateControl::FORMAT_DATE,
+                'language' => 'ru',
+                'name' => Html::getInputName($model, 'msg_createtime'),
+//                'ajaxConversion'=>false,
+                'options' => [
+                    'pluginOptions' => [
+                        'autoclose' => true
+                    ]
+                ]
+            ])
+/*        widget([
+                'class' => DateControl::className(),
+                'language' => 'ru',
+                'type'=>DateControl::FORMAT_DATE,
+//                'type' => DatePicker::TYPE_COMPONENT_APPEND,
+                'pluginOptions' => [
+                    'autoclose'=>true,
+    //                'format' => 'dd-M-yyyy'
+                ]
+            ]) */
+        ?>
+    </div>
 
-    <?= $form->field($model, 'msg_pers_lastname') ?>
+    <div class="col-sm-4">
+        <?= $form->field($model, 'msg_pers_lastname') ?>
+    </div>
 
-    <?= $form->field($model, 'msg_flag') ?>
+    <div class="col-sm-4">
+        <?= $form
+            ->field($model, 'msg_flag')
+            ->widget(Select2::classname(), [
+                'data' => ArrayHelper::map(
+                    Msgflags::find()
+//                    ->where(['status' => 1])
+                    ->asArray()
+                    ->all(), 'fl_id', 'fl_sname' /* function($item, $default){ return $item; } */),
+                'language' => 'ru',
+                'options' => ['placeholder' => 'Выберите состояние ...'],
+                'pluginOptions' => [
+                    'allowClear' => true,
+/*
+                    'formatResult' => new JsExpression(
+                        'function (item) {
+                        return "<span class=\\"glyphicon glyphicon-" + item.fl_glyth + "\\" style=\\"color: " + item.fl_glyth_color + "; font-size: 1.25em;\\"></span><span>"+item.fl_sname+"</span>";
+                    }'
+                    ),
+                    'escapeMarkup' => new JsExpression('function (m) { return m; }'),
+*/
+                ],
+                'pluginEvents' => [
+//                        'change' => 'function(event) { jQuery("#'.Html::getInputId($model, 'msg_empl_id').'").val(event.val); console.log("change", event); }',
+                ],
+            ]);
+        ?>
+    </div>
 
-    <?php // $form->field($model, 'msg_empl_id') ?>
-
+    <div class="col-sm-4">
     <?php
     $aAnsw = User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}');
     ?>
@@ -55,8 +156,9 @@ use app\models\User;
             ],
         ]);
     ?>
+    </div>
 
-    <?php // $form->field($model, 'msg_pers_org') ?>
+    <div class="col-sm-4">
     <?= $form->field(
         $model,
         'ekis_id'
@@ -137,7 +239,7 @@ use app\models\User;
                 'placeholder' => 'Выберите учреждение ...',
             ],
         ])
-    . $form->field(
+    /* . $form->field(
         $model,
         'msg_pers_org',
         ['template' => "{input}", 'options' => ['tag' => 'span']]
@@ -146,21 +248,15 @@ use app\models\User;
         $model,
         'msg_pers_region',
         ['template' => "{input}", 'options' => ['tag' => 'span']]
-    )->hiddenInput() ?>
+    )->hiddenInput() */ ?>
 
-    <?php // $form->field($model, 'msg_subject') ?>
+    </div>
+
+    <div class="col-sm-4">
     <?= $form
         ->field(
             $model,
-            'msg_subject',
-            [
-//            'template' => "{input}\n{hint}\n{error}",
-                'horizontalCssClasses' => [
-                    'label' => 'col-sm-1',
-                    'offset' => 'col-sm-offset-1',
-                    'wrapper' => 'col-sm-11',
-                ],
-            ])
+            'msg_subject')
         ->widget(Select2::classname(), [
             'data' => ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_SUBJECT), 'tag_id', 'tag_title'),
             'language' => 'ru',
@@ -172,7 +268,9 @@ use app\models\User;
                 'allowClear' => true,
             ],
         ]) ?>
+    </div>
 
+    <div class="col-sm-4">
     <?= $form
         ->field($model, 'alltags')
         ->widget(Select2::classname(), [
@@ -188,7 +286,9 @@ use app\models\User;
             ],
         ]) ?>
 
-    <?php // echo $form->field($model, 'msg_active') ?>
+    </div>
+
+    <?php /* echo $form->field($model, 'msg_active') ?>
     <?php // echo $form->field($model, 'msg_pers_secname') ?>
     <?php // echo $form->field($model, 'msg_pers_name') ?>
     <?php // echo $form->field($model, 'msg_pers_email') ?>
@@ -201,12 +301,16 @@ use app\models\User;
     <?php // echo $form->field($model, 'msg_empl_remark') ?>
     <?php // echo $form->field($model, 'msg_answer') ?>
     <?php // echo $form->field($model, 'msg_answertime') ?>
-    <?php // echo $form->field($model, 'msg_oldcomment') ?>
+    <?php // echo $form->field($model, 'msg_oldcomment') */ ?>
 
+
+    <div class="col-sm-6">
     <div class="form-group">
-        <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
-        <?= Html::resetButton('Reset', ['class' => 'btn btn-default']) ?>
+        <?= Html::submitButton('Искать', ['class' => 'btn btn-primary']) ?>
+        <?= Html::resetButton('Сбросить настройки', ['class' => 'btn btn-default']) ?>
     </div>
+    </div>
+
 
     <?php ActiveForm::end();
     // функция форматирования результатов в список для select2
@@ -218,6 +322,29 @@ var formatSelect = function(item, text, description) {
 EOT;
     $this->registerJs($sJs, View::POS_END , 'showselectpart');
 
+//    <div class="clearfix"></div>
+// <div class="col-sm-6">
+// </div>
     ?>
-
 </div>
+    <?= Html::a('Скрыть', '#', ['class' => 'btn btn-default pull-right', 'id'=>'hidesearchpanel']) ?>
+<?php
+// функция форматирования результатов в список для select2
+    $sJs =  <<<EOT
+var oPanel = jQuery("#idsearchpanel"),
+    oLink = jQuery("#hidesearchpanel"),
+    toggleSearchPanel = function() {
+        oPanel.toggle();
+        oLink.text(oPanel.is(":visible") ? "Скрыть" : "Показать");
+    };
+
+oLink
+    .text(oPanel.is(":visible") ? "Скрыть" : "Показать")
+    .on("click", function(event){ event.preventDefault(); toggleSearchPanel(); return false; });
+
+// toggleSearchPanel();
+EOT;
+    $this->registerJs($sJs, View::POS_READY , 'togglesearchpanel');
+?>
+
+<div class="clearfix"></div>

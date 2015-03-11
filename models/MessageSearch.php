@@ -73,7 +73,15 @@ class MessageSearch extends Message
 //        Yii::info('scenario = ' . $this->scenario . ' isAttributeActive(askid) = ' . ($this->isAttributeActive('askid') ? 'true' : 'false'));
         $this->load($params);
 
-        $this->prepareDateFilter($query);
+        $a = $this->makeDateRange('msg_createtime');
+        if( count($a) > 1 ) {
+            $query
+                ->andFilterWhere(['>', 'msg_createtime', $a[0]])
+                ->andFilterWhere(['<', 'msg_createtime', $a[1]]);
+        }
+        else {
+            $this->prepareDateFilter($query);
+        }
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to any records when validation fails
@@ -122,7 +130,14 @@ class MessageSearch extends Message
                 // только одни цифры - предполагаем номер
                 $this->msg_id = intval($this->askid);
             }
-            elseif( preg_match('|^[\\d\\.]*\\.[\\d]{4}$|', $this->askid) ) {
+            else {
+                $a = $this->makeDateRange('askid');
+                if( count($a) > 1 ) {
+                    $query
+                        ->andFilterWhere(['>', 'msg_createtime', $a[0]])
+                        ->andFilterWhere(['<', 'msg_createtime', $a[1]]);
+                }
+/*
                 // цифры с точками - предполагаем дату
                 Yii::info('this->askid = date');
                 $a = explode('.', strrev($this->askid));
@@ -151,11 +166,74 @@ class MessageSearch extends Message
                     $m1++;
                 }
                 Yii::info("2. m = {$m0} .. {$m1} d = {$d0} .. {$d1}");
-
                 $query
                     ->andFilterWhere(['>', 'msg_createtime', date('Y-m-d H:i:s', mktime(0, 0, 0, $m0, $d0, $y) - 1)])
                     ->andFilterWhere(['<', 'msg_createtime', date('Y-m-d H:i:s', mktime(0, 0, 0, $m1, $d1, $y))]);
+*/
             }
         }
+    }
+
+    /**
+     *
+     * Проверка на отсутствие данных в модели
+     *
+     * @return boolean
+     *
+     */
+    public function isEmpty() {
+        $b = true;
+        $a = array_keys($this->attributes);
+        foreach($a As $v) {
+            $b = $b && empty($this->attributes[$v]);
+            if( !empty($v) ) {
+                Yii::info('Not empty: ' . $v . ' = ' . print_r($this->attributes[$v], true));
+            }
+        }
+        return $b;
+    }
+
+    /**
+     *
+     * Из поля пытаемся вытащить номер сообщения или дату и добавить их к фильтрам
+     *
+     * @param $query
+     *
+     */
+    public function makeDateRange($name) {
+        $aRet = [];
+        if (preg_match('|^[\\d\\.]*\\.[\\d]{4}$|', $this->{$name})) {
+            // цифры с точками - предполагаем дату
+            $a = explode('.', strrev($this->{$name}));
+            $n = count($a);
+            $y = strrev($a[0]);
+            $m0 = $m1 = 0;
+            $d0 = $d1 = 0;
+
+            if ($n > 1) {
+                $m0 = intval(strrev($a[1]));
+                $m1 = $m0;
+            }
+            if ($m0 == 0) {
+                $m0 = 1;
+                $m1 = 12;
+            }
+
+            if ($n > 2) {
+                $d0 = intval(strrev($a[2]));
+                $d1 = $d0 + 1;
+            }
+
+            if ($d0 == 0) {
+                $d0 = $d1 = 1;
+                $m1++;
+            }
+
+            $aRet = [
+                date('Y-m-d H:i:s', mktime(0, 0, 0, $m0, $d0, $y) - 1),
+                date('Y-m-d H:i:s', mktime(0, 0, 0, $m1, $d1, $y)),
+            ];
+        }
+        return $aRet;
     }
 }
