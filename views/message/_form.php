@@ -60,7 +60,7 @@ echo '-->' . "\n";
                     'offset' => 'col-sm-offset-3',
                     'wrapper' => 'col-sm-9',
 //                    'error' => '',
-//                    'hint' => '',
+                    'hint' => 'col-sm-9 col-sm-offset-3',
                 ],
             ],
     ]);
@@ -108,28 +108,7 @@ echo '-->' . "\n";
 //                        'change' => 'function(event) { jQuery("#'.Html::getInputId($model, 'msg_empl_id').'").val(event.val); console.log("change", event); }',
 //                        'select2-selecting' => 'function(event) { console.log("select2-selecting", event); }',
                     ],
-                ]);
-            ?>
-        </div>
-
-        <div class="col-sm-6">
-            <?= $form
-                ->field($model, 'msg_empl_command')
-                ->textarea();
-            ?>
-        </div>
-
-        <div class="col-sm-6">
-            <?= $form
-                ->field($model, 'msg_comment')
-                ->textarea();
-            ?>
-        </div>
-
-        <div class="col-sm-6">
-            <?= $form
-                ->field($model, 'msg_empl_remark')
-                ->textarea();
+                ])
             ?>
         </div>
 
@@ -153,6 +132,30 @@ echo '-->' . "\n";
 
         <div class="col-sm-6">
             <?= $form
+                ->field($model, 'msg_empl_command')
+                ->textarea()
+                ->hint('Текст поручения будет виден всем посетителям при публикации обращения на сайте');
+            ?>
+        </div>
+
+        <div class="col-sm-6">
+            <?= $form
+                ->field($model, 'msg_comment')
+                ->textarea()
+                ->hint('Текст комментария будет виден только ответчику и модератору');
+            ?>
+        </div>
+
+        <div class="col-sm-6">
+            <?= $form
+                ->field($model, 'msg_empl_remark')
+                ->textarea()
+                ->hint('Текст замечания будет виден только ответчику и модератору');
+            ?>
+        </div>
+
+        <div class="col-sm-6">
+            <?= $form
                 ->field($model, 'alltags')
                 ->widget(Select2::classname(), [
                     'data' => ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_title'),
@@ -168,23 +171,6 @@ echo '-->' . "\n";
                 ])
             //                ->dropDownList($aAnsw, ['multiple' => true])
             ?>
-        </div>
-
-        <div class="col-sm-6">
-            <div class="form-group">
-                <label for="message-msg_pers_text" class="control-label col-sm-3">&nbsp;</label>
-                <div class="col-sm-4">
-                    <a href="#" class="btn btn-default togglepart" id="toggle_userformpart" style="margin-bottom: 14px;">Обращение</a>
-                </div>
-
-        <?php if( !empty($model->msg_answer)  ): ?>
-                <div class="col-sm-4">
-                    <a href="#" class="btn btn-default togglepart" id="toggle_answer">Ответ</a>
-                </div>
-        <?php endif; ?>
-
-            </div>
-
         </div>
 
         <?php if( !empty($model->msg_answer)  ): ?>
@@ -429,13 +415,6 @@ echo '-->' . "\n";
             'msg_pers_region',
             ['template' => "{input}", 'options' => ['tag' => 'span']]
         )->hiddenInput()
-        /*?>
-               <?= $form->field(
-                   $model,
-                   'msg_pers_org'
-                   )
-                   ->textInput(['maxlength' => 255])
-        */
         ?>
     </div>
 
@@ -493,19 +472,42 @@ echo '-->' . "\n";
                             []
                         );
                     ?>
-                        <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
+            <div class="col-sm-2"><?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?></div>
+
+                <div class="col-sm-10">
+                    <div class="form-group">
+                        <!-- label for="message-msg_pers_text" class="control-label col-sm-3">&nbsp;</label -->
+                        <div class="col-sm-2">
+                            <a href="#" class="btn btn-default togglepart" id="toggle_userformpart" style="margin-bottom: 14px;">Показать Обращение</a>
+                        </div>
+
+                        <?php if( !empty($model->msg_answer)  ): ?>
+                            <div class="col-sm-2">
+                                <a href="#" class="btn btn-default togglepart" id="toggle_answer">Показать Ответ</a>
+                            </div>
+                        <?php endif; ?>
+
+                    </div>
+
+                </div>
         </div>
     </div>
-    <div class="col-sm-4">
+    <div class="col-sm-12">
         <div class="form-group" style="margin-top: 2em;">
                 <?php
                         foreach($aOp As $k=>$aData):
                 ?>
-                            <?= Html::submitButton(
+                            <div id="<?= "buttongroup_" . $k ?>">
+                                <div class="col-sm-4">
+                                <?= Html::submitButton(
                                 'Сохранить и ' . $aData,
-                                ['class' => 'btn btn-default changeflag', 'id' => 'buttonsave_' . $k, 'style' => 'margin-bottom: 1em;'])
-                            ?>
-                            <?= '' /*Html::a('Сохранить и ' . $aData, '#', ['class' => 'btn btn-primary changeflag', 'id' => 'buttonsave_' . $k])*/ ?>
+                                ['class' => 'btn btn-default changeflag', 'id' => 'buttonsave_' . $k, 'style' => 'margin-bottom: 1em;']) ?>
+                                </div>
+                                <div class="col-sm-8">
+                                    <?= 'Описание кнопки' ?>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
                 <?php
                         endforeach;
                 /**
@@ -554,15 +556,19 @@ oMsgTextField.on("keyup", function(event){
 });
 EOT;
 
-    // Показываем/скрываем сообщение пользователя
+    // Показываем/скрываем сообщение пользователя и ответ
     $sJs .=  <<<EOT
 //var oUserPart = jQuery(".togglepart");
 jQuery(".togglepart").on("click", function(event){
     var ob = jQuery(this),
         id = ob.attr("id"),
-        dest = id.split("_").pop();
+        dest = id.split("_").pop(),
+        aText = ob.text().split(" "),
+        oDest = jQuery("#id_" + dest);
     event.preventDefault();
-    jQuery("#id_" + dest).toggle();
+    aText[0] = oDest.is(":visible") ? "Показать" : "Скрыть";
+    ob.text(aText.join(" "));
+    oDest.toggle();
     return false;
 });
 EOT;
@@ -595,13 +601,15 @@ var filterButtons = function() {
     if( {$nFlagNewMsg} == parseInt(oFlag.val()) ) {
         if( oCommand.val().length > 0 ) {
             oButtons.each(function(index, ob){
-                var ob = jQuery(this), nId = parseInt(ob.attr("id").split("_")[1])
+                var ob = jQuery(this),
+                    nId = parseInt(ob.attr("id").split("_")[1]),
+                    oGroup = jQuery("#buttongroup_" + nId);
                 console.log("flag = " + nId + " - " + ob.attr("id"));
                 if( (nId != {$nFlagInstrInt}) && nId != {$nFlagInstr} ) {
-                    ob.hide();
+                    oGroup.hide();
                 }
                 else {
-                    ob.show();
+                    oGroup.show();
                 }
             });
         }

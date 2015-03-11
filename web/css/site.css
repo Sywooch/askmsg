@@ -93,3 +93,7 @@ a.desc:after {
 td.commandcell {
     white-space: nowrap;
 }
+
+.modal {
+    z-index: 1080;
+}
