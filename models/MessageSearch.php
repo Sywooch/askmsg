@@ -152,8 +152,15 @@ class MessageSearch extends Message
     public function isEmpty() {
         $b = true;
         $a = array_keys($this->attributes);
+        $aIgnore = ['msgflags'];
         foreach($a As $v) {
+            if( in_array($v, $aIgnore) ) {
+                continue;
+            }
             $b = $b && empty($this->attributes[$v]);
+            if( !empty($this->attributes[$v]) ) {
+                Yii::info('Not empty: ' . $v . ' = ' . print_r($this->attributes[$v], true));
+            }
         }
         return $b;
     }
