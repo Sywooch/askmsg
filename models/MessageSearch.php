@@ -5,6 +5,8 @@ namespace app\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\db\Query;
+
 use app\models\Message;
 use app\models\Regions;
 use app\models\Rolesimport;
@@ -74,6 +76,19 @@ class MessageSearch extends Message
 //        Yii::info('scenario = ' . $this->scenario . ' isAttributeActive(askid) = ' . ($this->isAttributeActive('askid') ? 'true' : 'false'));
         $this->load($params);
 
+        if( !empty($this->answers) ) {
+//            $ansQuery = Yii::$app->db->createCommand('Select Distinct ma_message_id From ' . Msganswers::tableName() . ' Where ma_user_id In ('.implode(',', $this->answers).')');
+            $ansQuery = (new Query)
+                ->select('ma_message_id')
+                ->from(Msganswers::tableName())
+                ->where(['ma_user_id' => $this->answers])
+                ->distinct();
+            $query->andFilterWhere(['or', ['msg_id' => $ansQuery], ['msg_empl_id' => $this->msg_empl_id]]);
+        }
+        else {
+            $query->andFilterWhere(['msg_empl_id' => $this->msg_empl_id]);
+        }
+
         $a = $this->makeDateRange('msg_createtime');
         if( count($a) > 1 ) {
             $query
@@ -97,7 +112,6 @@ class MessageSearch extends Message
 //            'msg_createtime' => $this->msg_createtime,
             'msg_subject' => $this->msg_subject,
             'msg_pers_region' => $this->msg_pers_region,
-            'msg_empl_id' => $this->msg_empl_id,
 //            'msg_answertime' => $this->msg_answertime,
             'msg_flag' => $this->msg_flag ? $this->msg_flag : $this->msgflags,
         ]);
@@ -145,29 +159,6 @@ class MessageSearch extends Message
 
     /**
      *
-     * Проверка на отсутствие данных в модели
-     *
-     * @return boolean
-     *
-     */
-    public function isEmpty() {
-        $b = true;
-        $a = array_keys($this->attributes);
-        $aIgnore = Yii::$app->user->can(Rolesimport::ROLE_ADMIN) ? [] : ['msg_empl_id'];
-        foreach($a As $v) {
-            if( in_array($v, $aIgnore) ) {
-                continue;
-            }
-            $b = $b && empty($this->attributes[$v]);
-            if( !empty($this->attributes[$v]) ) {
-                Yii::info('Not empty: ' . $v . ' = ' . print_r($this->attributes[$v], true));
-            }
-        }
-        return $b;
-    }
-
-    /**
-     *
      * Из поля пытаемся вытащить номер сообщения или дату и добавить их к фильтрам
      *
      * @param $query
@@ -209,4 +200,29 @@ class MessageSearch extends Message
         }
         return $aRet;
     }
+
+    /**
+     *
+     * Проверка на отсутствие данных в модели
+     *
+     * @return boolean
+     *
+     */
+    public function isEmpty() {
+        $b = true;
+        $a = array_keys($this->attributes);
+//        $aIgnore = Yii::$app->user->can(Rolesimport::ROLE_ADMIN) ? [] : ['msg_empl_id', 'answers'];
+        $aIgnore = ['msg_empl_id', 'answers'];
+        foreach($a As $v) {
+            if( in_array($v, $aIgnore) ) {
+                continue;
+            }
+            $b = $b && empty($this->attributes[$v]);
+            if( !empty($this->attributes[$v]) ) {
+                Yii::info('Not empty: ' . $v . ' = ' . print_r($this->attributes[$v], true));
+            }
+        }
+        return $b;
+    }
+
 }

@@ -506,28 +506,6 @@ class Message extends \yii\db\ActiveRecord
             'relateidfield' => 'mt_tag_id',
             'relateidarray' => $model->alltags,
         ]);
-//        Yii::info("event: {$event->name} -> " . print_r($model->answers, true) . print_r($this->answers, true));
-/*
-        if( $event->name === ActiveRecord::EVENT_AFTER_UPDATE ) {
-            $nCou = Msganswers::updateAll(['ma_message_id' => 0, 'ma_user_id' => 0], 'ma_message_id = ' . $model->msg_id);
-            Yii::info('Clear soanswers: ' . $nCou);
-        }
-        if( is_array($model->answers) ) {
-            foreach($model->answers As $id) {
-                // Msganswers::updateAll();
-                $nUpd = Yii::$app
-                    ->db
-                    ->createCommand('Update ' . Msganswers::tableName() . ' Set ma_message_id = :ma_message_id, ma_user_id = :ma_user_id Where ma_message_id = 0 Limit 1', [':ma_message_id' => $model->msg_id, ':ma_user_id' => $id])
-                    ->execute();
-                if( $nUpd == 0 ) {
-                    $nUpd = Yii::$app
-                        ->db
-                        ->createCommand('Insert Into ' . Msganswers::tableName() . ' (ma_message_id, ma_user_id) Values (:ma_message_id,  :ma_user_id)', [':ma_message_id' => $model->msg_id, ':ma_user_id' => $id])
-                        ->execute();
-                }
-            }
-        }
-*/
     }
 
     /**
@@ -550,11 +528,11 @@ class Message extends \yii\db\ActiveRecord
                         ->db
                         ->createCommand('Insert Into ' . $param['reltableclass']::tableName() . ' ('.$param['msgidfield'].', '.$param['relateidfield'].') Values (:ma_message_id,  :ma_user_id)', [':ma_message_id' => $this->msg_id, ':ma_user_id' => $id])
                         ->execute();
-                    Yii::info('Insert saveRelateddata : ['.$this->msg_id.', '.$id.']');
+//                    Yii::info('Insert saveRelateddata : ['.$this->msg_id.', '.$id.']');
                 }
-                else {
-                    Yii::info('Update saveRelateddata : ['.$this->msg_id.', '.$id.']');
-                }
+//                else {
+//                    Yii::info('Update saveRelateddata : ['.$this->msg_id.', '.$id.']');
+//                }
             }
         }
     }

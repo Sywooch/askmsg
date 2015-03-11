@@ -110,6 +110,7 @@ class MessageController extends Controller
 
         $searchModel->msgflags = Message::getMessageFilters()[Rolesimport::ROLE_ANSWER_DOGM];
         $searchModel->msg_empl_id = Yii::$app->user->identity->getId();
+        $searchModel->answers = [Yii::$app->user->identity->getId()];
 
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
