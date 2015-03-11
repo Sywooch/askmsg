@@ -7,6 +7,7 @@ use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\Message;
 use app\models\Regions;
+use app\models\Rolesimport;
 
 /**
  * MessageSearch represents the model behind the search form about `app\models\Message`.
@@ -152,7 +153,7 @@ class MessageSearch extends Message
     public function isEmpty() {
         $b = true;
         $a = array_keys($this->attributes);
-        $aIgnore = ['msgflags'];
+        $aIgnore = Yii::$app->user->can(Rolesimport::ROLE_ADMIN) ? [] : ['msg_empl_id'];
         foreach($a As $v) {
             if( in_array($v, $aIgnore) ) {
                 continue;
