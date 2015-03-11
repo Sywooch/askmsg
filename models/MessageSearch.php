@@ -79,7 +79,8 @@ class MessageSearch extends Message
                 ->andFilterWhere(['>', 'msg_createtime', $a[0]])
                 ->andFilterWhere(['<', 'msg_createtime', $a[1]]);
         }
-        else {
+
+        if( !empty($this->askid) ) {
             $this->prepareDateFilter($query);
         }
 
@@ -91,7 +92,7 @@ class MessageSearch extends Message
 
 
         $query->andFilterWhere([
-//            'msg_id' => $this->msg_id,
+            'msg_id' => $this->msg_id,
 //            'msg_createtime' => $this->msg_createtime,
 //            'msg_active' => $this->msg_active,
             'msg_pers_region' => $this->msg_pers_region,
@@ -137,39 +138,6 @@ class MessageSearch extends Message
                         ->andFilterWhere(['>', 'msg_createtime', $a[0]])
                         ->andFilterWhere(['<', 'msg_createtime', $a[1]]);
                 }
-/*
-                // цифры с точками - предполагаем дату
-                Yii::info('this->askid = date');
-                $a = explode('.', strrev($this->askid));
-                $n = count($a);
-                $y = strrev($a[0]);
-                $m0 = $m1 = 0;
-                $d0 = $d1 = 0;
-
-                if($n > 1) {
-                    $m0 = intval(strrev($a[1]));
-                    $m1 = $m0;
-                }
-                if( $m0 == 0 ) {
-                    $m0 = 1;
-                    $m1 = 12;
-                }
-                Yii::info("1. m = {$m0} .. {$m1} d = {$d0} .. {$d1}");
-
-                if($n > 2) {
-                    $d0 = intval(strrev($a[2]));
-                    $d1 = $d0 + 1;
-                }
-
-                if( $d0 == 0 ) {
-                    $d0 = $d1 = 1;
-                    $m1++;
-                }
-                Yii::info("2. m = {$m0} .. {$m1} d = {$d0} .. {$d1}");
-                $query
-                    ->andFilterWhere(['>', 'msg_createtime', date('Y-m-d H:i:s', mktime(0, 0, 0, $m0, $d0, $y) - 1)])
-                    ->andFilterWhere(['<', 'msg_createtime', date('Y-m-d H:i:s', mktime(0, 0, 0, $m1, $d1, $y))]);
-*/
             }
         }
     }
@@ -186,9 +154,6 @@ class MessageSearch extends Message
         $a = array_keys($this->attributes);
         foreach($a As $v) {
             $b = $b && empty($this->attributes[$v]);
-            if( !empty($v) ) {
-                Yii::info('Not empty: ' . $v . ' = ' . print_r($this->attributes[$v], true));
-            }
         }
         return $b;
     }

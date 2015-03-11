@@ -27,7 +27,11 @@ if( !isset($action) ) {
 
 ?>
 
-<div class="message-search" id="idsearchpanel" <?= $model->isEmpty() ? ' style="display: none;"' : '' ?>>
+<div class="col-sm-12 form-group">
+    <?= Html::a('Скрыть', '#', ['class' => 'btn btn-default pull-right', 'id'=>'hidesearchpanel']) ?>
+</div>
+<div class="clearfix"></div>
+<div class="message-search" id="idsearchpanel" style="<?= $model->isEmpty() ? 'display: none; ' : '' ?>clear: both; border: 1px solid #777777; border-radius: 4px; background-color: #eeeeee; padding-top: 2em; padding-bottom: 1em; margin-bottom: 2em;">
 
     <?php $form = ActiveForm::begin([
         'action' => $action,
@@ -304,13 +308,13 @@ if( !isset($action) ) {
     <?php // echo $form->field($model, 'msg_oldcomment') */ ?>
 
 
-    <div class="col-sm-6">
-    <div class="form-group">
-        <?= Html::submitButton('Искать', ['class' => 'btn btn-primary']) ?>
-        <?= Html::resetButton('Сбросить настройки', ['class' => 'btn btn-default']) ?>
+    <div class="col-sm-12">
+        <!-- div class="form-group" -->
+        <?= Html::a('Сбросить настройки', $action, ['class' => 'btn btn-default pull-right']) ?>
+        <?= Html::submitButton('Искать', ['class' => 'btn btn-success pull-right']) ?>
+        <!-- /div -->
     </div>
-    </div>
-
+    <div class="clearfix"></div>
 
     <?php ActiveForm::end();
     // функция форматирования результатов в список для select2
@@ -323,26 +327,27 @@ EOT;
     $this->registerJs($sJs, View::POS_END , 'showselectpart');
 
 //    <div class="clearfix"></div>
-// <div class="col-sm-6">
-// </div>
     ?>
 </div>
-    <?= Html::a('Скрыть', '#', ['class' => 'btn btn-default pull-right', 'id'=>'hidesearchpanel']) ?>
 <?php
 // функция форматирования результатов в список для select2
     $sJs =  <<<EOT
 var oPanel = jQuery("#idsearchpanel"),
     oLink = jQuery("#hidesearchpanel"),
+    renameButton = function() {
+        oLink.text((oPanel.is(":visible") ? "Скрыть" : "Показать") + " форму поиска");
+    },
     toggleSearchPanel = function() {
         oPanel.toggle();
-        oLink.text(oPanel.is(":visible") ? "Скрыть" : "Показать");
+        renameButton();
     };
 
-oLink
-    .text(oPanel.is(":visible") ? "Скрыть" : "Показать")
-    .on("click", function(event){ event.preventDefault(); toggleSearchPanel(); return false; });
+renameButton();
+oLink.on(
+    "click",
+    function(event){ event.preventDefault(); toggleSearchPanel(); return false; }
+);
 
-// toggleSearchPanel();
 EOT;
     $this->registerJs($sJs, View::POS_READY , 'togglesearchpanel');
 ?>
