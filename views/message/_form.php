@@ -478,12 +478,12 @@ echo '-->' . "\n";
                 <div class="col-sm-10">
                     <div class="form-group">
                         <!-- label for="message-msg_pers_text" class="control-label col-sm-3">&nbsp;</label -->
-                        <div class="col-sm-2">
+                        <div class="col-sm-3">
                             <a href="#" class="btn btn-default togglepart" id="toggle_userformpart" style="margin-bottom: 14px;">Показать Обращение</a>
                         </div>
 
                         <?php if( !empty($model->msg_answer)  ): ?>
-                            <div class="col-sm-2">
+                            <div class="col-sm-3">
                                 <a href="#" class="btn btn-default togglepart" id="toggle_answer">Показать Ответ</a>
                             </div>
                         <?php endif; ?>

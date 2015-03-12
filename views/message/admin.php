@@ -11,6 +11,7 @@ use app\assets\ListdataAsset;
 use app\models\Rolesimport;
 use app\models\Regions;
 use app\models\Msgflags;
+use app\models\Tags;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\MessageSearch */
@@ -24,7 +25,10 @@ ListdataAsset::register($this);
 
 /*
      <h1><?= Html::encode($this->title) ?></h1>
- */
+*/
+
+$aTags = ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_title');
+Yii::info('TAGS: ' . print_r($aTags, true));
 
 ?>
 <div class="message-index">
@@ -140,13 +144,15 @@ EOT;
             ],
             [
                 'class' => 'yii\grid\DataColumn',
-                'attribute' => 'msg_pers_region',
-//                'header' => '',
-                'filter' => Regions::getListData(),
+//                'attribute' => 'msg_pers_region',
+//                'filter' => Regions::getListData(),
+                'attribute' => 'alltags',
+                'filter' => $aTags,
                 'filterOptions' => ['class' => 'gridwidth7'],
-
                 'content' => function ($model, $key, $index, $column) {
-                    return Html::encode($model->region->reg_name) . '<span>' . Html::encode($model->msg_oldcomment) . '</span>';
+//                    return count($model->alltags);
+                    return Html::encode(implode(', ', ArrayHelper::map($model->alltags, 'tag_id', 'tag_title')));
+//                    return Html::encode($model->region->reg_name) . '<span>' . Html::encode($model->msg_oldcomment) . '</span>';
                 },
                 'contentOptions' => [
                     'class' => 'griddate',

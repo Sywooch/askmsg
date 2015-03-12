@@ -6,10 +6,13 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\Query;
+use yii\helpers\ArrayHelper;
 
 use app\models\Message;
 use app\models\Regions;
 use app\models\Rolesimport;
+use app\models\Tags;
+use app\models\Msgtags;
 
 /**
  * MessageSearch represents the model behind the search form about `app\models\Message`.
@@ -25,6 +28,7 @@ class MessageSearch extends Message
         return [
             [['msg_id', 'msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag'], 'integer'],
             [['askid', ], 'string'],
+            [['alltags'], 'in', 'range' => array_keys(ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_title')), 'allowArray' => true],
             [['msg_subject', 'msg_createtime', 'msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_org', 'msg_pers_text', 'msg_comment', 'msg_empl_command', 'msg_empl_remark', 'msg_answer', 'msg_answertime', 'msg_oldcomment'], 'safe'],
         ];
     }
@@ -48,9 +52,10 @@ class MessageSearch extends Message
     public function search($params)
     {
         $query = Message::find()
-            ->with('region')
-            ->with('employee')
+//            ->with('region')
 //            ->with('answers')
+            ->with('employee')
+            ->with('alltags')
             ->with('flag');
 
         $dataProvider = new ActiveDataProvider([
@@ -92,6 +97,15 @@ class MessageSearch extends Message
         }
         else {
             $query->andFilterWhere(['msg_empl_id' => $this->msg_empl_id]);
+        }
+
+        if( !empty($this->alltags) ) {
+            $tagsQuery = (new Query)
+                ->select('mt_msg_id')
+                ->from(Msgtags::tableName())
+                ->where(['mt_tag_id' => $this->alltags])
+                ->distinct();
+            $query->andFilterWhere(['msg_id' => $tagsQuery]);
         }
 
         $a = $this->makeDateRange('msg_createtime');

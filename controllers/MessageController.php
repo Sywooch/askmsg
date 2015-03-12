@@ -198,7 +198,7 @@ class MessageController extends Controller
             $model = new Message();
             $model->scenario = 'person';
             // поправим после сохранения сообщения всех соответчиков
-            $model->on(ActiveRecord::EVENT_AFTER_INSERT, [$model, 'saveCoanswers'] );
+            // $model->on(ActiveRecord::EVENT_AFTER_INSERT, [$model, 'saveCoanswers'] );
         }
         else {
             $model = $this->findModel($id);
@@ -208,6 +208,7 @@ class MessageController extends Controller
             }
             // поправим после сохранения сообщения всех соответчиков
             $model->on(ActiveRecord::EVENT_AFTER_UPDATE, [$model, 'saveCoanswers'] );
+            $model->on(ActiveRecord::EVENT_AFTER_UPDATE, [$model, 'saveAlltags'] );
         }
 
 

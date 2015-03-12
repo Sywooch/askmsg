@@ -3,16 +3,18 @@
 namespace app\models;
 
 use Yii;
-use app\models\User;
-use app\models\Msgflags;
-use app\models\Msganswers;
-use app\models\Msgtags;
-
 use yii\db\Expression;
 use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
 use yii\behaviors\AttributeBehavior;
 use yii\base\Event;
+use yii\helpers\ArrayHelper;
+
+use app\models\User;
+use app\models\Tags;
+use app\models\Msgflags;
+use app\models\Msganswers;
+use app\models\Msgtags;
 use app\models\Rolesimport;
 use app\components\AttributewalkBehavior;
 use app\components\NotificateBehavior;
@@ -53,6 +55,7 @@ use app\components\NotificateBehavior;
 class Message extends \yii\db\ActiveRecord
 {
     const MAX_PERSON_TEXT_LENGTH = 4000;
+    const KEY_STATMSG_DATA = 'count_message_flags';
 
     public $employer; // Ответчик
     public $asker; // Проситель
@@ -205,7 +208,8 @@ class Message extends \yii\db\ActiveRecord
                             ActiveRecord::EVENT_AFTER_UPDATE,
                         ],
                         'value' => function ($event, $model) {
-                            /** @var */
+                            /** @var $model Message */
+                            Yii::$app->cache->delete(Message::KEY_STATMSG_DATA); // удалим статистику
                             if( !isset($model->_oldAttributes['msg_flag'])
                                 || ( isset($model->_oldAttributes['msg_flag'])
                                     && $model->_oldAttributes['msg_flag'] != $model->msg_flag )
@@ -242,6 +246,7 @@ class Message extends \yii\db\ActiveRecord
             [['msg_flag'], 'required'],
 //            [['answers'], 'safe'],
             [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_12, '', '{{val}}')), 'allowArray' => true],
+            [['alltags'], 'in', 'range' => array_keys(ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_title')), 'allowArray' => true],
 //            [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}')), 'allowArray' => true],
             [['msg_id', 'msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject', 'ekis_id'], 'integer'],
             [['msg_pers_text'], 'string', 'max' => self::MAX_PERSON_TEXT_LENGTH, 'on' => 'person'],
@@ -282,7 +287,8 @@ class Message extends \yii\db\ActiveRecord
                                         'msg_empl_id',
                                         'msg_flag',
                                         'msg_active',
-                                        'answers'
+                                        'answers',
+                                        'alltags',
                                     ]
         );
 
@@ -425,6 +431,7 @@ class Message extends \yii\db\ActiveRecord
 
     /**
      *  Установка соответчиков
+     * @param array $answers id soanswers for message
      */
     public function setAnswers($answers)
     {
@@ -448,12 +455,13 @@ class Message extends \yii\db\ActiveRecord
         return $this
             ->hasMany(
                 Tags::className(),
-                ['tags_id' => 'mt_tag_id'])
+                ['tag_id' => 'mt_tag_id'])
             ->via('msgtags');
     }
 
     /**
      *  Установка тегов
+     * @param array $tags id tags for validate
      */
     public function setAlltags($tags)
     {
@@ -499,6 +507,7 @@ class Message extends \yii\db\ActiveRecord
      */
     public function saveAlltags($event) {
         $model = $event->sender;
+//        Yii::info('saveAlltags: ' . print_r($model, true));
         $model->saveRelateddata([
             'eventname' => $event->name,
             'reltableclass' => Msgtags::className(),
@@ -513,9 +522,10 @@ class Message extends \yii\db\ActiveRecord
      * @param array $param
      */
     public function saveRelateddata($param) {
+//        Yii::info('saveRelateddata() ' . print_r($param, true));
         if( $param['eventname'] === ActiveRecord::EVENT_AFTER_UPDATE ) {
             $nCou = $param['reltableclass']::updateAll([$param['msgidfield'] => 0, $param['relateidfield'] => 0], $param['msgidfield'] . ' = ' . $this->msg_id);
-            Yii::info('Clear soanswers: ' . $nCou);
+//            Yii::info('Clear relate records: ' . $nCou);
         }
         if( is_array($param['relateidarray']) ) {
             foreach($param['relateidarray'] As $id) {
@@ -528,10 +538,10 @@ class Message extends \yii\db\ActiveRecord
                         ->db
                         ->createCommand('Insert Into ' . $param['reltableclass']::tableName() . ' ('.$param['msgidfield'].', '.$param['relateidfield'].') Values (:ma_message_id,  :ma_user_id)', [':ma_message_id' => $this->msg_id, ':ma_user_id' => $id])
                         ->execute();
-//                    Yii::info('Insert saveRelateddata : ['.$this->msg_id.', '.$id.']');
+//                    Yii::info('Insert relate records : ['.$this->msg_id.', '.$id.']');
                 }
 //                else {
-//                    Yii::info('Update saveRelateddata : ['.$this->msg_id.', '.$id.']');
+//                    Yii::info('Update relate records : ['.$this->msg_id.', '.$id.']');
 //                }
             }
         }

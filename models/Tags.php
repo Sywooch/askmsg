@@ -22,6 +22,8 @@ class Tags extends \yii\db\ActiveRecord
         self::TAGTYPE_SUBJECT => 'Тема',
     ];
 
+    public static $_cache = null;
+
     /**
      * @inheritdoc
      */
@@ -74,12 +76,20 @@ class Tags extends \yii\db\ActiveRecord
      */
     public static function getTagslist($nType)
     {
+        if( self::$_cache === null ) {
+            self::$_cache = [];
+        }
+        if( isset(self::$_cache[$nType]) ) {
+            return self::$_cache[$nType];
+        }
+
         $aRet = [];
         if( isset(self::$_aTypes[$nType]) ) {
             $aRet = self::find()
                 ->where(['tag_type' => $nType, 'tag_active' => 1,])
                 ->all();
         }
+        self::$_cache[$nType] = $aRet;
         return $aRet;
     }
 }

@@ -17,15 +17,31 @@ $aStatFlags = [
     Msgflags::MFLG_SHOW_ANSWER,
     Msgflags::MFLG_INT_FIN_INSTR,
 ];
-$query = (new Query())
-    ->select(['COUNT(m.msg_id) As cou', 'f.fl_name', 'f.fl_id', 'f.fl_sname'])
-    ->from([Msgflags::tableName() . ' f'])
-    ->leftJoin(Message::tableName() . ' m', 'f.fl_id = m.msg_flag')
-    ->where('f.fl_id In ('.implode(',' , $aStatFlags).')')
-    ->groupBy(['f.fl_name', 'f.fl_id', 'f.fl_sname']);
+
+$aStat = Yii::$app->cache->get(Message::KEY_STATMSG_DATA);
+if( $aStat === false ) {
+    // Left Join variant
+    $query = (new Query())
+        ->select(['COUNT(m.msg_id) As cou', 'f.fl_name', 'f.fl_id', 'f.fl_sname'])
+        ->from([Msgflags::tableName() . ' f'])
+        ->leftJoin(Message::tableName() . ' m', 'f.fl_id = m.msg_flag')
+//        ->where('f.fl_id In (' . implode(',', $aStatFlags) . ')')
+        ->groupBy(['f.fl_name', 'f.fl_id', 'f.fl_sname']);
+
+    /*
+    // Inner Join variant
+    $query = (new Query())
+        ->select(['COUNT(m.msg_id) As cou', 'f.fl_name', 'f.fl_id', 'f.fl_sname'])
+        ->from([Msgflags::tableName() . ' f', Message::tableName() . ' m'])
+        ->where('f.fl_id = m.msg_flag And f.fl_id In ('.implode(',' , $aStatFlags).')')
+        ->groupBy(['f.fl_name', 'f.fl_id', 'f.fl_sname']);
+    */
+    $aStat = $query->createCommand()->queryAll();
+    Yii::$app->cache->set(Message::KEY_STATMSG_DATA, $aStat, 3600);
+}
 
 $aData = ArrayHelper::map(
-    $query->createCommand()->queryAll(),
+    $aStat,
     'fl_id',
     function($item) { return $item; }
 );
