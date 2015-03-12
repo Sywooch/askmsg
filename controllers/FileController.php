@@ -42,6 +42,14 @@ class FileController extends Controller
     }
 
     /**
+     * Lists all File models.
+     * @return mixed
+     */
+    public function actionUpload()
+    {
+    }
+
+    /**
      * Displays a single File model.
      * @param integer $id
      * @return mixed

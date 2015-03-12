@@ -635,4 +635,29 @@ class Message extends \yii\db\ActiveRecord
         Yii::info("countAvalableFile() return {$n}");
         return $n;
     }
+
+    /**
+     * Get user Files
+     *
+     * @param $bGuest boolean true - guest file, false - answer file
+     * @return array of File objects
+     */
+    public function getUserFiles($bGuest = true) {
+        $aRet = [];
+        foreach($this->attachments As $ob) {
+            /** @var File  $ob */
+            if( $bGuest ) {
+                if( $ob->file_user_id == 0 ) {
+                    $aRet[] = $ob;
+                }
+            }
+            else {
+                if( $ob->file_user_id != 0 ) {
+                    $aRet[] = $ob;
+                }
+            }
+        }
+        return $aRet;
+    }
+
 }

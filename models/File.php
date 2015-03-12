@@ -91,15 +91,15 @@ class File extends \yii\db\ActiveRecord
      */
     public function isUploadDirExists() {
         $sDir = Yii::getAlias(Yii::$app->params['message.file.uploaddir']);
-        Yii::info("Upload dir: {$sDir}");
+//        Yii::info("Upload dir: {$sDir}");
         if( !is_dir($sDir) ) {
-            Yii::info("Upload dir: {$sDir} not exists");
+//            Yii::info("Upload dir: {$sDir} not exists");
             $a = explode('/', Yii::$app->params['message.file.uploaddir']);
             $s = '';
             while( count($a) > 0 ) {
                 $s .= (($s === '') ? '' : '/') . array_shift($a);
                 $sd = Yii::getAlias($s);
-                Yii::info("Upload dir: try {$s} = {$sd}");
+//                Yii::info("Upload dir: try {$s} = {$sd}");
                 if( !is_dir($sd) && !mkdir($sd) ) {
                     return false;
                 }

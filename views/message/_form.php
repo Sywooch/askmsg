@@ -17,6 +17,7 @@ use app\models\User;
 use app\models\Rolesimport;
 use app\models\Tags;
 use app\models\Message;
+use app\models\File;
 
 use kartik\file\FileInput;
 
@@ -206,7 +207,7 @@ $isModerate = $model->scenario == 'moderator';
      */
     if( $isModerate ):
     ?>
-        <div id="id_userformpart" style="display: none; clear: both; border: 1px solid #777777; border-radius: 4px; background-color: #eeeeee; padding-top: 2em; margin-bottom: 2em;">
+        <div id="id_userformpart" style="display: none; clear: both; border: 1px solid #777777; border-radius: 4px; background-color: #eeeeee; padding-top: 2em; padding-bottom: 2em; margin-bottom: 2em;">
     <?php
     endif; // if( $isModerate ):
     ?>
@@ -445,30 +446,67 @@ $isModerate = $model->scenario == 'moderator';
         ->textarea(['rows' => 6]) ?>
     </div>
 
+    <?php
+    if( $model->isNewRecord ):
+    ?>
     <div class="col-sm-12">
         <?= $form->field(
             $model,
             'file[]',
             [
 //            'template' => "{input}\n{hint}\n{error}",
-            'horizontalCssClasses' => [
-                'label' => 'col-sm-1',
-                'offset' => 'col-sm-offset-1',
-                'wrapper' => 'col-sm-11',
-            ],
-        ])
-        ->widget(
-            FileInput::classname(),
-            [
-                'options'=>[
-//                    'accept'=>'image/*',
-                    'multiple'=> !Yii::$app->user->isGuest
+                'horizontalCssClasses' => [
+                    'label' => 'col-sm-1',
+                    'offset' => 'col-sm-offset-1',
+                    'wrapper' => 'col-sm-11',
                 ],
-                'pluginOptions'=>[
-                    'allowedFileExtensions' => Yii::$app->params['message.file.ext']
-                ]
-            ]) ?>
+            ])
+            ->widget(
+                FileInput::classname(),
+                [
+                    'options'=>[
+    //                    'accept'=>'image/*',
+                        'multiple'=> !Yii::$app->user->isGuest
+                    ],
+                    'pluginOptions'=>[
+                        'uploadUrl' => Url::to(['file/upload']),
+                        'allowedFileExtensions' => Yii::$app->params['message.file.ext'],
+                        'maxFileCount' => 3,
+                        'showPreview' => true,
+                        'showCaption' => true,
+                        'showRemove' => true,
+                        'showUpload' => false,
+                    ]
+                ]) ?>
     </div>
+
+    <?php
+    else:
+        $aFiles = $model->getUserFiles(true);
+        if( count($aFiles) > 0 ):
+            ?>
+            <div class="col-sm-12">
+            <label for="message-msg_pers_text" class="control-label col-sm-1">Файлы</label>
+            <div class="col-sm-11">
+            <?php
+            foreach($aFiles As $oFile):
+                /** @var File  $oFile */
+                echo Html::a(
+                    $oFile->file_orig_name,
+                    $oFile->getUrl(),
+                    ['class' => 'btn btn-default']
+                );
+            endforeach;
+            ?>
+            <div class="clearfix"></div>
+            </div>
+            </div>
+        <?php
+        endif;
+    ?>
+    <?php
+    endif; // if( $model->countAvalableFile() > 0 ):
+    ?>
     <div class="clearfix"></div>
 
     <?php
