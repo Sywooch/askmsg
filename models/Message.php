@@ -237,11 +237,11 @@ class Message extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_region', 'msg_subject', 'ekis_id'], 'required'],
+            [['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_region'], 'required'],
             [['msg_answer'], 'required', 'on' => 'answer', ],
-            [['msg_pers_org', 'msg_pers_secname'], 'required', 'on'=>'person', ],
+            [['msg_pers_org', 'ekis_id', 'msg_subject', 'msg_pers_secname'], 'required', 'on'=>'person', ],
 //            [['msg_pers_secname'], 'required', 'on'=>['answer', 'person', 'moderator']],
-            [['msg_createtime', 'msg_answertime'], 'filter', 'filter' => function($v){ return empty($v) ? new Expression('NOW()') : $v;  }],
+            [['msg_createtime', 'msg_answertime'], 'filter', 'filter' => function($v){ return empty($v) ? new Expression('NOW()') : $v; }],
             [['msg_createtime', 'msg_answertime'], 'safe'],
             [['msg_flag'], 'required'],
 //            [['answers'], 'safe'],
@@ -314,12 +314,14 @@ class Message extends \yii\db\ActiveRecord
         ];
 
         // у старых сообщений нет темы, ekis_id
+        /*
         foreach(['msg_subject', 'ekis_id', 'msg_pers_org'] As $v) {
             $n = array_search($v, $scenarios['moderator'], true);
             if( $n !== false ) {
                 unset($scenarios['moderator'][$n]);
             }
         }
+        */
 
         $scenarios['answer'] = ['msg_answer', 'msg_answertime', 'msg_flag'];
 

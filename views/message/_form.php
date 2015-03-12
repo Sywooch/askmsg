@@ -46,6 +46,9 @@ else {
     echo "No errors";
 }
 echo '-->' . "\n";
+
+$isModerate = $model->scenario == 'moderator';
+
 ?>
 
 <div class="message-form">
@@ -66,7 +69,7 @@ echo '-->' . "\n";
     ]);
 
 
-    if( $model->scenario == 'moderator' ) {
+    if( $isModerate ) {
         echo $form->errorSummary([$model]);
     }
 
@@ -84,7 +87,7 @@ echo '-->' . "\n";
      * Часть модератора
      *
      */
-    if( $model->scenario == 'moderator' ):
+    if( $isModerate ):
     ?>
         <?= $form->field($model, 'msg_flag', ['template' => "{input}", 'options' => ['tag' => 'span']])->hiddenInput();  ?>
 
@@ -183,7 +186,7 @@ echo '-->' . "\n";
         <?php endif; ?>
 
     <?php
-    endif; // if( $model->scenario == 'moderator' ):
+    endif; // if( $isModerate ):
     /**
      *
      * Окончание части модератора
@@ -198,11 +201,11 @@ echo '-->' . "\n";
      * Часть пользователя
      *
      */
-    if( $model->scenario == 'moderator' ):
+    if( $isModerate ):
     ?>
         <div id="id_userformpart" style="display: none; clear: both; border: 1px solid #777777; border-radius: 4px; background-color: #eeeeee; padding-top: 2em; margin-bottom: 2em;">
     <?php
-    endif; // if( $model->scenario == 'moderator' ):
+    endif; // if( $isModerate ):
     ?>
 
     <div class="col-sm-12">
@@ -211,7 +214,6 @@ echo '-->' . "\n";
                 $model,
                 'msg_subject',
                 [
-//            'template' => "{input}\n{hint}\n{error}",
                     'horizontalCssClasses' => [
                     'label' => 'col-sm-1',
                     'offset' => 'col-sm-offset-1',
@@ -221,8 +223,9 @@ echo '-->' . "\n";
             ->widget(Select2::classname(), [
                 'data' => ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_SUBJECT), 'tag_id', 'tag_title'),
                 'language' => 'ru',
+//                'disabled' => $isModerate,
+//                'readonly' => $isModerate,
                 'options' => [
-//                    'multiple' => true,
                     'placeholder' => 'Выберите тему сообщения ...',
                 ],
                 'pluginOptions' => [
@@ -232,6 +235,29 @@ echo '-->' . "\n";
 
         ?>
     </div>
+
+    <?php
+    if( $isModerate ):
+    ?>
+        <div class="col-sm-12">
+            <?= $form->field(
+                $model,
+                'msg_pers_org',
+                [
+                    'horizontalCssClasses' => [
+                        'label' => 'col-sm-1',
+                        'offset' => 'col-sm-offset-1',
+                        'wrapper' => 'col-sm-11',
+                    ],
+                    'inputOptions' => [
+                        'disabled' => true,
+                    ]
+                ]
+            )->textInput(['maxlength' => 255]) ?>
+        </div>
+    <?php
+    endif; // if( $isModerate ):
+    ?>
 
     <div class="col-sm-4">
         <?= $form->field($model, 'msg_pers_lastname')->textInput(['maxlength' => 255]) ?>
@@ -255,26 +281,6 @@ echo '-->' . "\n";
             'mask' => '+7(999) 999-99-99'
         ]) ?>
     </div>
-
-<?php
-/*
-    <div class="clearfix"></div>
-    <div class="col-sm-4">
-        <?= $form
-            ->field($model, 'msg_pers_region')
-            ->dropDownList(
-                ArrayHelper::map(
-                    Regions::find()
-                        ->where(['reg_active'=>1])
-                        ->orderBy(['reg_name' => SORT_ASC])
-                        ->all(),
-                    'reg_id',
-                    'reg_name'
-                )
-            ) ?>
-    </div>
-*/
-?>
 
     <div class="col-sm-4">
         <?= $form->field(
@@ -439,11 +445,11 @@ echo '-->' . "\n";
     <div class="clearfix"></div>
 
     <?php
-    if( $model->scenario == 'moderator' ):
+    if( $isModerate ):
     ?>
         </div>
     <?php
-    endif; // if( $model->scenario == 'moderator' ):
+    endif; // if( $isModerate ):
     /**
      *
      * Окончание части пользователя
@@ -459,7 +465,7 @@ echo '-->' . "\n";
                  * Тут кусочек для кнопок модератора, чтобы он нажимал и менял флаг
                  *
                  */
-                    if( $model->scenario == 'moderator' ):
+                    if( $isModerate ):
                         $aOp = array_reduce(
                             Msgflags::getStateTrans($model->msg_flag),
                             function ( $carry , $item ) {
@@ -523,7 +529,7 @@ echo '-->' . "\n";
                         <?= Html::submitButton($model->isNewRecord ? 'Отправить' : 'Сохранить', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
                     </div>
                 <?php
-                    endif; // if( $model->scenario == 'moderator' ):
+                    endif; // if( $isModerate ):
                 ?>
         </div>
     </div>
