@@ -7,6 +7,12 @@ use app\models\Rolesimport;
 /* @var $this yii\web\View */
 /* @var $model app\models\Message */
 /* @var $form yii\widgets\ActiveForm */
+/* @var $oSubj app\models\Tags */
+
+$isModerate = Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM);
+$isAnswer = Yii::$app->user->can(Rolesimport::ROLE_ANSWER_DOGM);
+$isDopFields = $isModerate || $isAnswer;
+$oSubj = $model->subject;
 ?>
 
 <div class="listdata">
@@ -19,9 +25,27 @@ use app\models\Rolesimport;
 
 
     <div class="listperson">
-        <!-- strong><?= Html::encode($model->msg_pers_lastname) ?></strong> <?= Html::encode($model->msg_pers_name) ?> <?= Html::encode($model->msg_pers_secname) ?> -->
         <strong><?= Html::encode($model->getFullName()) ?></strong>
     </div>
+
+    <?php
+    if( $isDopFields ) :
+    ?>
+        <div class="listdate">
+            <strong><?= Html::encode($model->msg_pers_org) ?></strong>
+        </div>
+        <?php
+            if( $oSubj !== null ) :
+        ?>
+            <div class="listdate" style="clear: both;">
+                <strong><?= Html::encode($oSubj->tag_title) ?></strong>
+            </div>
+        <?php
+            endif;
+        ?>
+    <?php
+    endif;
+    ?>
 
     <div class="listtext">
         <?= str_replace("\n", "<br />\n", Html::encode($model->msg_pers_text)) ?>
@@ -31,6 +55,20 @@ use app\models\Rolesimport;
         <div class="listcommand">
             <strong>Поручение: </strong>
             <?= Html::encode($model->msg_empl_command) ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if( !empty($model->msg_comment) && $isDopFields ): ?>
+        <div class="listcommand">
+            <strong>Комментарий: </strong>
+            <?= Html::encode($model->msg_comment) ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if( !empty($model->msg_empl_remark) && $isDopFields ): ?>
+        <div class="listcommand">
+            <strong>Замечание: </strong>
+            <?= Html::encode($model->msg_empl_remark) ?>
         </div>
     <?php endif; ?>
 

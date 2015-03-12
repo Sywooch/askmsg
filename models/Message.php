@@ -387,6 +387,14 @@ class Message extends \yii\db\ActiveRecord
     }
 
     /*
+     * Отношения к теме
+     *
+     */
+    public function getSubject() {
+        return $this->hasOne(Tags::className(), ['tag_id' => 'msg_subject']);
+    }
+
+    /*
      * Отношения к Ответчику
      *
      */

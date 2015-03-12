@@ -18,6 +18,7 @@ $aStatFlags = [
     Msgflags::MFLG_INT_FIN_INSTR,
 ];
 
+// Статистику получаем из кеша или вычисляем и кладем в кеш
 $aStat = Yii::$app->cache->get(Message::KEY_STATMSG_DATA);
 if( $aStat === false ) {
     // Left Join variant
@@ -28,14 +29,6 @@ if( $aStat === false ) {
 //        ->where('f.fl_id In (' . implode(',', $aStatFlags) . ')')
         ->groupBy(['f.fl_name', 'f.fl_id', 'f.fl_sname']);
 
-    /*
-    // Inner Join variant
-    $query = (new Query())
-        ->select(['COUNT(m.msg_id) As cou', 'f.fl_name', 'f.fl_id', 'f.fl_sname'])
-        ->from([Msgflags::tableName() . ' f', Message::tableName() . ' m'])
-        ->where('f.fl_id = m.msg_flag And f.fl_id In ('.implode(',' , $aStatFlags).')')
-        ->groupBy(['f.fl_name', 'f.fl_id', 'f.fl_sname']);
-    */
     $aStat = $query->createCommand()->queryAll();
     Yii::$app->cache->set(Message::KEY_STATMSG_DATA, $aStat, 3600);
 }
