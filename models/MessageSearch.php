@@ -59,7 +59,12 @@ class MessageSearch extends Message
                 'defaultOrder' => [
                     'msg_createtime'=>SORT_DESC
                 ]
-            ]
+            ],
+            'pagination' => [
+                'defaultPageSize' => 50,
+                'pageSize' => 50,
+            ],
+
         ]);
 
 /*

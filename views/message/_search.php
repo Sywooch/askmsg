@@ -20,6 +20,7 @@ use app\models\Msgflags;
 /* @var $this yii\web\View */
 /* @var $model app\models\MessageSearch */
 /* @var $form yii\widgets\ActiveForm */
+/* @var $idserchblock string */
 
 if( !isset($action) ) {
     $action = ['admin'];
@@ -27,11 +28,7 @@ if( !isset($action) ) {
 
 ?>
 
-<div class="col-sm-12 form-group">
-    <?= Html::a('Скрыть', '#', ['class' => 'btn btn-default pull-right', 'id'=>'hidesearchpanel']) ?>
-</div>
-<div class="clearfix"></div>
-<div class="message-search" id="idsearchpanel" style="<?= $model->isEmpty() ? 'display: none; ' : '' ?>clear: both; border: 1px solid #777777; border-radius: 4px; background-color: #eeeeee; padding-top: 2em; padding-bottom: 1em; margin-bottom: 2em;">
+<div class="message-search" id="<?= $idserchblock; ?>" style="<?= $model->isEmpty() ? 'display: none; ' : '' ?>clear: both; border: 1px solid #777777; border-radius: 4px; background-color: #eeeeee; padding-top: 2em; padding-bottom: 1em; margin-bottom: 2em;">
 
     <?php $form = ActiveForm::begin([
         'action' => $action,
@@ -330,27 +327,5 @@ EOT;
 //    <div class="clearfix"></div>
     ?>
 </div>
-<?php
-// функция форматирования результатов в список для select2
-    $sJs =  <<<EOT
-var oPanel = jQuery("#idsearchpanel"),
-    oLink = jQuery("#hidesearchpanel"),
-    renameButton = function() {
-        oLink.text((oPanel.is(":visible") ? "Скрыть" : "Показать") + " форму поиска");
-    },
-    toggleSearchPanel = function() {
-        oPanel.toggle();
-        renameButton();
-    };
-
-renameButton();
-oLink.on(
-    "click",
-    function(event){ event.preventDefault(); toggleSearchPanel(); return false; }
-);
-
-EOT;
-    $this->registerJs($sJs, View::POS_READY , 'togglesearchpanel');
-?>
 
 <div class="clearfix"></div>

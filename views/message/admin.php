@@ -29,18 +29,58 @@ ListdataAsset::register($this);
 ?>
 <div class="message-index">
 
+    <div class="col-sm-12">
+        <div class="form-group">
+            <?= Html::a('Скрыть', '#', ['class' => 'btn btn-default pull-right', 'id'=>'hidesearchpanel', 'role'=>"button"]) ?>
+            <?php
+            if( Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM) ) {
+            ?>
+                <?= $this->render(
+                    '_flagstat',
+                    []
+                )
+                ?>
+            <?php
+            }
+            ?>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+
+
     <?php
+        $idserchblock = 'idsearchpanel';
         echo $this->render(
             '_search',
             [
                 'model' => $searchModel,
                 'action' => $action,
+                'idserchblock' => $idserchblock,
             ]
         );
-//        $aFlags = Msgflags::getStateData();
+
+// показ/скрытие формы фильтрации
+    $sJs =  <<<EOT
+var oPanel = jQuery("#{$idserchblock}"),
+    oLink = jQuery("#hidesearchpanel"),
+    renameButton = function() {
+        oLink.text((oPanel.is(":visible") ? "Скрыть" : "Показать") + " форму поиска");
+    },
+    toggleSearchPanel = function() {
+        oPanel.toggle();
+        renameButton();
+    };
+
+renameButton();
+oLink.on(
+    "click",
+    function(event){ event.preventDefault(); toggleSearchPanel(); return false; }
+);
+
+EOT;
+    $this->registerJs($sJs, View::POS_READY , 'togglesearchpanel');
 
     ?>
-
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
