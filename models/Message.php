@@ -9,8 +9,10 @@ use yii\behaviors\TimestampBehavior;
 use yii\behaviors\AttributeBehavior;
 use yii\base\Event;
 use yii\helpers\ArrayHelper;
+use yii\web\UploadedFile;
 
 use app\models\User;
+use app\models\File;
 use app\models\Tags;
 use app\models\Msgflags;
 use app\models\Msganswers;
@@ -62,6 +64,10 @@ class Message extends \yii\db\ActiveRecord
     public $askid; // Номер и дата
     public $askcontacts; // Email и телефон
     public $tags; // округ, комментарии
+    /**
+     * @var mixed file аттрибут для генерации поля добавления файла
+     */
+    public $file;
 
     public $_oldAttributes = [];
 
@@ -236,6 +242,7 @@ class Message extends \yii\db\ActiveRecord
      */
     public function rules()
     {
+        $fileCount = $this->countAvalableFile();
         return [
             [['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_region'], 'required'],
             [['msg_answer'], 'required', 'on' => 'answer', ],
@@ -247,6 +254,8 @@ class Message extends \yii\db\ActiveRecord
 //            [['answers'], 'safe'],
             [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_12, '', '{{val}}')), 'allowArray' => true],
             [['alltags'], 'in', 'range' => array_keys(ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_title')), 'allowArray' => true],
+            [['file'], 'safe'],
+            [['file'], 'file', 'maxFiles' => $fileCount, 'maxSize' => Yii::$app->params['message.file.maxsize'], 'extensions' => Yii::$app->params['message.file.ext']],
 //            [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}')), 'allowArray' => true],
             [['msg_id', 'msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject', 'ekis_id'], 'integer'],
             [['msg_pers_text'], 'string', 'max' => self::MAX_PERSON_TEXT_LENGTH, 'on' => 'person'],
@@ -275,7 +284,8 @@ class Message extends \yii\db\ActiveRecord
             'msg_pers_region',
             'msg_createtime',
             'msg_subject',
-            'ekis_id'
+            'ekis_id',
+            'file'
         ];
 
         $scenarios['moderator'] = array_merge(
@@ -323,7 +333,7 @@ class Message extends \yii\db\ActiveRecord
         }
         */
 
-        $scenarios['answer'] = ['msg_answer', 'msg_answertime', 'msg_flag'];
+        $scenarios['answer'] = ['msg_answer', 'msg_answertime', 'msg_flag', 'file'];
 
         return $scenarios;
     }
@@ -383,6 +393,7 @@ class Message extends \yii\db\ActiveRecord
             'askcontacts' => 'Контакты',
             'tags' => 'Теги',
             'alltags' => 'Теги',
+            'file' => 'Файл',
         ];
     }
 
@@ -392,6 +403,17 @@ class Message extends \yii\db\ActiveRecord
      */
     public function getSubject() {
         return $this->hasOne(Tags::className(), ['tag_id' => 'msg_subject']);
+    }
+
+    /*
+     * Отношения к теме
+     *
+     */
+    public function getAttachments() {
+        return $this->hasMany(
+            File::className(),
+            ['file_msg_id' => 'msg_id']
+        );
     }
 
     /*
@@ -557,4 +579,60 @@ class Message extends \yii\db\ActiveRecord
         }
     }
 
+    /**
+     * Process upload of file
+     *
+     */
+    public function uploadFiles() {
+        // TODO: вынести в отдельное поведение
+        $files = UploadedFile::getInstances($this, 'file');
+        Yii::info("uploadFiles() files = " . count($files));
+
+        // if no image was uploaded abort the upload
+        if( empty($files) ) {
+            return;
+        }
+
+        $nCou = $this->countAvalableFile();
+
+        foreach($files As $ob) {
+            /** @var  UploadedFile $ob */
+            if( $nCou < 1 ) {
+                break;
+            }
+            $oFile = new File();
+            $oFile->addFile($ob, $this->msg_id);
+            if( $oFile->hasErrors() ) {
+                Yii::info('uploadFiles(): File error: ' . print_r($oFile->getErrors(), true));
+            }
+            else {
+                $nCou -= 1;
+                Yii::info('uploadFiles(): save file ['.$nCou.'] ' . $oFile->file_orig_name . ' [' . $oFile->file_size . ']');
+            }
+        }
+    }
+
+    /**
+     * Подсчет возможного количества загружаемых файлов
+     *
+     * @return int
+     */
+    public function countAvalableFile() {
+        $n = Yii::$app->params['message.file.newcount'];
+        if( !$this->isNewRecord ) {
+            $n = Yii::$app->params['message.file.answercount'];
+            foreach($this->attachments As $ob) {
+                /** @var File  $ob */
+                if( $ob->file_user_id !== null ) {
+                    $n -= 1;
+                }
+                Yii::info("countAvalableFile() [{$n}]" . print_r($ob->attributes, true));
+            }
+            if( $n < 0 ) {
+                $n = 0;
+            }
+        }
+        Yii::info("countAvalableFile() return {$n}");
+        return $n;
+    }
 }

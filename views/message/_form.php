@@ -18,7 +18,7 @@ use app\models\Rolesimport;
 use app\models\Tags;
 use app\models\Message;
 
-use kartik\typeahead\Typeahead;
+use kartik\file\FileInput;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Message */
@@ -56,6 +56,9 @@ $isModerate = $model->scenario == 'moderator';
     <?php $form = ActiveForm::begin([
             'id' => 'message-form',
             'layout' => 'horizontal',
+            'options'=>[
+                'enctype'=>'multipart/form-data'
+            ],
             'fieldConfig' => [
 //                'template' => "{label}\n{beginWrapper}\n{input}\n{hint}\n{error}\n{endWrapper}",
                 'horizontalCssClasses' => [
@@ -442,6 +445,30 @@ $isModerate = $model->scenario == 'moderator';
         ->textarea(['rows' => 6]) ?>
     </div>
 
+    <div class="col-sm-12">
+        <?= $form->field(
+            $model,
+            'file[]',
+            [
+//            'template' => "{input}\n{hint}\n{error}",
+            'horizontalCssClasses' => [
+                'label' => 'col-sm-1',
+                'offset' => 'col-sm-offset-1',
+                'wrapper' => 'col-sm-11',
+            ],
+        ])
+        ->widget(
+            FileInput::classname(),
+            [
+                'options'=>[
+//                    'accept'=>'image/*',
+                    'multiple'=> !Yii::$app->user->isGuest
+                ],
+                'pluginOptions'=>[
+                    'allowedFileExtensions' => Yii::$app->params['message.file.ext']
+                ]
+            ]) ?>
+    </div>
     <div class="clearfix"></div>
 
     <?php

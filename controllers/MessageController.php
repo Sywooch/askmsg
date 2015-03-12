@@ -213,6 +213,7 @@ class MessageController extends Controller
 
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            $model->uploadFiles();
             if( $model->scenario == 'person' ) {
                 return $this->render(
                         'thankyou',

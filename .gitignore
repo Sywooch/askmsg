@@ -27,3 +27,4 @@ phpunit.phar
 /phpunit.xml
 /web/*.log
 /models/_Rolesimport.php
+/web/upload

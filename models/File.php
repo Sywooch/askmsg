@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use yii\web\UploadedFile;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "{{%file}}".
@@ -45,14 +47,89 @@ class File extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'file_id' => 'File ID',
-            'file_time' => 'File Time',
-            'file_orig_name' => 'File Orig Name',
-            'file_msg_id' => 'File Msg ID',
-            'file_user_id' => 'File User ID',
-            'file_size' => 'File Size',
-            'file_type' => 'File Type',
-            'file_name' => 'File Name',
+            'file_id' => 'ID',
+            'file_time' => 'Время',
+            'file_orig_name' => 'Имя файла',
+            'file_msg_id' => 'Сообщение',
+            'file_user_id' => 'Пользователь',
+            'file_size' => 'Размер',
+            'file_type' => 'Тип',
+            'file_name' => 'Внутр. имя',
         ];
+    }
+
+    /**
+     *
+     * Make full path to file
+     *
+     * @return string
+     *
+     */
+    public function getFullpath() {
+        $sDir = Yii::getAlias(Yii::$app->params['message.file.uploaddir']) . DIRECTORY_SEPARATOR . sprintf("%02x", $this->file_id % 256);
+        if( !is_dir($sDir) && !mkdir($sDir) ) {
+            return null;
+        }
+        return $sDir . DIRECTORY_SEPARATOR . $this->file_name;
+    }
+
+    /**
+     *
+     * Make full path to file
+     *
+     * @return string
+     *
+     */
+    public function getUrl() {
+        $sName = $this->getFullpath();
+        return str_replace(DIRECTORY_SEPARATOR, '/', substr($sName, strlen(Yii::getAlias('@webroot'))));
+    }
+
+    /**
+     * Test if upload dir axists and try to create one in not
+     *
+     */
+    public function isUploadDirExists() {
+        $sDir = Yii::getAlias(Yii::$app->params['message.file.uploaddir']);
+        Yii::info("Upload dir: {$sDir}");
+        if( !is_dir($sDir) ) {
+            Yii::info("Upload dir: {$sDir} not exists");
+            $a = explode('/', Yii::$app->params['message.file.uploaddir']);
+            $s = '';
+            while( count($a) > 0 ) {
+                $s .= (($s === '') ? '' : '/') . array_shift($a);
+                $sd = Yii::getAlias($s);
+                Yii::info("Upload dir: try {$s} = {$sd}");
+                if( !is_dir($sd) && !mkdir($sd) ) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @param $ob UploadedFile
+     * @param $mid integer Message id
+     */
+    public function addFile($ob, $mid) {
+        if( !$this->isUploadDirExists() ) {
+            Yii::info("Error: Upload dir not exists");
+            return;
+        }
+        $a = explode(".", $ob->name);
+        $ext = array_pop($a);
+
+        $this->file_time = new Expression('NOW()');
+        $this->file_orig_name = $ob->name;
+        $this->file_size = $ob->size;
+        $this->file_type = $ob->type;
+        $this->file_name = Yii::$app->security->generateRandomString().".{$ext}";
+        $this->file_user_id = Yii::$app->user->isGuest ? 0 : Yii::$app->user->id;
+        $this->file_msg_id = $mid;
+        if( $this->save() ) {
+            $ob->saveAs($this->getFullpath());
+        }
+
     }
 }
