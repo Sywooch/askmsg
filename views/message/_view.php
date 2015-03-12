@@ -51,6 +51,22 @@ $oSubj = $model->subject;
         <?= str_replace("\n", "<br />\n", Html::encode($model->msg_pers_text)) ?>
     </div>
 
+    <?php
+    $aFiles = $model->getUserFiles(true);
+    if( (count($aFiles) > 0) && !Yii::$app->user->isGuest ):
+    ?>
+        <div class="listcommand">
+            <strong>Файлы: </strong>
+            <?php foreach($aFiles As $oFile):
+            /** @var File  $oFile */ ?>
+                <?= Html::a(
+                        $oFile->file_orig_name,
+                        $oFile->getUrl()
+                ) ?>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+
     <?php if( !empty($model->msg_empl_command)  ): ?>
         <div class="listcommand">
             <strong>Поручение: </strong>
