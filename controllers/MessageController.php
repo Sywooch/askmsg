@@ -176,6 +176,7 @@ class MessageController extends Controller
         $model = $this->findModel($id);
         $model->scenario = 'answer';
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+//            $model->uploadFiles();
             return $this->redirect(['answerlist']);
         }
         return $this->render('create', [

@@ -22,7 +22,8 @@
         "vova07/yii2-imperavi-widget": "*",
         "kartik-v/yii2-datecontrol": "dev-master",
         "yiisoft/yii2-jui": "~2.0",
-        "kartik-v/yii2-widget-fileinput": "*"
+        "kartik-v/yii2-widget-fileinput": "*",
+        "vova07/yii2-fileapi-widget": "*"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",

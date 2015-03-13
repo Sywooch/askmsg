@@ -28,7 +28,6 @@ ListdataAsset::register($this);
 */
 
 $aTags = ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_title');
-Yii::info('TAGS: ' . print_r($aTags, true));
 
 ?>
 <div class="message-index">
@@ -98,7 +97,12 @@ EOT;
                 'header' => 'Номер и дата',
                 'filterOptions' => ['class' => 'gridwidth7'],
                 'content' => function ($model, $key, $index, $column) {
-                    return Html::a('№ ' . $model->msg_id, ['message/view', 'id'=>$model->msg_id]) . '<span>' . date('d.m.Y H:i:s', strtotime($model->msg_createtime)) . '</span>';
+                    $url = Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM) ?
+                        ['message/update', 'id'=>$model->msg_id] :
+                        ['message/answer', 'id'=>$model->msg_id];
+// ['title' => 'Изменить Обращение ' . $model->msg_id])
+//                    update} {answer
+                    return Html::a('№ ' . $model->msg_id, $url) . '<span>' . date('d.m.Y H:i:s', strtotime($model->msg_createtime)) . '</span>';
                 },
                 'contentOptions' => [
                     'class' => 'griddate',
@@ -158,29 +162,6 @@ EOT;
                     'class' => 'griddate',
                 ],
             ],
-            // 'msg_pers_email:email',
-            // 'msg_pers_phone',
-            // 'msg_pers_org',
-            // 'msg_pers_region',
-            // 'msg_pers_text:ntext',
-/*
-            [
-                'class' => 'yii\grid\DataColumn',
-                'attribute' => 'employer',
-                'content' => function ($model, $key, $index, $column) {
-                    return Html::encode($model->msg_empl_id . ($model->employee !== null ? (' ' . $model->employee->us_lastname . ' ' . $model->employee->us_name . ' ' . $model->employee->us_secondname) : '') );
-                },
-            ],
-*/
-            // 'msg_comment',
-            // 'msg_empl_id',
-            // 'msg_empl_command',
-            // 'msg_empl_remark',
-            // 'msg_answer:ntext',
-            // 'msg_answertime',
-            // 'msg_oldcomment',
-            // 'msg_flag',
-
             [
                 'class' => 'yii\grid\ActionColumn',
                 'contentOptions' => ['class' => 'commandcell'],
