@@ -10,7 +10,7 @@ use yii\web\JsExpression;
 use yii\web\View;
 
 use kartik\select2\Select2;
-use kartik\file\FileInput;
+// use kartik\file\FileInput;
 
 use app\models\Regions;
 use app\models\Msgflags;
@@ -20,6 +20,7 @@ use app\models\Tags;
 use app\models\Message;
 use app\models\File;
 use app\assets\HelperscriptAsset;
+use app\assets\JqueryfilerAsset;
 
 
 /* @var $this yii\web\View */
@@ -27,6 +28,7 @@ use app\assets\HelperscriptAsset;
 /* @var $form yii\widgets\ActiveForm */
 
 HelperscriptAsset::register($this);
+JqueryfilerAsset::register($this);
 
 /*
     <?= $form->field($model, 'msg_createtime')->textInput() ?>
@@ -157,6 +159,101 @@ var formatSelect = function(item, text, description) {
 
 EOT;
 $this->registerJs($sJs, View::POS_END , 'showselectpart');
+
+$sExt = '["' . implode('","', Yii::$app->params['message.file.ext']) . '"]';
+$nMaxSize = Yii::$app->params['message.file.maxsize'] / 1000000;
+$sJs = <<<EOT
+$('#message-file').filer({
+        limit: 1,
+        maxSize: {$nMaxSize},
+        extensions: {$sExt},
+        changeInput: true,
+        showThumbs: true,
+        appendTo: null,
+        theme: "default",
+        templates: {
+            box: '<ul class="jFiler-item-list"></ul>',
+            item: '<li class="jFiler-item">\
+                        <div class="jFiler-item-container">\
+                            <div class="jFiler-item-inner">\
+                                <div class="jFiler-item-thumb">\
+                                    <div class="jFiler-item-status"></div>\
+                                    <div class="jFiler-item-info">\
+                                        <span class="jFiler-item-title"><b title="{{fi-name}}">{{fi-name | limitTo: 25}}</b></span>\
+                                    </div>\
+                                    {{fi-image}}\
+                                </div>\
+                                <div class="jFiler-item-assets jFiler-row">\
+                                    <ul class="list-inline pull-left">\
+                                        <li>{{fi-progressBar}}</li>\
+                                    </ul>\
+                                    <ul class="list-inline pull-right">\
+                                        <li><a class="icon-jfi-trash jFiler-item-trash-action"></a></li>\
+                                    </ul>\
+                                </div>\
+                            </div>\
+                        </div>\
+                    </li>',
+            itemAppend: '<li class="jFiler-item">\
+                        <div class="jFiler-item-container">\
+                            <div class="jFiler-item-inner">\
+                                <div class="jFiler-item-thumb">\
+                                    <div class="jFiler-item-status"></div>\
+                                    <div class="jFiler-item-info">\
+                                        <span class="jFiler-item-title"><b title="{{fi-name}}">{{fi-name | limitTo: 25}}</b></span>\
+                                    </div>\
+                                    {{fi-image}}\
+                                </div>\
+                                <div class="jFiler-item-assets jFiler-row">\
+                                    <ul class="list-inline pull-left">\
+                                        <span class="jFiler-item-others">{{fi-icon}} {{fi-size2}}</span>\
+                                    </ul>\
+                                    <ul class="list-inline pull-right">\
+                                        <li><a class="icon-jfi-trash jFiler-item-trash-action"></a></li>\
+                                    </ul>\
+                                </div>\
+                            </div>\
+                        </div>\
+                    </li>',
+            progressBar: '<div class="bar"></div>',
+            itemAppendToEnd: false,
+            removeConfirmation: true,
+            _selectors: {
+                list: '.jFiler-item-list',
+                item: '.jFiler-item',
+                progressBar: '.bar',
+                remove: '.jFiler-item-trash-action',
+            }
+        },
+        dragDrop: {
+            dragEnter: null,
+            dragLeave: null,
+            drop: null,
+        },
+        addMore: true,
+        clipBoardPaste: true,
+        excludeName: null,
+        beforeShow: function(){return true},
+        onSelect: function(){},
+        afterShow: function(){},
+        onRemove: function(){},
+        onEmpty: function(){},
+        captions: {
+            button: "Выберите файл",
+            feedback: "Выбрано файлов для загрузки",
+            feedback2: "Выбрано файлов",
+            drop: "Перетащите сюда файлы для загрузки",
+            removeConfirmation: "Удалить этот файл?",
+            errors: {
+                filesLimit: "Можно загрузить не более {{fi-limit}} файлов.",
+                filesType: "Файлы только типов {{fi-extension}} разрешены к загрузке.",
+                filesSize: "{{fi-name}} слишком большой! Выберите файл до {{fi-maxSize}} MB.",
+                filesSizeAll: "Слишком большие файлы выбрали! Пожалуйста ограничьте их размер {{fi-maxSize}} MB."
+            }
+        }
+    });
+EOT;
+$this->registerJs($sJs, View::POS_READY, 'jqueryfiler');
 
 $aAnsw = User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}');
 
@@ -600,9 +697,19 @@ $aFieldParam = [
     <div class="col-sm-12">
         <?= $form
             ->field($model, 'file[]', $aFieldParam['filefield'])
+            ->fileInput(['multiple' => true])
+            ->hint('Максимальный размер файла: '
+                . Yii::$app->params['message.file.maxsize']
+                . ' байт, Допустимые типы файлов: '
+                . implode(',', Yii::$app->params['message.file.ext'])
+            )
+        ?>
+
+        <?php /* = $form
+            ->field($model, 'file[]', $aFieldParam['filefield'])
             ->widget(FileInput::classname(), $aFieldParam['file'])
             ->hint('Максимальный размер файла: ' . Yii::$app->params['message.file.maxsize'] . ' байт, Допустимые типы файлов: ' . implode(',', Yii::$app->params['message.file.ext']))
-        ?>
+        */ ?>
     </div>
 
     <?php

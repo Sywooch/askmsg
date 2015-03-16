@@ -241,7 +241,7 @@ $('#message-file').filer({
                 filesLimit: "Можно загрузить не более {{fi-limit}} файлов.",
                 filesType: "Файлы только типов {{fi-extension}} разрешены к загрузке.",
                 filesSize: "{{fi-name}} слишком большой! Выберите файл до {{fi-maxSize}} MB.",
-                filesSizeAll: "Слишко большие файлы выбрали! Пожалуйста ограничьте их размер {{fi-maxSize}} MB."
+                filesSizeAll: "Слишком большие файлы выбрали! Пожалуйста ограничьте их размер {{fi-maxSize}} MB."
             }
         }
     });

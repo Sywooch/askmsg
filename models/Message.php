@@ -606,7 +606,7 @@ class Message extends \yii\db\ActiveRecord
                 break;
             }
             $oFile = new File();
-            $oFile->addFile($ob, $this->msg_id);
+            $oFile->addFile($ob, $this->msg_id, $this->scenario == 'person');
             if( $oFile->hasErrors() ) {
                 Yii::info('uploadFiles(): File error: ' . print_r($oFile->getErrors(), true));
             }
@@ -637,7 +637,7 @@ class Message extends \yii\db\ActiveRecord
                 $n = 0;
             }
         }
-        Yii::info("countAvalableFile() return {$n}");
+//        Yii::info("countAvalableFile() return {$n}");
         return $n;
     }
 
