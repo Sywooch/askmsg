@@ -163,8 +163,9 @@ class MessageController extends Controller
      * @return mixed
      */
     public function actionUpload($id)
-    {
-        $model = $this->findModel($id);
+    { // TODO: пока не используется, возможно понадобится при автоматической загрузке файлов ответчиком
+        // $model = $this->findModel($id);
+        return '';
     }
 
     /**
@@ -186,7 +187,7 @@ class MessageController extends Controller
         $model = $this->findModel($id);
         $model->scenario = 'answer';
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-//            $model->uploadFiles();
+            $model->uploadFiles();
             return $this->redirect(['answerlist']);
         }
         return $this->render('create', [

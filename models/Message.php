@@ -398,7 +398,7 @@ class Message extends \yii\db\ActiveRecord
             'tags' => 'Теги',
             'alltags' => 'Теги',
             'file' => 'Файл',
-            'attachfile' => 'Файл',
+            'attachfile' => 'Прикрепить',
         ];
     }
 
