@@ -139,15 +139,21 @@ var filterButtons = function() {
             });
         }
         else {
-            oButtons.show();
+            oButtons.each(function(index, ob){
+                var ob = jQuery(this),
+                    nId = parseInt(ob.attr("id").split("_")[1]),
+                    oGroup = jQuery("#buttongroup_" + nId);
+                oGroup.show();
+            });
         }
-        console.log("Command = " + oCommand.val());
+        console.log("Command ["+oCommand.val().length+"] = " + oCommand.val());
     }
 };
 
 oCommand.on("keyup", function(event){
     filterButtons();
 });
+filterButtons();
 EOT;
 
 $this->registerJs($sJs, View::POS_READY, 'toggleuserpart');
