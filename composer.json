@@ -13,6 +13,20 @@
         "source": "https://github.com/yiisoft/yii2"
     },
     "minimum-stability": "stable",
+    "repositories": {
+        "jqueryfiler": {
+            "type": "package",
+            "package": {
+                "name": "creativedream/jqueryfiler",
+                "version": "1.0",
+                "source": {
+                    "url": "https://github.com/CreativeDream/jquery.filer",
+                    "type": "git",
+                    "reference": "2fd0d889d4d6ebf60a1ee08a1a6945ed0adfeeb8"
+                }
+            }
+        }
+    },
     "require": {
         "php": ">=5.4.0",
         "yiisoft/yii2": "*",
@@ -23,7 +37,8 @@
         "kartik-v/yii2-datecontrol": "dev-master",
         "yiisoft/yii2-jui": "~2.0",
         "kartik-v/yii2-widget-fileinput": "*",
-        "vova07/yii2-fileapi-widget": "*"
+        "vova07/yii2-fileapi-widget": "*",
+        "creativedream/jqueryfiler": "1.0"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",

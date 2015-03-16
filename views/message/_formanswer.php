@@ -10,7 +10,8 @@ use vova07\imperavi\Widget;
 use app\assets\ListdataAsset;
 use app\models\Msgflags;
 use app\models\File;
-use app\assets\FileapiAsset;
+// use app\assets\FileapiAsset;
+use app\assets\JqueryfilerAsset;
 
 use kartik\file\FileInput;
 
@@ -20,7 +21,8 @@ use kartik\file\FileInput;
 /* @var $form yii\widgets\ActiveForm */
 
 ListdataAsset::register($this);
-FileapiAsset::register($this);
+// FileapiAsset::register($this);
+JqueryfilerAsset::register($this);
 
 $aOp = array_reduce(
     Msgflags::getStateTrans($model->msg_flag),
@@ -151,7 +153,7 @@ $aOp = array_reduce(
                     'showRemove' => true,
                     'showUpload' => false,
 //                    'previewFileType' => 'image',
-/*
+
                     'layoutTemplates' => [
                         'preview' => '<div class="file-preview {class}">' .
                             ' <div class="close fileinput-remove">×</div>' .
@@ -179,7 +181,7 @@ $aOp = array_reduce(
                     'fileActionSettings' => [
                         'indicatorNew' => '',
                     ]
-*/
+
                 ]
             ]
         ];
@@ -202,7 +204,7 @@ http://rubaxa.github.io/jquery.fileapi/ - тут смотрим примеры �
 http://mailru.github.io/FileAPI/ - тут API
 
 */
-
+/*
 $sJs = <<<'EOT'
 $('#multiupload').fileapi({
    url: 'http://rubaxa.org/FileAPI/server/ctrl.php',
@@ -226,10 +228,11 @@ $('#multiupload').fileapi({
    }
 });
 EOT;
-$this->registerJs($sJs, View::POS_READY, 'fuleupload');
-
+$this->registerJs($sJs, View::POS_READY, 'fileupload');
+*/
         ?>
-        <div id="multiupload">
+<?php
+/*        <div id="multiupload">
             <!-- form class="b-upload b-upload_multi" action="http://rubaxa.org/FileAPI/server/ctrl.php" method="POST" enctype="multipart/form-data" -->
                 <div class="b-upload__hint">Добавить файлы в очередь загрузки, например изображения ;]</div>
                 <div class="js-files b-upload__files">
@@ -259,16 +262,230 @@ $this->registerJs($sJs, View::POS_READY, 'fuleupload');
                 </div>
             <!-- /form -->
         </div>
+*/
+?>
+
             <!-- ?= $form
-            ->field($model, 'attachfile[]')
+//            ->field($model, 'attachfile[]')
 //            ->fileInput(['multiple' => true])
-            ->widget(FileInput::classname(), ['options'=>['multiple' => 'multiple'], 'pluginOptions'=>['uploadUrl' => Url::to(['file/upload']),'allowedFileExtensions' => Yii::$app->params['message.file.ext'],'maxFileCount' => 3,]])
+//            ->widget(FileInput::classname(), ['options'=>['multiple' => 'multiple'], 'pluginOptions'=>['uploadUrl' => Url::to(['file/upload']),'allowedFileExtensions' => Yii::$app->params['message.file.ext'],'maxFileCount' => 3,]])
+            ->field($model, 'attachfile[]', $aFieldParam['filefield'])
 //            ->field($model, 'file[]', $aFieldParam['filefield'])
 //            ->fileInput(['multiple' => true])
-//            ->widget(FileInput::classname(), $aFieldParam['file'])
+            ->widget(FileInput::classname(), $aFieldParam['file'])
 //            ->hint('Максимальное кол-во файлов: ' . $nFiles . ', Максимальный размер файла: ' . Yii::$app->params['message.file.maxsize'] . ' байт, Допустимые типы файлов: ' . implode(',', Yii::$app->params['message.file.ext']))
+/*
+        <div class="jFiler">
+            <a class="file_input">
+                <i class="icon-jfi-paperclip"></i>
+                Attach a file
+            </a>
+        </div>
+
+*/
         ? -->
+        <?= $form
+            ->field($model, 'attachfile[]', ['options' => ['class' => 'form-group']])
+            ->fileInput(['multiple' => true])
+/*            ->widget(
+                FileInput::classname(),
+                $aFieldParam['file']
+/*                [
+                    'options'=>[
+//                        'accept'=>'image/*',
+                        'multiple'=>true
+                    ],
+                    'pluginOptions'=>[
+                        'uploadUrl' => Url::to(['file/upload']),
+                        'allowedFileExtensions'=>['jpg','gif','png','zip']
+                    ]
+                ]
+            ) */
+        ?>
     <?php
+$sUploadUrl = Url::to(['message/upload', 'id'=>$model->msg_id]);
+$sExt = '["' . implode('","', Yii::$app->params['message.file.ext']) . '"]';
+$nMaxSize = Yii::$app->params['message.file.maxsize'] / 1000000;
+$sJs = <<<EOT
+$('#message-attachfile').filer({
+        limit: {$nFiles},
+        maxSize: {$nMaxSize},
+        extensions: {$sExt},
+        changeInput: true,
+        showThumbs: true,
+        appendTo: null,
+        theme: "default",
+        templates: {
+            box: '<ul class="jFiler-item-list"></ul>',
+            item: '<li class="jFiler-item">\
+                        <div class="jFiler-item-container">\
+                            <div class="jFiler-item-inner">\
+                                <div class="jFiler-item-thumb">\
+                                    <div class="jFiler-item-status"></div>\
+                                    <div class="jFiler-item-info">\
+                                        <span class="jFiler-item-title"><b title="{{fi-name}}">{{fi-name | limitTo: 25}}</b></span>\
+                                    </div>\
+                                    {{fi-image}}\
+                                </div>\
+                                <div class="jFiler-item-assets jFiler-row">\
+                                    <ul class="list-inline pull-left">\
+                                        <li>{{fi-progressBar}}</li>\
+                                    </ul>\
+                                    <ul class="list-inline pull-right">\
+                                        <li><a class="icon-jfi-trash jFiler-item-trash-action"></a></li>\
+                                    </ul>\
+                                </div>\
+                            </div>\
+                        </div>\
+                    </li>',
+            itemAppend: '<li class="jFiler-item">\
+                        <div class="jFiler-item-container">\
+                            <div class="jFiler-item-inner">\
+                                <div class="jFiler-item-thumb">\
+                                    <div class="jFiler-item-status"></div>\
+                                    <div class="jFiler-item-info">\
+                                        <span class="jFiler-item-title"><b title="{{fi-name}}">{{fi-name | limitTo: 25}}</b></span>\
+                                    </div>\
+                                    {{fi-image}}\
+                                </div>\
+                                <div class="jFiler-item-assets jFiler-row">\
+                                    <ul class="list-inline pull-left">\
+                                        <span class="jFiler-item-others">{{fi-icon}} {{fi-size2}}</span>\
+                                    </ul>\
+                                    <ul class="list-inline pull-right">\
+                                        <li><a class="icon-jfi-trash jFiler-item-trash-action"></a></li>\
+                                    </ul>\
+                                </div>\
+                            </div>\
+                        </div>\
+                    </li>',
+            progressBar: '<div class="bar"></div>',
+            itemAppendToEnd: false,
+            removeConfirmation: true,
+            _selectors: {
+                list: '.jFiler-item-list',
+                item: '.jFiler-item',
+                progressBar: '.bar',
+                remove: '.jFiler-item-trash-action',
+            }
+        },
+/*
+        uploadFile: {
+            url: "message/upload",
+            data: {},
+            type: 'POST',
+            enctype: 'multipart/form-data',
+            beforeSend: function(){},
+            success: function(data, el){
+                var parent = el.find(".jFiler-jProgressBar").parent();
+                el.find(".jFiler-jProgressBar").fadeOut("slow", function(){
+                    $("<div class=\"jFiler-item-others text-success\"><i class=\"icon-jfi-check-circle\"></i> Success</div>").hide().appendTo(parent).fadeIn("slow");
+                });
+            },
+            error: function(el){
+                var parent = el.find(".jFiler-jProgressBar").parent();
+                el.find(".jFiler-jProgressBar").fadeOut("slow", function(){
+                    $("<div class=\"jFiler-item-others text-error\"><i class=\"icon-jfi-minus-circle\"></i> Error</div>").hide().appendTo(parent).fadeIn("slow");
+                });
+            },
+            statusCode: {},
+            onProgress: function(){},
+            onComplete: function(){}
+        },
+*/
+        dragDrop: {
+            dragEnter: null,
+            dragLeave: null,
+            drop: null,
+        },
+        addMore: true,
+        clipBoardPaste: true,
+        excludeName: null,
+        beforeShow: function(){return true},
+        onSelect: function(){},
+        afterShow: function(){},
+        onRemove: function(){},
+        onEmpty: function(){},
+        captions: {
+            button: "Choose Files",
+            feedback: "Choose files To Upload",
+            feedback2: "files were chosen",
+            drop: "Drop file here to Upload",
+            removeConfirmation: "Are you sure you want to remove this file?",
+            errors: {
+                filesLimit: "Only {{fi-limit}} files are allowed to be uploaded.",
+                filesType: "Only {{fi-extension}} are allowed to be uploaded.",
+                filesSize: "{{fi-name}} is too large! Please upload file up to {{fi-maxSize}} MB.",
+                filesSizeAll: "Files you've choosed are too large! Please upload files up to {{fi-maxSize}} MB."
+            }
+        }
+    });
+EOT;
+
+/*
+$sJs = <<<EOT
+        $('.file_input').filer({
+            showThumbs: true,
+            templates: {
+        box: '<ul class="jFiler-item-list"></ul>',
+                item: '<li class="jFiler-item">\
+                            <div class="jFiler-item-container">\
+                                <div class="jFiler-item-inner">\
+                                    <div class="jFiler-item-thumb">\
+                                        <div class="jFiler-item-status"></div>\
+                                        <div class="jFiler-item-info">\
+                                            <span class="jFiler-item-title"><b title="{{fi-name}}">{{fi-name | limitTo: 25}}</b></span>\
+                                        </div>\
+                                        {{fi-image}}\
+                                    </div>\
+                                    <div class="jFiler-item-assets jFiler-row">\
+                                        <ul class="list-inline pull-left">\
+                                            <li><span class="jFiler-item-others">{{fi-icon}} {{fi-size2}}</span></li>\
+                                        </ul>\
+                                        <ul class="list-inline pull-right">\
+                                            <li><a class="icon-jfi-trash jFiler-item-trash-action"></a></li>\
+                                        </ul>\
+                                    </div>\
+                                </div>\
+                            </div>\
+                        </li>',
+                itemAppend: '<li class="jFiler-item">\
+                            <div class="jFiler-item-container">\
+                                <div class="jFiler-item-inner">\
+                                    <div class="jFiler-item-thumb">\
+                                        <div class="jFiler-item-status"></div>\
+                                        <div class="jFiler-item-info">\
+                                            <span class="jFiler-item-title"><b title="{{fi-name}}">{{fi-name | limitTo: 25}}</b></span>\
+                                        </div>\
+                                        {{fi-image}}\
+                                    </div>\
+                                    <div class="jFiler-item-assets jFiler-row">\
+                                        <ul class="list-inline pull-left">\
+                                            <span class="jFiler-item-others">{{fi-icon}} {{fi-size2}}</span>\
+                                        </ul>\
+                                        <ul class="list-inline pull-right">\
+                                            <li><a class="icon-jfi-trash jFiler-item-trash-action"></a></li>\
+                                        </ul>\
+                                    </div>\
+                                </div>\
+                            </div>\
+                        </li>',
+                progressBar: '<div class="bar"></div>',
+                itemAppendToEnd: true,
+                removeConfirmation: true,
+                _selectors: {
+            list: '.jFiler-item-list',
+                    item: '.jFiler-item',
+                    progressBar: '.bar',
+                    remove: '.jFiler-item-trash-action',
+                }
+            },
+            addMore: true,
+        });
+EOT;
+*/
+        $this->registerJs($sJs, View::POS_READY, 'jqueryfiler');
+
     endif; // if( $nFiles > 0 ):
     ?>
     <div class="clearfix"></div>

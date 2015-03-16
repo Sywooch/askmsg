@@ -33,7 +33,7 @@ class MessageController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['update', 'delete', 'moderatelist'],
+                        'actions' => ['update', 'delete', 'moderatelist', 'upload'],
                         'roles' => [Rolesimport::ROLE_MODERATE_DOGM],
                     ],
                     [
@@ -155,6 +155,16 @@ class MessageController extends Controller
         return $this->render('view', [
             'model' => $model,
         ]);
+    }
+
+    /**
+     * Upload file to message
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionUpload($id)
+    {
+        $model = $this->findModel($id);
     }
 
     /**
