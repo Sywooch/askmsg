@@ -542,6 +542,14 @@ $aFieldParam = [
 
         <div class="col-sm-6">
             <?= $form
+                ->field($model, 'alltags')
+                ->widget(Select2::classname(), $aFieldParam['tags'])
+            ?>
+        </div>
+        <div class="clearfix"></div>
+
+        <div class="col-sm-6">
+            <?= $form
                 ->field($model, 'msg_empl_command')
                 ->textarea()
                 ->hint('Текст поручения будет виден всем посетителям при публикации обращения на сайте');
@@ -556,6 +564,15 @@ $aFieldParam = [
             ?>
         </div>
 
+        <?php
+            if( in_array(
+                $model->msg_flag,
+                [
+                    Msgflags::MFLG_INT_NEWANSWER,
+                    Msgflags::MFLG_SHOW_NEWANSWER,
+                ])
+            ):
+        ?>
         <div class="col-sm-6">
             <?= $form
                 ->field($model, 'msg_empl_remark')
@@ -563,13 +580,9 @@ $aFieldParam = [
                 ->hint('Текст замечания будет виден только ответчику и модератору');
             ?>
         </div>
-
-        <div class="col-sm-6">
-            <?= $form
-                ->field($model, 'alltags')
-                ->widget(Select2::classname(), $aFieldParam['tags'])
-            ?>
-        </div>
+        <?php
+            endif;
+        ?>
 
         <?php if( !empty($model->msg_answer)  ): ?>
         <div class="col-sm-12 thumbnail " id="id_answer" style="display: none;">
