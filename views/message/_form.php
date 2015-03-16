@@ -129,7 +129,6 @@ var filterButtons = function() {
                 var ob = jQuery(this),
                     nId = parseInt(ob.attr("id").split("_")[1]),
                     oGroup = jQuery("#buttongroup_" + nId);
-                console.log("flag = " + nId + " - " + ob.attr("id"));
                 if( (nId != {$nFlagInstrInt}) && nId != {$nFlagInstr} ) {
                     oGroup.hide();
                 }
@@ -146,7 +145,6 @@ var filterButtons = function() {
                 oGroup.show();
             });
         }
-        console.log("Command ["+oCommand.val().length+"] = " + oCommand.val());
     }
 };
 
