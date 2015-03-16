@@ -275,7 +275,7 @@ EOT;
             foreach($aOp As $k=>$aData):
             ?>
                 <?= Html::submitButton(
-                'Сохранить и ' . $aData,
+                $aData, // 'Сохранить и ' .
                 ['class' => 'btn btn-default changeflag', 'id' => 'buttonsave_' . $k, 'style' => 'margin-bottom: 1em;'])
                 ?>
             <?php

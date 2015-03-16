@@ -805,12 +805,12 @@ $aFieldParam = [
                         foreach($aOp As $k=>$aData):
                 ?>
                             <div id="<?= "buttongroup_" . $k ?>">
-                                <div class="col-sm-4">
+                                <div class="col-sm-3">
                                 <?= Html::submitButton(
-                                'Сохранить и ' . $aData['title'],
+                                $aData['title'], // 'Сохранить и ' .
                                 ['class' => 'btn btn-default changeflag', 'id' => 'buttonsave_' . $k, 'style' => 'margin-bottom: 1em;']) ?>
                                 </div>
-                                <div class="col-sm-8 help-block">
+                                <div class="col-sm-9 help-block">
                                     <?= $aData['hint'] ?>
                                 </div>
                                 <div class="clearfix"></div>

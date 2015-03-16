@@ -107,7 +107,7 @@ class Msgflags extends \yii\db\ActiveRecord
     public static function getStateTrans($nState = 0)
     {
         $aTrans = [
-            self::MFLG_NEW => [self::MFLG_SHOW_NO_ANSWER, self::MFLG_SHOW_INSTR, self::MFLG_INT_INSTR, self::MFLG_NOSHOW, self::MFLG_THANK, ],
+            self::MFLG_NEW => [self::MFLG_SHOW_NO_ANSWER, self::MFLG_SHOW_INSTR, self::MFLG_INT_INSTR, self::MFLG_NOSHOW, ], // self::MFLG_THANK,
             self::MFLG_NOSHOW => [self::MFLG_NEW, ],
             self::MFLG_THANK => [self::MFLG_NEW, ],
             self::MFLG_SHOW_NO_ANSWER => [self::MFLG_SHOW_INSTR, self::MFLG_SHOW_INSTR, ],
