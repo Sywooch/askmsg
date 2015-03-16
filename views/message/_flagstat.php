@@ -35,15 +35,9 @@ if( $aStat === false ) {
     $query = (new Query())
         ->select(['COUNT(m.msg_id) As cou', 'f.fl_name', 'f.fl_id', 'f.fl_sname'])
         ->from([Msgflags::tableName() . ' f'])
-        ->leftJoin(Message::tableName() . ' m', 'f.fl_id = m.msg_flag And m.msg_empl_id = ' . Yii::$app->user->identity->getId())
+        ->leftJoin(Message::tableName() . ' m', 'f.fl_id = m.msg_flag' . ($bOnlyLoggedUser ? (' And m.msg_empl_id = ' . Yii::$app->user->identity->getId()) : '') )
 //        ->where('f.fl_id In (' . implode(',', $aStatFlags) . ')')
         ->groupBy(['f.fl_name', 'f.fl_id', 'f.fl_sname']);
-
-    if( $bOnlyLoggedUser ) {
-        $query->andWhere([]);
-    }
-
-    Yii::info('SQL FILTER = ' . print_r($query->createCommand()->getRawSql(), true));
 
     $aStat = $query->createCommand()->queryAll();
     if( !$bOnlyLoggedUser ) {
