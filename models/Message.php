@@ -524,6 +524,22 @@ class Message extends \yii\db\ActiveRecord
     }
 
     /**
+     *  Возможность ответа
+     */
+    public function getIsAnswerble() {
+        $aFlagAns = [
+            Msgflags::MFLG_SHOW_INSTR,
+            Msgflags::MFLG_INT_INSTR,
+            Msgflags::MFLG_SHOW_REVIS,
+            Msgflags::MFLG_INT_REVIS_INSTR,
+        ];
+        $bRet = Yii::$app->user->can(Rolesimport::ROLE_ANSWER_DOGM)
+             && in_array($this->msg_flag, $aFlagAns)
+             && $this->msg_empl_id == Yii::$app->user->identity->getId();
+        return $bRet;
+    }
+
+    /**
      *  Сохраняем соответчиков
      * @param Event $event
      */

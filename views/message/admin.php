@@ -187,12 +187,21 @@ EOT;
                             '';
                    },
                     'answer'=>function ($url, $model) {
-                        return Yii::$app->user->can(Rolesimport::ROLE_ANSWER_DOGM) ?
+                        return $model->isAnswerble ?
                             Html::a( '<span class="glyphicon glyphicon-refresh"></span>', $url, ['title' => 'Изменить Обращение ' . $model->msg_id]) :
                             '';
                     },
+                    'delete' => function ($url, $model, $key) {
+                        return Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM) ?
+                            Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, [
+                                'title' => Yii::t('yii', 'Delete'),
+                                'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
+                                'data-method' => 'post',
+                                'data-pjax' => '0',
+                            ]) :
+                            '';
+                    }
                 ],
-
             ],
         ],
     ]); ?>
