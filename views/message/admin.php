@@ -36,11 +36,24 @@ $aTags = ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_t
         <div class="form-group">
             <?= Html::a('Скрыть', '#', ['class' => 'btn btn-default pull-right', 'id'=>'hidesearchpanel', 'role'=>"button"]) ?>
             <?php
+
+            $bOnlyLoggedUser = ($action[0] == 'answerlist');
+            Yii::info('action[0] = ' . $action[0] . ' -> ' . ($bOnlyLoggedUser ? 'true' : 'false'));
+
             if( Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM) ) {
             ?>
                 <?= $this->render(
                     '_flagstat',
-                    []
+                    ['bOnlyLoggedUser' => false]
+                )
+                ?>
+            <?php
+            }
+            elseif( Yii::$app->user->can(Rolesimport::ROLE_ANSWER_DOGM) ) {
+                ?>
+                <?= $this->render(
+                    '_flagstat',
+                    ['bOnlyLoggedUser' => $bOnlyLoggedUser]
                 )
                 ?>
             <?php
@@ -148,15 +161,11 @@ EOT;
             ],
             [
                 'class' => 'yii\grid\DataColumn',
-//                'attribute' => 'msg_pers_region',
-//                'filter' => Regions::getListData(),
                 'attribute' => 'alltags',
                 'filter' => $aTags,
                 'filterOptions' => ['class' => 'gridwidth7'],
                 'content' => function ($model, $key, $index, $column) {
-//                    return count($model->alltags);
                     return Html::encode(implode(', ', ArrayHelper::map($model->alltags, 'tag_id', 'tag_title')));
-//                    return Html::encode($model->region->reg_name) . '<span>' . Html::encode($model->msg_oldcomment) . '</span>';
                 },
                 'contentOptions' => [
                     'class' => 'griddate',
@@ -181,9 +190,6 @@ EOT;
                         return Yii::$app->user->can(Rolesimport::ROLE_ANSWER_DOGM) ?
                             Html::a( '<span class="glyphicon glyphicon-refresh"></span>', $url, ['title' => 'Изменить Обращение ' . $model->msg_id]) :
                             '';
-/*                        return Html::a( '<span class="glyphicon glyphicon-refresh"></span>', $url,
-                            ['title' => 'Изменить Обращение ' . $model->msg_id]);
-*/
                     },
                 ],
 

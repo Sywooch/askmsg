@@ -52,8 +52,6 @@ class MessageSearch extends Message
     public function search($params)
     {
         $query = Message::find()
-//            ->with('region')
-//            ->with('answers')
             ->with('employee')
             ->with('alltags')
             ->with('flag');
@@ -72,22 +70,10 @@ class MessageSearch extends Message
 
         ]);
 
-/*
-//        $query = Message::find()->leftJoin(['employee' => function($query) { $query->from(['us' => User::tableName()]); }], 'us.us_id = msg_empl_id');
-//            ->leftJoin(User::tableName() . ' us', 'us.us_id = msg_empl_id')
-//            ->leftJoin(Regions::tableName() . ' reg', 'reg.reg_id = msg_pers_region')
-         $dataProvider->sort->attributes['tags'] = [
-            'asc' => ['reg.reg_name' => SORT_ASC],
-            'desc' => ['reg.reg_name' => SORT_DESC],
-        ];
-*/
 
-//        $this->askid = '';
-//        Yii::info('scenario = ' . $this->scenario . ' isAttributeActive(askid) = ' . ($this->isAttributeActive('askid') ? 'true' : 'false'));
         $this->load($params);
 
         if( !empty($this->answers) ) {
-//            $ansQuery = Yii::$app->db->createCommand('Select Distinct ma_message_id From ' . Msganswers::tableName() . ' Where ma_user_id In ('.implode(',', $this->answers).')');
             $ansQuery = (new Query)
                 ->select('ma_message_id')
                 ->from(Msganswers::tableName())

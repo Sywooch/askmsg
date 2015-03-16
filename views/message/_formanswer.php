@@ -153,6 +153,8 @@ $aFieldParam = [
         ?>
 
     <?php
+
+// https://github.com/CreativeDream/jquery.filer
 $sExt = '["' . implode('","', Yii::$app->params['message.file.ext']) . '"]';
 $nMaxSize = Yii::$app->params['message.file.maxsize'] / 1000000;
 $sJs = <<<EOT

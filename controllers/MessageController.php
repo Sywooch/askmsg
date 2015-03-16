@@ -112,8 +112,18 @@ class MessageController extends Controller
         $searchModel->msg_empl_id = Yii::$app->user->identity->getId();
         $searchModel->answers = [Yii::$app->user->identity->getId()];
 
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $params = Yii::$app->request->queryParams;
+        $sname = (new \ReflectionClass($searchModel))->getShortName();
+        $aExcl = array('msg_empl_id');
 
+        foreach($aExcl As $v) {
+            $sField = $sname . '[' . $v . ']';
+            if( isset($params[$sname]) && isset($params[$sname][$v]) ) {
+                unset($params[$sname][$v]);
+            }
+        }
+
+        $dataProvider = $searchModel->search($params);
 
         return $this->render('admin', [
             'searchModel' => $searchModel,
