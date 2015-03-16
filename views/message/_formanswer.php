@@ -283,7 +283,7 @@ EOT;
             ?>
             <?= Html::a(
                 'Вернуться в список обращений',
-                '#',
+                ['answerlist'],
                 ['class' => 'btn btn-default', 'id' => 'button_go_back', 'style' => 'margin-bottom: 1em;'])
             ?>
         </div>
@@ -308,7 +308,6 @@ oButtons.on("click", function(event){
     return true;
 });
 
-jQuery("#button_go_back").on("click", function(event) { event.preventDefault(); window.history.go(-1); return false; });
 EOT;
 
     $this->registerJs($sJs, View::POS_READY, 'toggleuserpart');

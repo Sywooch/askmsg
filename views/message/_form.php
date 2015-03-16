@@ -817,7 +817,20 @@ $aFieldParam = [
                             </div>
                 <?php
                         endforeach;
-                /**
+                ?>
+                        <div>
+                            <div class="col-sm-3">
+                                <?= Html::a(
+                                    'Вернуться в список обращений',
+                                    ['moderatelist'],
+                                    ['class' => 'btn btn-default', 'id' => 'button_go_back', 'style' => 'margin-bottom: 1em;'])
+                                ?>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+            <?php
+
+            /**
                  *
                  * Окончание кнопок модератора
                  *
