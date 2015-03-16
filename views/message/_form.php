@@ -19,11 +19,14 @@ use app\models\Rolesimport;
 use app\models\Tags;
 use app\models\Message;
 use app\models\File;
+use app\assets\HelperscriptAsset;
 
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Message */
 /* @var $form yii\widgets\ActiveForm */
+
+HelperscriptAsset::register($this);
 
 /*
     <?= $form->field($model, 'msg_createtime')->textInput() ?>
@@ -489,6 +492,7 @@ $aFieldParam = [
                     ?>
                         <div class="btn btn-default">
                             <?= Html::a( Html::encode($oFile->file_orig_name), $oFile->getUrl()) ?>
+                            <?= Html::a('<span class="glyphicon glyphicon-remove"></span>', ['file/remove', 'id' => $oFile->file_id], ['class'=>"link_with_confirm", 'title'=>'Удалить файл ' . Html::encode($oFile->file_orig_name)]) ?>
                         </div>
                     <?php
                         //                    <!-- ?= Html::a('<span class="glyphicon glyphicon-remove"></span>', ['file/delete', 'id' => $oFile->file_id]) ? -->
@@ -615,6 +619,7 @@ $aFieldParam = [
                     ?>
                         <div class="btn btn-default">
                             <?= Html::a( Html::encode($oFile->file_orig_name), $oFile->getUrl()) ?>
+                            <?= Html::a('<span class="glyphicon glyphicon-remove"></span>', ['file/delete', 'id' => $oFile->file_id], ['class'=>"link_with_confirm", 'title'=>'Удалить файл ' . Html::encode($oFile->file_orig_name)]) ?>
                         </div>
                     <?php
     //                    <!-- ?= Html::a('<span class="glyphicon glyphicon-remove"></span>', ['file/delete', 'id' => $oFile->file_id]) ? -->

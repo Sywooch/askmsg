@@ -8,6 +8,8 @@ use app\models\FileSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
+use app\models\Rolesimport;
 
 /**
  * FileController implements the CRUD actions for File model.
@@ -17,6 +19,34 @@ class FileController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+/*
+                    [
+
+                        'allow' => true,
+                        'actions' => ['index', 'list', 'create', 'view', 'update', 'delete'],
+                        'roles' => ['@'],
+                    ],
+*/
+                    [
+                        'allow' => true,
+                        'actions' => ['remove'],
+                        'roles' => [Rolesimport::ROLE_MODERATE_DOGM, Rolesimport::ROLE_ANSWER_DOGM],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['answerlist', 'answer'],
+                        'roles' => [Rolesimport::ROLE_ANSWER_DOGM],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['admin'],
+                        'roles' => [Rolesimport::ROLE_ADMIN],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -47,6 +77,22 @@ class FileController extends Controller
      */
     public function actionUpload()
     {
+    }
+
+    /**
+     * Remove file model
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionRemove($id)
+    {
+        $model = $this->findModel($id);
+        $sf = $model->getFullpath();
+        if( file_exists($sf) ) {
+            unlink($sf);
+        }
+        $model->delete();
+        $this->redirect(Yii::$app->request->referrer);
     }
 
     /**

@@ -10,10 +10,8 @@ use vova07\imperavi\Widget;
 use app\assets\ListdataAsset;
 use app\models\Msgflags;
 use app\models\File;
-// use app\assets\FileapiAsset;
 use app\assets\JqueryfilerAsset;
-
-use kartik\file\FileInput;
+use app\assets\HelperscriptAsset;
 
 
 /* @var $this yii\web\View */
@@ -21,8 +19,8 @@ use kartik\file\FileInput;
 /* @var $form yii\widgets\ActiveForm */
 
 ListdataAsset::register($this);
-// FileapiAsset::register($this);
 JqueryfilerAsset::register($this);
+HelperscriptAsset::register($this);
 
 $aOp = array_reduce(
     Msgflags::getStateTrans($model->msg_flag),
@@ -129,7 +127,7 @@ $aFieldParam = [
                     ?>
                     <div class="btn btn-default">
                         <?= Html::a( Html::encode($oFile->file_orig_name), $oFile->getUrl()) ?>
-                        <!-- ?= Html::a('<span class="glyphicon glyphicon-remove"></span>', ['file/delete', 'id' => $oFile->file_id]) ? -->
+                        <?= Html::a('<span class="glyphicon glyphicon-remove"></span>', ['file/remove', 'id' => $oFile->file_id], ['class'=>"link_with_confirm", 'title'=>'Удалить файл ' . Html::encode($oFile->file_orig_name)]) ?>
                     </div>
                 <?php
                 endforeach;
