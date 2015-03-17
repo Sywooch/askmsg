@@ -9,6 +9,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\behaviors\AttributeBehavior;
 use yii\base\Event;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\web\UploadedFile;
 
 use app\models\User;
@@ -244,6 +245,7 @@ class Message extends \yii\db\ActiveRecord
     public function rules()
     {
         $fileCount = $this->countAvalableFile();
+        $aFlagsToAnswer = [Msgflags::MFLG_INT_INSTR, Msgflags::MFLG_INT_REVIS_INSTR, Msgflags::MFLG_SHOW_INSTR,Msgflags::MFLG_SHOW_REVIS,];
         return [
             [['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_region'], 'required'],
             [['msg_answer'], 'required', 'on' => 'answer', ],
@@ -266,6 +268,10 @@ class Message extends \yii\db\ActiveRecord
             [['msg_answer'], 'filter', 'filter' => function($v){ return strip_tags($v, '<p><a><li><ol><ul><strong><b><em><i><u><h1><h2><h3><h4><h5><blockquote><pre><del><br>');  }],
             [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_oldcomment'], 'string', 'max' => 255],
             [['employer', 'asker', 'askid', 'askcontacts', 'tags'], 'string', 'max' => 255],
+            [['msg_empl_id', 'msg_empl_command'], 'required',
+                'when' => function($model) use ($aFlagsToAnswer) { return in_array($this->msg_flag, $aFlagsToAnswer); },
+                'whenClient' => "function (attribute, value) { return [".implode(',', $aFlagsToAnswer)."].indexOf(parseInt($('#".Html::getInputId($this, 'msg_flag') ."').val())) != -1 ;}"
+            ]
         ];
     }
 
@@ -533,9 +539,11 @@ class Message extends \yii\db\ActiveRecord
             Msgflags::MFLG_SHOW_REVIS,
             Msgflags::MFLG_INT_REVIS_INSTR,
         ];
-        $bRet = Yii::$app->user->can(Rolesimport::ROLE_ANSWER_DOGM)
+        $bRet = ((Yii::$app->user->can(Rolesimport::ROLE_ANSWER_DOGM)
+             && $this->msg_empl_id == Yii::$app->user->identity->getId())
+             || Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM))
              && in_array($this->msg_flag, $aFlagAns)
-             && $this->msg_empl_id == Yii::$app->user->identity->getId();
+             ;
         return $bRet;
     }
 

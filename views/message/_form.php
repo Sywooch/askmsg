@@ -10,9 +10,7 @@ use yii\web\JsExpression;
 use yii\web\View;
 
 use kartik\select2\Select2;
-// use kartik\file\FileInput;
 
-use app\models\Regions;
 use app\models\Msgflags;
 use app\models\User;
 use app\models\Rolesimport;

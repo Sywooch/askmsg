@@ -9,6 +9,7 @@ use app\models\MessageSearch;
 use yii\db\ActiveRecord;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use app\models\Rolesimport;
@@ -196,6 +197,11 @@ class MessageController extends Controller
     {
         $model = $this->findModel($id);
         $model->scenario = 'answer';
+
+        if( !$model->isAnswerble ) {
+            throw new ForbiddenHttpException('Message is not editable');
+        }
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $model->uploadFiles();
             return $this->redirect(['answerlist']);
