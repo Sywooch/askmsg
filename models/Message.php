@@ -145,6 +145,12 @@ class Message extends \yii\db\ActiveRecord
                 Msgflags::MFLG_INT_NEWANSWER,
                 Msgflags::MFLG_SHOW_NEWANSWER,
             ],
+            Rolesimport::ROLE_ANSWER_DOGM => [
+                Msgflags::MFLG_INT_REVIS_INSTR,
+                Msgflags::MFLG_INT_INSTR,
+                Msgflags::MFLG_SHOW_REVIS,
+                Msgflags::MFLG_SHOW_INSTR,
+            ],
         ];
         return isset($_flagFilter[$sUserRole]) ? $_flagFilter[$sUserRole] : [];
     }
@@ -173,8 +179,8 @@ class Message extends \yii\db\ActiveRecord
         if( $this->scenario != 'importdata' ) {
             $a = array_merge(
                 $a,
-                // поставим флаг нового сообщения
                 [
+                    // поставим флаг нового сообщения
                     [
                         'class' => AttributeBehavior::className(),
                         'attributes' => [
@@ -202,8 +208,11 @@ class Message extends \yii\db\ActiveRecord
                             ActiveRecord::EVENT_AFTER_FIND => '_oldAttributes',
                         ],
                         'value' => function ($event) {
+                            /** @var Message $ob */
+                            $ob = $event->sender;
                             return [
-                                'msg_flag' => $event->sender->msg_flag,
+                                'msg_flag' => $ob->msg_flag,
+                                'answers' => $ob->allanswers,
                             ];
                         },
 
@@ -218,17 +227,27 @@ class Message extends \yii\db\ActiveRecord
                         'value' => function ($event, $model) {
                             /** @var $model Message */
                             Yii::$app->cache->delete(Message::KEY_STATMSG_DATA); // удалим статистику
-                            if( !isset($model->_oldAttributes['msg_flag'])
-                                || ( isset($model->_oldAttributes['msg_flag'])
-                                    && $model->_oldAttributes['msg_flag'] != $model->msg_flag )
-                                && in_array($model->msg_flag, $model->getNotificationFlags(Rolesimport::ROLE_GUEST)) ) {
 
+                            if( $model->isNeedUserNotify() ) {
                                 Yii::$app->mailer->compose('notificateUser', ['model' => $model, 'flag' => isset($model->_oldAttributes['msg_flag']) ? $model->_oldAttributes['msg_flag'] : 0])
                                     ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
                                     ->setTo($model->msg_pers_email)
                                     ->setSubject('Обращение №' . $model->msg_id)
                                     ->send();
-
+                            }
+                            if( $model->isNeedAnswerNotify() ) {
+                                $aId = $model->getAnswerDiff();
+                                $aUser = User::findAll(['us_id' => $aId]);
+//                                Yii::info('Event: aUser = ' . print_r($aUser, true));
+                                $aUser = ArrayHelper::map($aUser, 'us_id', function($ob){ $a = $ob->attributes; $a['fullname'] = $ob->getFullName(); $a['shortname'] = $ob->getShortName(); return $a; });
+//                                Yii::info('Event: aUser = ' . print_r($aUser, true));
+                                foreach($aUser As $ob) {
+                                    Yii::$app->mailer->compose('notificateAnswer', ['model' => $model, 'user'=>$ob])
+                                        ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+                                        ->setTo([$ob['us_email'] => $ob['fullname']])
+                                        ->setSubject('Обращение №' . $model->msg_id)
+                                        ->send();
+                                }
                             }
                         },
                     ],
@@ -255,7 +274,7 @@ class Message extends \yii\db\ActiveRecord
             [['msg_createtime', 'msg_answertime'], 'safe'],
             [['msg_flag'], 'required'],
 //            [['answers'], 'safe'],
-            [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_12, '', '{{val}}')), 'allowArray' => true],
+            [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}')), 'allowArray' => true],
             [['alltags'], 'in', 'range' => array_keys(ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_title')), 'allowArray' => true],
             [['file'], 'safe'],
             [['file'], 'file', 'maxFiles' => $fileCount, 'maxSize' => Yii::$app->params['message.file.maxsize'], 'extensions' => Yii::$app->params['message.file.ext']],
@@ -512,6 +531,28 @@ class Message extends \yii\db\ActiveRecord
     }
 
     /**
+     *  Получение всех ответчиков
+     * @return array
+     */
+    public function getAllanswers()
+    {
+        $a = [];
+        if( $this->msg_empl_id != 0 ) {
+            $a[] = $this->msg_empl_id;
+        }
+
+        foreach($this->answers As $ob) {
+            if( is_object($ob) ) {
+                $a[] = $ob->us_id;
+            }
+            else {
+                $a[] = intval($ob);
+            }
+        }
+        return $a;
+    }
+
+    /**
      *  Полное имя просителя
      */
     public function getFullName() {
@@ -568,7 +609,7 @@ class Message extends \yii\db\ActiveRecord
      */
     public function saveAlltags($event) {
         $model = $event->sender;
-//        Yii::info('saveAlltags: ' . print_r($model, true));
+
         $model->saveRelateddata([
             'eventname' => $event->name,
             'reltableclass' => Msgtags::className(),
@@ -583,10 +624,8 @@ class Message extends \yii\db\ActiveRecord
      * @param array $param
      */
     public function saveRelateddata($param) {
-//        Yii::info('saveRelateddata() ' . print_r($param, true));
         if( $param['eventname'] === ActiveRecord::EVENT_AFTER_UPDATE ) {
             $nCou = $param['reltableclass']::updateAll([$param['msgidfield'] => 0, $param['relateidfield'] => 0], $param['msgidfield'] . ' = ' . $this->msg_id);
-//            Yii::info('Clear relate records: ' . $nCou);
         }
         if( is_array($param['relateidarray']) ) {
             foreach($param['relateidarray'] As $id) {
@@ -601,9 +640,6 @@ class Message extends \yii\db\ActiveRecord
                         ->execute();
 //                    Yii::info('Insert relate records : ['.$this->msg_id.', '.$id.']');
                 }
-//                else {
-//                    Yii::info('Update relate records : ['.$this->msg_id.', '.$id.']');
-//                }
             }
         }
     }
@@ -615,7 +651,7 @@ class Message extends \yii\db\ActiveRecord
     public function uploadFiles() {
         // TODO: вынести в отдельное поведение
         $files = UploadedFile::getInstances($this, 'file');
-        Yii::info("uploadFiles() files = " . count($files));
+//        Yii::info("uploadFiles() files = " . count($files));
 
         // if no image was uploaded abort the upload
         if( empty($files) ) {
@@ -687,6 +723,64 @@ class Message extends \yii\db\ActiveRecord
             }
         }
         return $aRet;
+    }
+
+    /**
+     * Проверка на смену флага
+     * @return boolean
+     *
+     */
+    public function isFlagChanged() {
+        $bRet = false;
+        if( isset($this->_oldAttributes['msg_flag']) ) {
+            $bRet = ($this->_oldAttributes['msg_flag'] != $this->msg_flag);
+        }
+        else {
+            $bRet = ($this->msg_flag > 0);
+        }
+        return $bRet;
+    }
+
+    /**
+     * Проверка на необходимость извещения пользователя
+     * @return boolean
+     *
+     */
+    public function isNeedUserNotify() {
+        $bRet = $this->isFlagChanged()
+            && in_array($this->msg_flag, $this->getNotificationFlags(Rolesimport::ROLE_GUEST));
+        return $bRet;
+    }
+
+    /**
+     *
+     * Проверка на необходимость извещения ответчиков
+     * @return boolean
+     *
+     */
+    public function isNeedAnswerNotify() {
+        return count($this->getAnswerDiff()) > 0;
+    }
+
+    /**
+     *
+     * Получение новых ответчиков
+     * @return array
+     *
+     */
+    public function getAnswerDiff() {
+        // TODO: добавить проверку на флаг сообщения: когда текущий флаг стал на доработку - тоже нужно всем уведомление
+        // Msgflags::MFLG_INT_REVIS_INSTR,
+        // Msgflags::MFLG_SHOW_REVIS,
+        $a = array_diff(
+            $this->allanswers,
+            isset($this->_oldAttributes['answers']) ? $this->_oldAttributes['answers'] : []
+        );
+        if( $this->isFlagChanged()
+            && in_array($this->msg_flag, $this->getNotificationFlags(Rolesimport::ROLE_ANSWER_DOGM)) ) {
+            $a = $this->allanswers;
+        }
+        return $a;
     }
 
 }

@@ -28,3 +28,4 @@ phpunit.phar
 /web/*.log
 /models/_Rolesimport.php
 /web/upload
+/models/*.old

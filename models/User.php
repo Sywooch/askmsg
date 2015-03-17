@@ -378,6 +378,17 @@ class User extends ActiveRecord  implements IdentityInterface
     }
 
     /**
+     *  Имя, фамилия пользователя
+     */
+    public function getShortName() {
+        $s = trim($this->us_name . ' ' . $this->us_secondname);
+        if( $s == '' ) {
+            $s = $this->us_lastname;
+        }
+        return $s;
+    }
+
+    /**
      *
      *  Поиск пользователей по их группе
      *

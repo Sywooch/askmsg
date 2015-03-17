@@ -53,6 +53,7 @@ class MessageSearch extends Message
     {
         $query = Message::find()
             ->with('employee')
+            ->with('answers')
             ->with('alltags')
             ->with('flag');
 
