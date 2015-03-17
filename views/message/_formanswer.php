@@ -23,7 +23,7 @@ JqueryfilerAsset::register($this);
 HelperscriptAsset::register($this);
 
 $aOp = array_reduce(
-    Msgflags::getStateTrans($model->msg_flag),
+    Msgflags::getStateTransAnswer($model->msg_flag),
     function ( $carry , $item ) {
         $sTitle = Msgflags::getStateTitle($item, 'fl_command');
         if( $sTitle != '' ) {
@@ -69,6 +69,7 @@ $aFieldParam = [
     ?>
 
 
+    <p>Текущее состояние: <?= Html::encode($model->flag->getStateTitle($model->msg_flag)) ?></p>
     <?php
     if( strlen($model->msg_empl_command) > 0 ):
         ?>

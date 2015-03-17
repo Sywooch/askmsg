@@ -782,7 +782,7 @@ $aFieldParam = [
                  */
                     if( $isModerate ):
                         $aOp = array_reduce(
-                            Msgflags::getStateTrans($model->msg_flag),
+                            Msgflags::getStateTransModer($model->msg_flag),
                             function ( $carry , $item ) {
                                 $sTitle = Msgflags::getStateTitle($item, 'fl_command');
                                 if( $sTitle != '' ) {
