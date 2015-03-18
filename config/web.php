@@ -11,6 +11,9 @@ $config = [
     'bootstrap' => ['log'],
     'defaultRoute' => 'message/create',
     'modules' => [
+        'gridview' =>  [
+            'class' => '\kartik\grid\Module'
+        ],
         'datecontrol' =>  [
             'class' => 'kartik\datecontrol\Module',
              // format settings for displaying each date attribute (ICU format example)

@@ -10,8 +10,11 @@ use app\assets\GriddataAsset;
 use app\assets\ListdataAsset;
 use app\models\Rolesimport;
 use app\models\Regions;
+use app\models\Message;
 use app\models\Msgflags;
 use app\models\Tags;
+
+use kartik\export\ExportMenu;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\MessageSearch */
@@ -236,5 +239,79 @@ jQuery('.showinmodal').on("click", function (event){
 EOT;
         $this->registerJs($sJs, View::POS_READY, 'showmodalmessage');
     ?>
+    <div class="col-sm-12">
+        <div class="form-group">
+            <label class="control-label">Экспорт данных </label>
+            <?= ExportMenu::widget([
+                'dataProvider' => $dataProvider,
+                'columns' => [
+                    'msg_id',
+                    [
+                        'class' => 'yii\grid\DataColumn',
+                        'attribute' => 'msg_createtime',
+                        'content' => function ($model, $key, $index, $column) {
+                            return date('d.m.Y H:i:s', strtotime($model->msg_createtime));
+                        },
+
+                    ],
+                    [
+                        'class' => 'yii\grid\DataColumn',
+                        'header' => 'Состояние',
+                        'attribute' => 'msg_flag',
+                        'content' => function ($model, $key, $index, $column) {
+                            return $model->flag->fl_sname;
+                        },
+                    ],
+                    [
+                        'class' => 'yii\grid\DataColumn',
+                        'header' => 'Состояние',
+                        'attribute' => 'flag.fl_sname',
+                    ],
+                    [
+                        'class' => 'yii\grid\DataColumn',
+                        'attribute' => 'msg_pers_lastname',
+                        'header' => 'Проситель',
+                        'content' => function ($model, $key, $index, $column) {
+                            /** @var Message $model */
+                            return $model->getFullName();
+                        },
+                    ],
+                    'msg_pers_email',
+                    'msg_pers_phone',
+                    [
+                        'class' => 'yii\grid\DataColumn',
+                        'attribute' => 'msg_empl_id',
+                        'content' => function ($model, $key, $index, $column) {
+                            /** @var Message $model */
+                            return (($model->msg_empl_id !== null) ? $model->employee->getFullName() : '');
+                        },
+                    ],
+                    [
+                        'attribute' => 'msg_pers_org',
+                        'content' => function ($model, $key, $index, $column) {
+                            /** @var Message $model */
+                            return htmlspecialchars_decode($model->msg_pers_org);
+                        },
+                    ],
+                    [
+                        'attribute' => 'msg_pers_text',
+                        'content' => function ($model, $key, $index, $column) {
+                            /** @var Message $model */
+                            return strip_tags(htmlspecialchars_decode($model->msg_pers_text));
+                        },
+                    ],
+                    'msg_empl_command',
+                    [
+                        'attribute' => 'msg_answer',
+                        'content' => function ($model, $key, $index, $column) {
+                            /** @var Message $model */
+                            return htmlspecialchars_decode(strip_tags($model->msg_answer));
+                        },
+                    ],
+                    'msg_empl_remark',
+                ]
+            ]);  ?>
+        </div>
+    </div>
 
 </div>
