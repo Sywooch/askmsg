@@ -98,6 +98,7 @@ oLink.on(
 
 EOT;
     $this->registerJs($sJs, View::POS_READY , 'togglesearchpanel');
+    $exportDataProvider = clone($dataProvider);
 
     ?>
 
@@ -242,8 +243,12 @@ EOT;
     <div class="col-sm-12">
         <div class="form-group">
             <label class="control-label">Экспорт данных </label>
+            <?php
+            echo '<p>'.$dataProvider->totalCount.'</p>';
+            ?>
             <?= ExportMenu::widget([
-                'dataProvider' => $dataProvider,
+                'dataProvider' => $exportDataProvider,
+                'filename' => 'user-messages',
                 'columns' => [
                     'msg_id',
                     [
