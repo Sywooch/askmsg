@@ -541,12 +541,14 @@ class Message extends \yii\db\ActiveRecord
             $a[] = $this->msg_empl_id;
         }
 
-        foreach($this->answers As $ob) {
-            if( is_object($ob) ) {
-                $a[] = $ob->us_id;
-            }
-            else {
-                $a[] = intval($ob);
+        if( $this->answers ) {
+            foreach($this->answers As $ob) {
+                if( is_object($ob) ) {
+                    $a[] = $ob->us_id;
+                }
+                else {
+                    $a[] = intval($ob);
+                }
             }
         }
         return $a;
