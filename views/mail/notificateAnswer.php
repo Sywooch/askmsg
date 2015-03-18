@@ -32,7 +32,7 @@ if( strlen($model->msg_empl_remark) > 0 ) {
 }
 ?>
 
-<p>Посмотреть обращение Вы можете по ссылке: <?= Html::a(Url::to($aLink, true), $aLink) ?></p>
+<p>Посмотреть обращение Вы можете по ссылке: <?= Html::a(Url::to($aLink, true), Url::to($aLink, true)) ?></p>
 
-<p>Все назначенные Вам обращения доступны по ссылке: <?= Html::a(Url::to($aListLink, true), $aListLink) ?></p>
+<p>Все назначенные Вам обращения доступны по ссылке: <?= Html::a(Url::to($aListLink, true), Url::to($aListLink, true)) ?></p>
 

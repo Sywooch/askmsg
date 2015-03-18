@@ -21,6 +21,6 @@ $aLink = ['message/view', 'id'=>$model->msg_id];
 
 <p>Текущий статус обращения: <?= Html::encode(preg_replace('|\\[[^\\]]+\\]|', '', $model->flag->fl_name)) ?></p>
 
-<p>Посмотреть обращение Вы можете по ссылке: <?= Html::a(Url::to($aLink, true), $aLink) ?></p>
+<p>Посмотреть обращение Вы можете по ссылке: <?= Html::a(Url::to($aLink, true), Url::to($aLink, true)) ?></p>
 
 
