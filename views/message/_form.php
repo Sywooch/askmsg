@@ -465,6 +465,9 @@ $aFieldParam = [
             'offset' => 'col-sm-offset-1',
             'wrapper' => 'col-sm-11',
         ],
+        'hintOptions' => [
+            'class' => 'col-sm-11 col-sm-offset-1',
+        ],
     ],
     'file' => [
         'options'=>[
@@ -794,24 +797,23 @@ $aFieldParam = [
                             []
                         );
                     ?>
-            <div class="col-sm-2"><?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?></div>
+            <div class="col-sm-3">
+                    <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success btn-block']) ?>
+            </div>
 
-                <div class="col-sm-10">
-                    <div class="form-group">
-                        <!-- label for="message-msg_pers_text" class="control-label col-sm-3">&nbsp;</label -->
-                        <div class="col-sm-3">
-                            <a href="#" class="btn btn-default togglepart" id="toggle_userformpart" style="margin-bottom: 14px;">Показать Обращение</a>
-                        </div>
 
-                        <?php if( !empty($model->msg_answer)  ): ?>
-                            <div class="col-sm-3">
-                                <a href="#" class="btn btn-default togglepart" id="toggle_answer">Показать Ответ</a>
-                            </div>
-                        <?php endif; ?>
+                    <!-- label for="message-msg_pers_text" class="control-label col-sm-3">&nbsp;</label -->
+            <div class="col-sm-3">
+                <a href="#" class="btn btn-default btn-block togglepart" id="toggle_userformpart" style="margin-bottom: 14px;">Показать Обращение</a>
+            </div>
 
-                    </div>
-
+            <?php if( !empty($model->msg_answer)  ): ?>
+                <div class="col-sm-3">
+                    <a href="#" class="btn btn-default btn-block togglepart" id="toggle_answer">Показать Ответ</a>
                 </div>
+            <?php endif; ?>
+
+
         </div>
     </div>
     <div class="col-sm-12">
@@ -823,7 +825,7 @@ $aFieldParam = [
                                 <div class="col-sm-3">
                                 <?= Html::submitButton(
                                 $aData['title'], // 'Сохранить и ' .
-                                ['class' => 'btn btn-default changeflag', 'id' => 'buttonsave_' . $k, 'style' => 'margin-bottom: 1em;']) ?>
+                                ['class' => 'btn btn-default btn-block changeflag', 'id' => 'buttonsave_' . $k, 'style' => 'margin-bottom: 1em;']) ?>
                                 </div>
                                 <div class="col-sm-9 help-block">
                                     <?= $aData['hint'] ?>
@@ -838,7 +840,7 @@ $aFieldParam = [
                                 <?= Html::a(
                                     'Вернуться в список обращений',
                                     ['moderatelist'],
-                                    ['class' => 'btn btn-default', 'id' => 'button_go_back', 'style' => 'margin-bottom: 1em;'])
+                                    ['class' => 'btn btn-default btn-block', 'id' => 'button_go_back', 'style' => 'margin-bottom: 1em;'])
                                 ?>
                             </div>
                             <div class="clearfix"></div>
@@ -853,8 +855,8 @@ $aFieldParam = [
                     else:
                 ?>
                     <label for="message-msg_pers_text" class="control-label col-sm-1">&nbsp;</label>
-                    <div class="col-sm-6">
-                        <?= Html::submitButton($model->isNewRecord ? 'Отправить' : 'Сохранить', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+                    <div class="col-sm-3">
+                        <?= Html::submitButton($model->isNewRecord ? 'Отправить' : 'Сохранить', ['class' => $model->isNewRecord ? 'btn btn-success btn-block' : 'btn btn-primary btn-block']) ?>
                     </div>
                 <?php
                     endif; // if( $isModerate ):

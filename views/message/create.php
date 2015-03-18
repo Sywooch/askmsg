@@ -22,8 +22,9 @@ if( !$model->isNewRecord ) {
 }
 
 $this->title = $aData['title'] . ($model->isNewRecord ? '' : (' № ' . $model->msg_id));
-$this->params['breadcrumbs'][] = ['label' => 'Обращения', 'url' => $url];
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'] = [];
+// $this->params['breadcrumbs'][] = ['label' => 'Обращения', 'url' => $url];
+// $this->params['breadcrumbs'][] = $this->title;
 
 /*
 <h1><?= Html::encode($this->title) ?></h1>

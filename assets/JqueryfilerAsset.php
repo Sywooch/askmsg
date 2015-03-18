@@ -38,5 +38,15 @@ class JqueryfilerAsset extends AssetBundle {
     public $depends = [
         'yii\web\JqueryAsset',
     ];
+/*
+    public function init()
+    {
+        parent::init();
 
+//        $this->js[] = (YII_ENV_DEV ? 'js/jquery.filer.js' : 'js/jquery.filer.min.js');
+        $this->js[] = 'js/jquery.filer.min.js';
+        j.attr('style', '-webkit-box-shadow: ' +  h + '; -moz-box-shadow: ' +  h + '; box-shadow: ' +  h + ';')
+
+    }
+*/
 }
