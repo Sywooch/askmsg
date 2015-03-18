@@ -23,7 +23,7 @@ use app\models\Msgflags;
 /* @var $idserchblock string */
 
 if( !isset($action) ) {
-    $action = ['admin'];
+    $action = ['index'];
 }
 
 ?>
@@ -52,19 +52,7 @@ if( !isset($action) ) {
     </div>
 
     <div class="col-sm-4">
-        <?= $form->field($model, 'msg_pers_email') ?>
-    </div>
-
-    <div class="col-sm-4">
         <?php
-/*
-            $sDateFld = DatePicker::widget([
-                'model' => $model,
-                'attribute' => 'msg_createtime',
-                'language' => 'ru',
-                //'dateFormat' => 'yyyy-MM-dd',
-            ]);
-*/
             echo $form
                 ->field(
                     $model,
@@ -80,83 +68,11 @@ if( !isset($action) ) {
                         'options' => ['class' => 'form-control',],
                     ]
                 );
-/*
-            ->widget(DateControl::classname(), [
-                'type'=>DateControl::FORMAT_DATE,
-                'language' => 'ru',
-                'name' => Html::getInputName($model, 'msg_createtime'),
-//                'ajaxConversion'=>false,
-                'options' => [
-                    'pluginOptions' => [
-                        'autoclose' => true
-                    ]
-                ]
-            ])
-/*        widget([
-                'class' => DateControl::className(),
-                'language' => 'ru',
-                'type'=>DateControl::FORMAT_DATE,
-//                'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                'pluginOptions' => [
-                    'autoclose'=>true,
-    //                'format' => 'dd-M-yyyy'
-                ]
-            ]) */
         ?>
     </div>
 
     <div class="col-sm-4">
         <?= $form->field($model, 'msg_pers_lastname') ?>
-    </div>
-
-    <div class="col-sm-4">
-        <?= $form
-            ->field($model, 'msg_flag')
-            ->widget(Select2::classname(), [
-                'data' => ArrayHelper::map(
-                    Msgflags::find()
-//                    ->where(['status' => 1])
-                    ->asArray()
-                    ->all(), 'fl_id', 'fl_sname' /* function($item, $default){ return $item; } */),
-                'language' => 'ru',
-                'options' => ['placeholder' => 'Выберите состояние ...'],
-                'pluginOptions' => [
-                    'allowClear' => true,
-/*
-                    'formatResult' => new JsExpression(
-                        'function (item) {
-                        return "<span class=\\"glyphicon glyphicon-" + item.fl_glyth + "\\" style=\\"color: " + item.fl_glyth_color + "; font-size: 1.25em;\\"></span><span>"+item.fl_sname+"</span>";
-                    }'
-                    ),
-                    'escapeMarkup' => new JsExpression('function (m) { return m; }'),
-*/
-                ],
-                'pluginEvents' => [
-//                        'change' => 'function(event) { jQuery("#'.Html::getInputId($model, 'msg_empl_id').'").val(event.val); console.log("change", event); }',
-                ],
-            ]);
-        ?>
-    </div>
-
-    <div class="col-sm-4">
-    <?php
-    $aAnsw = User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}');
-    ?>
-
-    <?= $form
-        ->field($model, 'msg_empl_id')
-        ->widget(Select2::classname(), [
-            'data' => $aAnsw,
-            'language' => 'ru',
-            'options' => ['placeholder' => 'Выберите ответчика ...'],
-            'pluginOptions' => [
-                'allowClear' => true,
-            ],
-            'pluginEvents' => [
-//                        'change' => 'function(event) { jQuery("#'.Html::getInputId($model, 'msg_empl_id').'").val(event.val); console.log("change", event); }',
-            ],
-        ]);
-    ?>
     </div>
 
     <div class="col-sm-4">
@@ -240,16 +156,7 @@ if( !isset($action) ) {
                 'placeholder' => 'Выберите учреждение ...',
             ],
         ])
-    /* . $form->field(
-        $model,
-        'msg_pers_org',
-        ['template' => "{input}", 'options' => ['tag' => 'span']]
-    )->hiddenInput()
-    . $form->field(
-        $model,
-        'msg_pers_region',
-        ['template' => "{input}", 'options' => ['tag' => 'span']]
-    )->hiddenInput() */ ?>
+    ?>
 
     </div>
 
@@ -271,39 +178,6 @@ if( !isset($action) ) {
         ]) ?>
     </div>
 
-    <div class="col-sm-4">
-    <?= $form
-        ->field($model, 'alltags')
-        ->widget(Select2::classname(), [
-            'data' => ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_title'),
-            'language' => 'ru',
-            'options' => [
-                'multiple' => true,
-//                        'tags' => true,
-                'placeholder' => 'Выберите теги ...',
-            ],
-            'pluginOptions' => [
-                'allowClear' => true,
-            ],
-        ]) ?>
-
-    </div>
-
-    <?php /* echo $form->field($model, 'msg_active') ?>
-    <?php // echo $form->field($model, 'msg_pers_secname') ?>
-    <?php // echo $form->field($model, 'msg_pers_name') ?>
-    <?php // echo $form->field($model, 'msg_pers_email') ?>
-    <?php // echo $form->field($model, 'msg_pers_phone') ?>
-    <?php // echo $form->field($model, 'msg_pers_org') ?>
-    <?php // echo $form->field($model, 'msg_pers_region') ?>
-    <?php // echo $form->field($model, 'msg_pers_text') ?>
-    <?php // echo $form->field($model, 'msg_comment') ?>
-    <?php // echo $form->field($model, 'msg_empl_command') ?>
-    <?php // echo $form->field($model, 'msg_empl_remark') ?>
-    <?php // echo $form->field($model, 'msg_answer') ?>
-    <?php // echo $form->field($model, 'msg_answertime') ?>
-    <?php // echo $form->field($model, 'msg_oldcomment') */ ?>
-
 
     <div class="col-sm-12">
         <!-- div class="form-group" -->
@@ -324,7 +198,6 @@ var formatSelect = function(item, text, description) {
 EOT;
     $this->registerJs($sJs, View::POS_END , 'showselectpart');
 
-//    <div class="clearfix"></div>
     ?>
 </div>
 

@@ -26,10 +26,10 @@ class MessageSearch extends Message
     public function rules()
     {
         return [
-            [['msg_id', 'msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag'], 'integer'],
+            [['msg_id', 'msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject', 'ekis_id'], 'integer'],
             [['askid', ], 'string'],
             [['alltags'], 'in', 'range' => array_keys(ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_title')), 'allowArray' => true],
-            [['msg_subject', 'msg_createtime', 'msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_org', 'msg_pers_text', 'msg_comment', 'msg_empl_command', 'msg_empl_remark', 'msg_answer', 'msg_answertime', 'msg_oldcomment'], 'safe'],
+            [['msg_createtime', 'msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_org', 'msg_pers_text', 'msg_comment', 'msg_empl_command', 'msg_empl_remark', 'msg_answer', 'msg_answertime', 'msg_oldcomment'], 'safe'],
         ];
     }
 
@@ -39,7 +39,16 @@ class MessageSearch extends Message
     public function scenarios()
     {
         // bypass scenarios() implementation in the parent class
-        return Model::scenarios();
+        $scenarios = Model::scenarios();
+        $scenarios['index'] = [
+            'msg_id',
+            'msg_pers_lastname',
+            'msg_createtime',
+            'msg_subject',
+            'ekis_id',
+        ];
+
+        return $scenarios;
     }
 
     /**
@@ -134,6 +143,75 @@ class MessageSearch extends Message
 //            ->andFilterWhere(['like', 'msg_empl_remark', $this->msg_empl_remark])
 //            ->andFilterWhere(['like', 'msg_answer', $this->msg_answer])
 //            ->andFilterWhere(['like', 'msg_oldcomment', $this->msg_oldcomment]);
+
+        return $dataProvider;
+    }
+
+    /**
+     * Creates data provider instance with search query applied
+     *
+     * @param array $params
+     *
+     * @return ActiveDataProvider
+     */
+    public function searchindex($params)
+    {
+        $query = Message::find()
+            ->with('employee')
+            ->with('answers')
+            ->with('subject')
+//            ->with('alltags')
+            ->with('flag');
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'sort'=> [
+                'defaultOrder' => [
+                    'msg_createtime'=>SORT_DESC
+                ]
+            ],
+            'pagination' => [
+                'defaultPageSize' => 50,
+                'pageSize' => 50,
+            ],
+
+        ]);
+
+        $this->load($params);
+
+/*
+        if( !empty($this->alltags) ) {
+            $tagsQuery = (new Query)
+                ->select('mt_msg_id')
+                ->from(Msgtags::tableName())
+                ->where(['mt_tag_id' => $this->alltags])
+                ->distinct();
+            $query->andFilterWhere(['msg_id' => $tagsQuery]);
+        }
+*/
+        $a = $this->makeDateRange('msg_createtime');
+        if( count($a) > 1 ) {
+            $query
+                ->andFilterWhere(['>', 'msg_createtime', $a[0]])
+                ->andFilterWhere(['<', 'msg_createtime', $a[1]]);
+        }
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+
+        $query->andFilterWhere([
+            'msg_id' => $this->msg_id,
+            'msg_subject' => $this->msg_subject,
+            'msg_flag' => $this->msgflags,
+            'ekis_id' => $this->ekis_id,
+        ]);
+
+        $query->andFilterWhere(['like', 'msg_pers_lastname', $this->msg_pers_lastname]);
+//        $query->andFilterWhere(['like', 'msg_pers_org', $this->msg_pers_org]);
 
         return $dataProvider;
     }

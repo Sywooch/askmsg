@@ -392,8 +392,8 @@ class Message extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'msg_id' => 'ID',
-            'msg_createtime' => 'Создано',
+            'msg_id' => 'Номер',
+            'msg_createtime' => 'Дата',
             'msg_active' => 'Видимо',
             'msg_pers_name' => 'Имя',
             'msg_pers_secname' => 'Отчество',

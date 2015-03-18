@@ -141,7 +141,8 @@ class MessageController extends Controller
     {
         $searchModel = new MessageSearch();
         $searchModel->msgflags = Message::getMessageFilters()[Rolesimport::ROLE_GUEST];
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $searchModel->scenario = 'index';
+        $dataProvider = $searchModel->searchindex(Yii::$app->request->queryParams);
 
         return $this->render('list', [
             'searchModel' => $searchModel,

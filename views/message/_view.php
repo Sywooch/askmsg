@@ -21,6 +21,7 @@ $oSubj = $model->subject;
     </div>
     <div class="listdate">
         <?= date('d.m.Y H:i:s', strtotime($model->msg_createtime)) ?>
+        <?= '№' . $model->msg_id . ' ' ?>
     </div>
 
 
@@ -129,7 +130,7 @@ $oSubj = $model->subject;
         ?>
     <?php endif; ?>
 
-    <?php if( count($model->answers) > 0 ): ?>
+    <?php if( $isDopFields && (count($model->answers) > 0) ): ?>
         <div class="listemploee">
             <strong>Соответчики: </strong>
             <?php foreach( $model->answers As $ob ): ?>
