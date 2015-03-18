@@ -98,25 +98,27 @@ $aFieldParam = [
         if( $model->msg_answer == '' ) {
             $model->msg_answer = 'Уважаемая(-ый) ' . $model->getShortName() . ".\nС уважением, " . Yii::$app->user->identity->getFullName() . '.';
         }
-        /*
- = $form->field(
-            $model,
-            'msg_answer')
-        ->textarea(['rows' => 6]) */ ?>
-    <?= $form->field(
-            $model,
-            'msg_answer')
-        ->widget(Widget::className(), [
-            'settings' => [
-                'lang' => 'ru',
-                'minHeight' => 200,
-                'buttons' => ['formatting', 'bold', 'italic', 'deleted', 'unorderedlist', 'orderedlist', 'link', 'alignment'], // 'outdent', 'indent', 'image',
-                'plugins' => [
-//                    'clips',
-                    'fullscreen',
+
+        // Фокус на редактор помещаем
+        $sJs = 'setTimeout(function() {var oEditor = jQuery(".redactor-editor").first(); oEditor.focus(); console.log("Click: ", oEditor);}, 500);';
+        $this->registerJs($sJs, View::POS_READY, 'focusonimperavi');
+
+    ?>
+    <?= $form
+            ->field(
+                $model,
+                'msg_answer')
+            ->widget(Widget::className(), [
+                'settings' => [
+                    'lang' => 'ru',
+                    'minHeight' => 200,
+                    'buttons' => ['formatting', 'bold', 'italic', 'deleted', 'unorderedlist', 'orderedlist', 'link', 'alignment'], // 'outdent', 'indent', 'image',
+                    'plugins' => [
+//                       'clips',
+                        'fullscreen',
+                    ]
                 ]
-            ]
-            ]) ?>
+                ]) ?>
     <?= $form->field($model, 'msg_flag', ['template' => "{input}", 'options' => ['tag' => 'span']])->hiddenInput();  ?>
     <?php
     $aFiles = $model->getUserFiles(false);
