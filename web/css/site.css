@@ -102,3 +102,7 @@ td.commandcell {
 /*    margin-left: 12px; */
     margin-right: 12px;
 }
+
+.navbar-fixed-top, .navbar-fixed-bottom {
+    z-index: 1060;
+}

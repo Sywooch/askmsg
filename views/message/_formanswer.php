@@ -94,7 +94,11 @@ $aFieldParam = [
     endif;
     ?>
 
-    <?php /*
+    <?php
+        if( $model->msg_answer == '' ) {
+            $model->msg_answer = 'Уважаемая(-ый) ' . $model->getShortName() . ".\nС уважением, " . Yii::$app->user->identity->getFullName() . '.';
+        }
+        /*
  = $form->field(
             $model,
             'msg_answer')
