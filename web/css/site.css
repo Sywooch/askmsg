@@ -106,3 +106,14 @@ td.commandcell {
 .navbar-fixed-top, .navbar-fixed-bottom {
     z-index: 1060;
 }
+
+span.description {
+    display: block;
+    font-size: 0.9em;
+    color: #aaaaaa;
+}
+
+.select2-highlighted span.description {
+    color: #dddddd;
+}
+

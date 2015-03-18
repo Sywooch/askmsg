@@ -156,7 +156,7 @@ $this->registerJs($sJs, View::POS_READY, 'toggleuserpart');
 // функция форматирования результатов в список для select2
 $sJs =  <<<EOT
 var formatSelect = function(item, text, description) {
-    return  item[text] + "<span>" + item[description] + "</span>";
+    return  item[text] + "<span class=\\"description\\">" + item[description] + "</span>";
 }
 
 EOT;
