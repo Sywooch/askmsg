@@ -171,7 +171,7 @@ class Message extends \yii\db\ActiveRecord
                     $model = $event->sender;
                     $s = $model->$attribute;
                     $s = mb_strtoupper(mb_substr($s, 0, 1)) . mb_substr($s, 1);
-//                    Yii::info('Convert letter: ' . $model->$attribute . ' -> ' . $s);
+                    Yii::info('Convert letter: ' . $model->$attribute . ' -> ' . $s);
                     return $s;
                 },
             ],
