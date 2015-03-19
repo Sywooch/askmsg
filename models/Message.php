@@ -69,7 +69,6 @@ class Message extends \yii\db\ActiveRecord
      * @var mixed file аттрибут для генерации поля добавления файла
      */
     public $file;
-    public $attachfile;
 
     public $_oldAttributes = [];
 
@@ -280,8 +279,6 @@ class Message extends \yii\db\ActiveRecord
             [['alltags'], 'in', 'range' => array_keys(ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_title')), 'allowArray' => true],
             [['file'], 'safe'],
             [['file'], 'file', 'maxFiles' => $fileCount, 'maxSize' => Yii::$app->params['message.file.maxsize'], 'extensions' => Yii::$app->params['message.file.ext']],
-            [['attachfile'], 'safe'],
-            [['attachfile'], 'file', 'maxFiles' => $fileCount, 'maxSize' => Yii::$app->params['message.file.maxsize'], 'extensions' => Yii::$app->params['message.file.ext']],
 //            [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}')), 'allowArray' => true],
             [['msg_id', 'msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject', 'ekis_id'], 'integer'],
             [['msg_pers_text'], 'string', 'max' => self::MAX_PERSON_TEXT_LENGTH, 'on' => 'person'],
@@ -316,21 +313,20 @@ class Message extends \yii\db\ActiveRecord
             'msg_subject',
             'ekis_id',
             'file',
-            'attachfile',
         ];
 
         $scenarios['moderator'] = array_merge(
-                                    $scenarios['person'],
-                                    [
-                                        'msg_empl_command',
-                                        'msg_empl_remark',
-                                        'msg_comment',
-                                        'msg_empl_id',
-                                        'msg_flag',
-                                        'msg_active',
-                                        'answers',
-                                        'alltags',
-                                    ]
+            $scenarios['person'],
+            [
+                'msg_empl_command',
+                'msg_empl_remark',
+                'msg_comment',
+                'msg_empl_id',
+                'msg_flag',
+                'msg_active',
+                'answers',
+                'alltags',
+            ]
         );
 
         $scenarios['importdata'] = [
@@ -364,7 +360,12 @@ class Message extends \yii\db\ActiveRecord
         }
         */
 
-        $scenarios['answer'] = ['msg_answer', 'msg_answertime', 'msg_flag', 'file', 'attachfile'];
+        $scenarios['answer'] = [
+            'msg_answer',
+            'msg_answertime',
+            'msg_flag',
+            'file',
+        ];
 
         return $scenarios;
     }
@@ -425,7 +426,6 @@ class Message extends \yii\db\ActiveRecord
             'tags' => 'Теги',
             'alltags' => 'Теги',
             'file' => 'Файл',
-            'attachfile' => 'Прикрепить',
         ];
     }
 

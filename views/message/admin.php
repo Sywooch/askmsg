@@ -41,7 +41,6 @@ $aTags = ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_t
             <?php
 
             $bOnlyLoggedUser = ($action[0] == 'answerlist');
-            Yii::info('action[0] = ' . $action[0] . ' -> ' . ($bOnlyLoggedUser ? 'true' : 'false'));
 
             if( Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM) ) {
             ?>
@@ -243,9 +242,7 @@ EOT;
     <div class="col-sm-12">
         <div class="form-group">
             <label class="control-label">Экспорт данных </label>
-            <?php
-            echo '<p>'.$dataProvider->totalCount.'</p>';
-            ?>
+
             <?= ExportMenu::widget([
                 'dataProvider' => $exportDataProvider,
                 'filename' => 'user-messages',
