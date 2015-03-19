@@ -170,7 +170,7 @@ class Message extends \yii\db\ActiveRecord
                     /** @var  $model Activerecord */
                     $model = $event->sender;
                     $s = $model->$attribute;
-                    $s = mb_strtoupper(mb_substr($s, 0, 1)) . mb_substr($s, 1);
+                    $s = mb_strtoupper(mb_substr($s, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr($s, 1, null, 'UTF-8');
                     Yii::info('Convert letter: ' . $model->$attribute . ' -> ' . $s);
                     return $s;
                 },
