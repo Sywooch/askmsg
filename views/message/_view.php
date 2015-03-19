@@ -117,9 +117,9 @@ $oSubj = $model->subject;
                     /** @var File  $oFile */
                     ?>
                     <?= Html::a(
-                    $oFile->file_orig_name,
-                    $oFile->getUrl()
-                )
+                        $oFile->file_orig_name,
+                        $oFile->getUrl()
+                    )
                     ?>
                 <?php
                 endforeach;

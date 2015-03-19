@@ -22,14 +22,13 @@ class FileController extends Controller
             'access' => [
                 'class' => AccessControl::className(),
                 'rules' => [
-/*
-                    [
 
+                    [
                         'allow' => true,
-                        'actions' => ['index', 'list', 'create', 'view', 'update', 'delete'],
-                        'roles' => ['@'],
+                        'actions' => ['download'],
+                        'roles' => ['?', '@'],
                     ],
-*/
+
                     [
                         'allow' => true,
                         'actions' => ['remove'],
@@ -54,6 +53,21 @@ class FileController extends Controller
                 ],
             ],
         ];
+    }
+
+    /**
+     * Display save as dialof for all files
+     * @param string $name
+     * @return mixed
+     */
+    public function actionDownload($name = '')
+    {
+        /** @var File $model */
+        $model = File::find(['file_name' => $name])->one();
+        if( ($name == '') || ($model === null) ) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+        Yii::$app->response->sendFile($model->getFullpath(), $model->file_orig_name);
     }
 
     /**

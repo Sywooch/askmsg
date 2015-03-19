@@ -81,8 +81,9 @@ class File extends \yii\db\ActiveRecord
      *
      */
     public function getUrl() {
-        $sName = $this->getFullpath();
-        return str_replace(DIRECTORY_SEPARATOR, '/', substr($sName, strlen(Yii::getAlias('@webroot'))));
+        return ['file/download', 'name' => $this->file_name];
+//        $sName = $this->getFullpath();
+//        return str_replace(DIRECTORY_SEPARATOR, '/', substr($sName, strlen(Yii::getAlias('@webroot'))));
     }
 
     /**

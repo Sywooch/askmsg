@@ -724,11 +724,6 @@ $aFieldParam = [
             )
         ?>
 
-        <?php /* = $form
-            ->field($model, 'file[]', $aFieldParam['filefield'])
-            ->widget(FileInput::classname(), $aFieldParam['file'])
-            ->hint('Максимальный размер файла: ' . Yii::$app->params['message.file.maxsize'] . ' байт, Допустимые типы файлов: ' . implode(',', Yii::$app->params['message.file.ext']))
-        */ ?>
     </div>
 
     <?php
