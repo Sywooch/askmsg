@@ -114,6 +114,14 @@ oButtons.on("click", function(event){
 });
 EOT;
 
+// Берем поручение из старых вариантов
+$sJs .=  <<<EOT
+jQuery('#idinstructionlist').on("select2:select", function(event){
+    console.log("change", event);
+});
+
+EOT;
+
 // Фильтруем видимость кнопок в зависимости от смены состояния полей замечаний и поручений
 // новая запись: оставляем кнопки с поручениями, если заполнено поручение
 $nFlagNewMsg = Msgflags::MFLG_NEW;
@@ -410,7 +418,7 @@ $aFieldParam = [
                     }'),
 
                 'results' => new JsExpression('function (data, page) {
-                                console.log("results("+page+") data = ", data);
+//                                console.log("results("+page+") data = ", data);
                                 var more = (page * 10) < data.total; // whether or not there are more results available
                                 return {results: data.list, more: more};
 //                                return { results: data.list };
@@ -483,8 +491,50 @@ $aFieldParam = [
             'showRemove' => true,
             'showUpload' => false,
         ]
-    ]
-];
+    ],
+
+    'instrlist' => [
+        'name' => 'instructionlist',
+        'id' => 'idinstructionlist',
+        'language' => 'ru',
+        'pluginOptions' => [
+            'ajax' =>[
+                'method' => 'POST',
+                'url' => Url::to(['message/instruction']),
+                'dataType' => 'json',
+                'withCredentials' => true,
+                'data' => new JsExpression('function (term, page) {
+                        return {
+                            term: term,
+                            limit: 10,
+                            start: (page - 1) * 10,
+                            "_": (new Date()).getSeconds()
+                        };
+                    }'),
+
+                'results' => new JsExpression('function (data, page) {
+                                var more = (page * 10) < data.total; // whether or not there are more results available
+                                return {results: data.list, more: more};
+                             }'),
+                'id' => new JsExpression('function(item){return item.id;}'),
+            ],
+            'formatResult' => new JsExpression('function (item) { return item.text;}'),
+            'escapeMarkup' => new JsExpression('function (m) { return m; }'),
+            'onChange' => new JsExpression('function(item){return "change";}'),
+            'onSelect' => new JsExpression('function(item){return "select";}'),
+        ],
+        'pluginEvents' => [
+            'change' => 'function(event) {
+                    var sIdReg = "'.Html::getInputId($model, 'msg_empl_command').'",
+                        oInstr = jQuery("#" + sIdReg);
+                    oInstr.val(event.added.text);
+//                    oInstr.val(oInstr.val() + "\n" + event.added.text);
+//                    console.log("change", event);
+                }',
+        ],
+    ],
+
+    ];
 ?>
 
 <div class="message-form">
@@ -557,7 +607,10 @@ $aFieldParam = [
             <?= $form
                 ->field($model, 'msg_empl_command')
                 ->textarea()
-                ->hint('Текст поручения будет виден всем посетителям при публикации обращения на сайте');
+                ->hint(Select2::widget($aFieldParam['instrlist']) . 'Текст поручения будет виден всем посетителям при публикации обращения на сайте');
+            ?>
+            <?=
+                ''
             ?>
         </div>
 

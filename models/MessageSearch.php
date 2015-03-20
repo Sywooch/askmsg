@@ -83,6 +83,14 @@ class MessageSearch extends Message
 
         $this->load($params);
 
+        // если указан id записи, все остальное сбрасываем
+        if( !empty($this->msg_id) ) {
+            $a = ['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_org', 'msg_flag', 'msgflags', 'msg_pers_region', 'msg_subject', 'answers', 'alltags', 'msg_createtime'];
+            foreach($a As $v) {
+                $this->$v = null;
+            }
+        }
+
         if( !empty($this->answers) ) {
             $ansQuery = (new Query)
                 ->select('ma_message_id')
@@ -120,7 +128,6 @@ class MessageSearch extends Message
             // $query->where('0=1');
             return $dataProvider;
         }
-
 
         $query->andFilterWhere([
             'msg_id' => $this->msg_id,
@@ -307,6 +314,46 @@ class MessageSearch extends Message
             }
         }
         return $b;
+    }
+
+    /**
+     *
+     * Получение списка наиболее употребительных
+     * @param array $param
+     * @return array
+     *
+     */
+    public function instructionList($param) {
+        $query = (new \yii\db\Query())
+            ->select('msg_empl_command, COUNT(msg_id) As cou')
+            ->from(self::tableName())
+            ->where('msg_empl_command Is Not NULL')
+            ->andFilterWhere(['like', 'msg_empl_command', $param['term']])
+            ->groupBy('msg_empl_command')
+            ->orderBy('cou DESC')
+            ->offset($param['offset'])
+            ->limit($param['limit']);
+
+        $countQuery = (new \yii\db\Query())
+            ->select('Count(Distinct msg_empl_command)')
+            ->from(self::tableName())
+            ->where('msg_empl_command Is Not NULL')
+            ->andFilterWhere(['like', 'msg_empl_command', $param['term']]);
+
+        $nStart =  1 * $param['offset'];
+        $a = [];
+        foreach($query->all() As $item) {
+            $a[] = [
+                'text' => $item['msg_empl_command'],
+                'count' => $item['cou'],
+                'id' => $nStart++,
+            ];
+        }
+        $aData = [
+            'total' => $countQuery->scalar(),
+            'list' => $a,
+        ];
+        return $aData;
     }
 
 }

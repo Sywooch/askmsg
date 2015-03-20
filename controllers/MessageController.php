@@ -34,7 +34,7 @@ class MessageController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['update', 'delete', 'moderatelist', 'upload'],
+                        'actions' => ['update', 'delete', 'moderatelist', 'upload', 'instruction'],
                         'roles' => [Rolesimport::ROLE_MODERATE_DOGM],
                     ],
                     [
@@ -72,6 +72,24 @@ class MessageController extends Controller
             'dataProvider' => $dataProvider,
             'action' => ['admin'],
         ]);
+    }
+
+    /**
+     * Lists all last instruction
+     * @return mixed
+     */
+    public function actionInstruction()
+    {
+        $param = [
+            'term' => Yii::$app->request->getQueryParam('term', ''),
+            'limit' => Yii::$app->request->getQueryParam('limit', 10),
+            'offset' => Yii::$app->request->getQueryParam('start', 0),
+        ];
+        $searchModel = new MessageSearch();
+
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        return $searchModel->instructionList($param);
     }
 
     /**

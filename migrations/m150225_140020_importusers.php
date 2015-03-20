@@ -326,7 +326,7 @@ CREATE TABLE `b_user` (
                     'msg_empl_remark' => $ad['PROPERTY_216'],
                 ];
                 if( !empty($oMsg->msg_empl_id) ) {
-                    if( $oMsg->msg_flag == MFLG_NEW ) { // при назначеном исполнителе и новом обращении - делаем внутреннее поручение
+                    if( $oMsg->msg_flag == Msgflags::MFLG_NEW ) { // при назначеном исполнителе и новом обращении - делаем внутреннее поручение
                         $oMsg->msg_flag = Msgflags::MFLG_INT_INSTR;
                     }
 //                    elseif() {}
