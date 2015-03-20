@@ -276,7 +276,7 @@ class Message extends \yii\db\ActiveRecord
             [['msg_flag'], 'required'],
 //            [['answers'], 'safe'],
             [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}')), 'allowArray' => true],
-            [['alltags'], 'in', 'range' => array_keys(ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_title')), 'allowArray' => true],
+            [['alltags'], 'in', 'range' => ($this->scenario != 'importdata') ? array_keys(ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_title')) : [], 'allowArray' => true],
             [['file'], 'safe'],
             [['file'], 'file', 'maxFiles' => $fileCount, 'maxSize' => Yii::$app->params['message.file.maxsize'], 'extensions' => Yii::$app->params['message.file.ext']],
 //            [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}')), 'allowArray' => true],
@@ -287,7 +287,7 @@ class Message extends \yii\db\ActiveRecord
             [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_oldcomment'], 'string', 'max' => 255],
             [['employer', 'asker', 'askid', 'askcontacts', 'tags'], 'string', 'max' => 255],
             [['msg_empl_id', 'msg_empl_command'], 'required',
-                'when' => function($model) use ($aFlagsToAnswer) { return in_array($this->msg_flag, $aFlagsToAnswer); },
+                'when' => function($model) use ($aFlagsToAnswer) { return ($this->scenario != 'importdata') && in_array($this->msg_flag, $aFlagsToAnswer); },
                 'whenClient' => "function (attribute, value) { return [".implode(',', $aFlagsToAnswer)."].indexOf(parseInt($('#".Html::getInputId($this, 'msg_flag') ."').val())) != -1 ;}"
             ]
         ];

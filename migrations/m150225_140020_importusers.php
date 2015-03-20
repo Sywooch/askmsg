@@ -42,6 +42,9 @@ b_user_group
         $connection = \Yii::$app->db;
         $oldConnection = \Yii::$app->dbold;
 
+        $this->addColumn('{{%msgflags}}', 'fl_hint', Schema::TYPE_TEXT);
+        Yii::$app->db->schema->refresh();
+
         /* ************************************************************************
          * import user groups
          *
@@ -319,9 +322,15 @@ CREATE TABLE `b_user` (
                     'msg_flag' => isset($aFlagsMap[$ad['PROPERTY_201']]) ? $aFlagsMap[$ad['PROPERTY_201']] : 0,
                     'msg_comment' => $ad['PROPERTY_202'],
                     'msg_empl_id' => empty($ad['PROPERTY_207']) ? $ad['PROPERTY_207'] : $aUserMap[$ad['PROPERTY_207']],
-                    'msg_empl_command' => $ad['PROPERTY_215'],
+                    'msg_empl_command' => $ad['PROPERTY_215'], // empty($ad['PROPERTY_215']) ? 'Ответить' :
                     'msg_empl_remark' => $ad['PROPERTY_216'],
                 ];
+                if( !empty($oMsg->msg_empl_id) ) {
+                    if( $oMsg->msg_flag == MFLG_NEW ) { // при назначеном исполнителе и новом обращении - делаем внутреннее поручение
+                        $oMsg->msg_flag = Msgflags::MFLG_INT_INSTR;
+                    }
+//                    elseif() {}
+                }
                 if( !$oMsg->save() ) {
                     \Yii::info("Error insert into message " . print_r($oMsg->getErrors(), true) . ' ' . print_r($ad, true) );
                     echo 'Error insert into message : ' . print_r($oMsg->getErrors(), true) . "\n";
@@ -369,6 +378,7 @@ CREATE TABLE `b_user` (
             echo "Delete From {$v} : {$nDel}\n";
             \Yii::info('Migrate down: delete '. $nDel . ' records from ' . $v);
         }
+        $this->dropColumn('{{%msgflags}}', 'fl_hint');
 
         return true;
     }

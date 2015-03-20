@@ -21,7 +21,7 @@ use app\assets\HelperscriptAsset;
 ListdataAsset::register($this);
 JqueryfilerAsset::register($this);
 HelperscriptAsset::register($this);
-
+/*
 $aOp = array_reduce(
     Msgflags::getStateTransAnswer($model->msg_flag),
     function ( $carry , $item ) {
@@ -33,6 +33,20 @@ $aOp = array_reduce(
     },
     []
 );
+*/
+$aOp = array_reduce(
+    Msgflags::getStateTransAnswer($model->msg_flag),
+    function ( $carry , $item ) {
+        $sTitle = Msgflags::getStateTitle($item, 'fl_command');
+        if( $sTitle != '' ) {
+            $aFlagData = Msgflags::getStateData($item);
+            $carry[$item] = ['title' => $sTitle, 'hint' => isset($aFlagData['fl_hint']) ? $aFlagData['fl_hint'] : '--'];
+        }
+        return $carry;
+    },
+    []
+);
+
 
 $aFieldParam = [
     'filefield' => [
@@ -264,36 +278,51 @@ EOT;
 
     <div class="form-group">
         <label for="message-msg_pers_text" class="control-label col-sm-2">&nbsp;</label>
-        <div class="col-sm-6">
-            <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary']) ?>
+        <div class="col-sm-3">
+            <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary btn-block']) ?>
         </div>
-        <div class="col-sm-4">
+        <div class="col-sm-3">
             <?php
             // показываем кнопу для вывода обращения
-            echo Html::a('Текст обращения', '#', ['class' => 'btn btn-success', 'id'=>'idshowmessage']);
+            echo Html::a('Текст обращения', '#', ['class' => 'btn btn-success btn-block', 'id'=>'idshowmessage']);
             $this->registerJs('jQuery("#idshowmessage").on("click", function(event) { event.preventDefault(); $("#messagedata").modal("show"); return false; });', View::POS_READY, 'myKey');
             ?>
         </div>
     </div>
-    <div class="form-group">
-        <label for="message-msg_pers_text" class="control-label col-sm-2">&nbsp;</label>
-        <div class="col-sm-6">
+    <div class="form-group" style="margin-top: 3em;">
             <?php
             foreach($aOp As $k=>$aData):
             ?>
-                <?= Html::submitButton(
+                <label for="message-msg_pers_text" class="control-label col-sm-2">&nbsp;</label>
+                <div id="<?= "buttongroup_" . $k ?>">
+                    <div class="col-sm-3">
+                        <?= Html::submitButton(
+                            $aData['title'], // 'Сохранить и ' .
+                            ['class' => 'btn btn-default btn-block changeflag', 'id' => 'buttonsave_' . $k, 'style' => 'margin-bottom: 1em;']) ?>
+                    </div>
+                    <div class="col-sm-7 help-block">
+                        <?= $aData['hint'] ?>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <?php /*= Html::submitButton(
                 $aData, // 'Сохранить и ' .
                 ['class' => 'btn btn-default changeflag', 'id' => 'buttonsave_' . $k, 'style' => 'margin-bottom: 1em;'])
-                ?>
+               */ ?>
             <?php
             endforeach;
             ?>
-            <?= Html::a(
-                'Вернуться в список обращений',
-                ['answerlist'],
-                ['class' => 'btn btn-default', 'id' => 'button_go_back', 'style' => 'margin-bottom: 1em;'])
-            ?>
-        </div>
+            <div>
+                <label for="message-msg_pers_text" class="control-label col-sm-2">&nbsp;</label>
+                <div class="col-sm-3">
+                    <?= Html::a(
+                        'Вернуться в список обращений',
+                        ['answerlist'],
+                        ['class' => 'btn btn-default btn-block', 'id' => 'button_go_back', 'style' => 'margin-bottom: 1em;'])
+                    ?>
+                </div>
+                <div class="clearfix"></div>
+            </div>
     </div>
 
 

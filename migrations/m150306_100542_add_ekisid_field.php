@@ -23,8 +23,6 @@ class m150306_100542_add_ekisid_field extends Migration
             110 => 'Сообщение отображается на сайте',
             111 => 'Сообщение не отображается на сайте',
         ];
-        $this->addColumn('{{%msgflags}}', 'fl_hint', Schema::TYPE_TEXT);
-        Yii::$app->db->schema->refresh();
         $aOb = Msgflags::find()->where('fl_id > 0')->all();
 
         echo "count: " . count($aOb) . "\n";
@@ -46,7 +44,6 @@ class m150306_100542_add_ekisid_field extends Migration
 
     public function down()
     {
-        $this->dropColumn('{{%msgflags}}', 'fl_hint');
 
         return true;
     }
