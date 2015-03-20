@@ -3,16 +3,17 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\Message;
-use app\models\MessageSearch;
-
 use yii\db\ActiveRecord;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
+use yii\web\Response;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+
 use app\models\Rolesimport;
+use app\models\Message;
+use app\models\MessageSearch;
 
 /**
  * MessageController implements the CRUD actions for Message model.
@@ -87,7 +88,7 @@ class MessageController extends Controller
         ];
         $searchModel = new MessageSearch();
 
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        Yii::$app->response->format = Response::FORMAT_JSON;
 
         return $searchModel->instructionList($param);
     }

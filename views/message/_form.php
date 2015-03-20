@@ -8,6 +8,7 @@ use yii\helpers\Url;
 use yii\widgets\MaskedInput;
 use yii\web\JsExpression;
 use yii\web\View;
+use yii\bootstrap\Modal;
 
 use kartik\select2\Select2;
 
@@ -520,18 +521,20 @@ $aFieldParam = [
             ],
             'formatResult' => new JsExpression('function (item) { return item.text;}'),
             'escapeMarkup' => new JsExpression('function (m) { return m; }'),
-            'onChange' => new JsExpression('function(item){return "change";}'),
-            'onSelect' => new JsExpression('function(item){return "select";}'),
         ],
+
         'pluginEvents' => [
             'change' => 'function(event) {
                     var sIdReg = "'.Html::getInputId($model, 'msg_empl_command').'",
-                        oInstr = jQuery("#" + sIdReg);
-                    oInstr.val(event.added.text);
+//                        oInstr = jQuery("#" + sIdReg),
+                        oInstrTmp = jQuery("#idinstructionlist");
+                    oInstrTmp.val(event.added.text);
+//                    oInstr.val(event.added.text);
 //                    oInstr.val(oInstr.val() + "\n" + event.added.text);
 //                    console.log("change", event);
                 }',
         ],
+
     ],
 
     ];
@@ -605,13 +608,32 @@ $aFieldParam = [
 
         <div class="col-sm-6">
             <?= $form
-                ->field($model, 'msg_empl_command')
+//                ->field($model, 'msg_empl_command', ['template' => "{label}\n{input}\n<a href="#" class="btn btn-default" id="idshowselect"><span class="glyphicon glyphicon-asterisk"></span></a>{hint}\n{error}"])
+                ->field($model, 'msg_empl_command'/*, ['template' => "{label}\n{beginWrapper}\n{input}\n{hint}\n{error}\n{endWrapper}"]*/)
                 ->textarea()
-                ->hint(Select2::widget($aFieldParam['instrlist']) . 'Текст поручения будет виден всем посетителям при публикации обращения на сайте');
+                ->hint(/* Select2::widget($aFieldParam['instrlist']) . <a href="#" class="btn btn-default" id="idshowselect"><span class="glyphicon glyphicon-asterisk"></span></a> */'Текст поручения будет виден всем посетителям при публикации обращения на сайте. <a href="#" id="idshowselect">Выбрать поручение из списка</a>');
             ?>
             <?=
                 ''
             ?>
+
+            <?php
+            // Окно для обращения
+            $this->registerJs('jQuery("#idshowselect").on("click", function(event) { event.preventDefault(); $("#messagedata").modal("show"); return false; });', View::POS_READY, 'showselectinstr');
+            Modal::begin([
+                'header' => 'Выбрать поручение из списка',
+                'id' => 'messagedata',
+                'footer' => '<button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button><button type="button" class="btn btn-primary" id="setinstruct">Вставить поручение</button>',
+            ]);
+            $this->registerJs('jQuery("#setinstruct").on("click", function(event) { var s = jQuery("#idinstructionlist").val(); event.preventDefault(); if( s.length > 0 ) { jQuery("#'.Html::getInputId($model, 'msg_empl_command').'").val(s); } $("#messagedata").modal("hide"); return false; });', View::POS_READY, 'selectinstruct');
+            ?>
+
+            <?= Select2::widget($aFieldParam['instrlist']) ?>
+
+            <?php
+            Modal::end();
+            ?>
+
         </div>
 
         <div class="col-sm-6">
