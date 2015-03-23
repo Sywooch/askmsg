@@ -119,7 +119,7 @@ GriddataAsset::register($this);
     Modal::end();
 
         $sJs =  <<<EOT
-console.log("Shownmodal: " + jQuery('.showinmodal').length);
+//console.log("Shownmodal: " + jQuery('.showinmodal').length);
 jQuery('.showinmodal').on("click", function (event){
     event.preventDefault();
 
