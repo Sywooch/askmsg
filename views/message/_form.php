@@ -611,7 +611,7 @@ $aFieldParam = [
 //                ->field($model, 'msg_empl_command', ['template' => "{label}\n{input}\n<a href="#" class="btn btn-default" id="idshowselect"><span class="glyphicon glyphicon-asterisk"></span></a>{hint}\n{error}"])
                 ->field($model, 'msg_empl_command'/*, ['template' => "{label}\n{beginWrapper}\n{input}\n{hint}\n{error}\n{endWrapper}"]*/)
                 ->textarea()
-                ->hint(/* Select2::widget($aFieldParam['instrlist']) . <a href="#" class="btn btn-default" id="idshowselect"><span class="glyphicon glyphicon-asterisk"></span></a> */'Текст поручения будет виден всем посетителям при публикации обращения на сайте. <a href="#" id="idshowselect">Выбрать поручение из списка</a>');
+                ->hint(/* Select2::widget($aFieldParam['instrlist']) . <a href="#" class="btn btn-default" id="idshowselect"><span class="glyphicon glyphicon-asterisk"></span></a> */'Текст поручения будет виден всем посетителям при публикации обращения на сайте. Вы можете <a href="#" id="idshowselect">выбрать поручение из списка</a>');
             ?>
             <?=
                 ''
