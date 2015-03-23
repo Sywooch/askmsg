@@ -72,6 +72,7 @@ $this->registerJs($sJs, View::POS_READY, 'toggleuserpart');
         <div class="col-sm-9">
             <?= Html::encode($model->msg_empl_command) ?>
         </div>
+        <div class="clearfix"></div>
     <?php endif; ?>
 
     <?php if( !empty($model->msg_comment) && $isDopFields ): ?>
