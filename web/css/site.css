@@ -117,3 +117,18 @@ span.description {
     color: #dddddd;
 }
 
+.dopline {
+    display: block;
+    font-size: 0.8em;
+    color: #999999;
+}
+
+.no-horisontal-padding {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.no-horisontal-margin {
+    margin-left: 0;
+    margin-right: 0;
+}

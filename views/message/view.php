@@ -19,7 +19,7 @@ ListdataAsset::register($this);
     <h1><?= Html::encode($this->title) ?></h1>
     <?=
         $this->render(
-            '_view',
+            '_view01',
             [
                 'model' => $model,
             ]
