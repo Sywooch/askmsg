@@ -75,17 +75,11 @@ $this->registerJs($sJs, View::POS_READY, 'toggleuserpart');
     <?php endif; ?>
 
     <?php if( !empty($model->msg_comment) && $isDopFields ): ?>
-        <div class="col-sm-3"><strong>Комментарий</strong></div>
-        <div class="col-sm-9">
-            <?= Html::encode($model->msg_comment) ?>
-        </div>
+        <div class="alert alert-info" role="alert"><?= Html::encode($model->msg_comment) ?></div>
     <?php endif; ?>
 
     <?php if( !empty($model->msg_empl_remark) && $isDopFields ): ?>
-        <div class="col-sm-3"><strong>Замечание</strong></div>
-        <div class="col-sm-9">
-            <?= Html::encode($model->msg_empl_remark) ?>
-        </div>
+        <div class="alert alert-danger" role="alert"><?= Html::encode($model->msg_empl_remark) ?></div>
     <?php endif; ?>
 </div>
 
