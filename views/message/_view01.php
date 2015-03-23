@@ -19,6 +19,8 @@ $isShowAnswer = !empty($model->msg_answer)
     && (($model->msg_flag == Msgflags::MFLG_SHOW_ANSWER) || Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM));
 $bShowFooter = false;
 
+$nMaxTextHeight = 280;
+
 // Показываем/скрываем сообщение пользователя и ответ
 $sJs =  <<<EOT
 //var oUserPart = jQuery(".togglepart");
@@ -33,6 +35,38 @@ jQuery(".togglepart").on("click", function(event){
     ob.text(aText.join(" "));
     oDest.toggle();
     return false;
+});
+
+jQuery(".hidemoretext").each(function(index, element){
+    var ob = jQuery(this),
+        h = ob.height(),
+        nSmallSize = {$nMaxTextHeight},
+        nMaxSize = nSmallSize + 28,
+        oAns = ob.find(".answerblock");
+    if( h > nMaxSize ) {
+        if( oAns.length > 0 ) {
+            console.log(oAns.attr("id") + ": ", oAns.position(), nSmallSize);
+            nSmallSize = Math.min(oAns.offset().top - ob.offset().top - 28, nSmallSize);
+            console.log(oAns.attr("id") + " -> " + nSmallSize);
+        }
+        ob
+            .append("<div class=\"showmoretext\" href=\"#\"><span class=\"glyphicon glyphicon-chevron-down\"></span></div>")
+            .css({position: "relative", overflow: "hidden"})
+            .height(nSmallSize)
+            .find(".showmoretext").on("click", function(event){
+                var olink = jQuery(this);
+                event.preventDefault();
+                if( ob.height() > nMaxSize ) {
+                    ob.height(nSmallSize);
+                    olink.html("<span class=\"glyphicon glyphicon-chevron-down\"></span>");
+                }
+                else {
+                    ob.css({height: "100%"});
+                    olink.html("<span class=\"glyphicon glyphicon-chevron-up\"></span>");
+                }
+                return false;
+            });
+    }
 });
 EOT;
 
@@ -76,11 +110,21 @@ $this->registerJs($sJs, View::POS_READY, 'toggleuserpart');
     <?php endif; ?>
 
     <?php if( !empty($model->msg_comment) && $isDopFields ): ?>
-        <div class="alert alert-info" role="alert"><?= Html::encode($model->msg_comment) ?></div>
+        <div class="col-sm-12">
+            <div class="alert alert-info" role="alert">
+                <span aria-hidden="true" class="glyphicon glyphicon-info-sign"></span>
+                <?= Html::encode($model->msg_comment) ?>
+            </div>
+        </div>
     <?php endif; ?>
 
     <?php if( !empty($model->msg_empl_remark) && $isDopFields ): ?>
-        <div class="alert alert-danger" role="alert"><?= Html::encode($model->msg_empl_remark) ?></div>
+        <div class="col-sm-12">
+            <div class="alert alert-danger" role="alert">
+                <span aria-hidden="true" class="glyphicon glyphicon-exclamation-sign"></span>
+                <?= Html::encode($model->msg_empl_remark) ?>
+            </div>
+        </div>
     <?php endif; ?>
 </div>
 
@@ -103,10 +147,10 @@ $this->registerJs($sJs, View::POS_READY, 'toggleuserpart');
         <div class="clearfix"></div>
     </div>
 
-    <div class="panel-body">
+    <div class="panel-body hidemoretext">
         <?php
         if( $isDopFields ) :
-            ?>
+        ?>
             <?php
             if( $oSubj !== null ) :
             ?>
@@ -122,17 +166,17 @@ $this->registerJs($sJs, View::POS_READY, 'toggleuserpart');
 
         <p class="text-justify">
             <?= str_replace("\n", "<br />\n", Html::encode($model->msg_pers_text)) ?>
-            <?php if( $isShowAnswer  ): ?>
+            <?php /* if( $isShowAnswer  ): ?>
                 <br />
                 <?= Html::a('Показать ответ', '#', ['class' => 'togglepart btn btn-default', 'id'=>'toggle_answer'.$model->msg_id]) ?>
-            <?php endif; ?>
+            <?php endif; */ ?>
         </p>
 
         <?php
         $aFiles = $model->getUserFiles(true);
         if( (count($aFiles) > 0) && !Yii::$app->user->isGuest ):
             ?>
-            <div class="listcommand">
+            <div>
                 <strong>Файлы: </strong>
                 <?php foreach($aFiles As $oFile):
                     /** @var File  $oFile */ ?>
@@ -145,9 +189,11 @@ $this->registerJs($sJs, View::POS_READY, 'toggleuserpart');
         <?php endif; ?>
 
         <?php if( $isShowAnswer  ): ?>
-            <div id="id_answer<?= $model->msg_id ?>" class="breadcrumb" style="display: none;">
+            <div id="id_answer<?= $model->msg_id ?>" class="breadcrumb answerblock">
+                <h4>Ответ</h4>
                 <?= $model->msg_answer ?>
                 <?php
+                //  style="display: none;"
                 $aFiles = $model->getUserFiles(false);
                 $nFilesExists = count($aFiles);
                 if( $nFilesExists > 0 ):

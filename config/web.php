@@ -31,6 +31,14 @@ $config = [
         ]
     ],
     'components' => [
+        'view' => [
+            'theme' => [
+                'pathMap' => [
+                    '@app/views' => '@app/themes/fromvideo'
+                ],
+                'baseUrl' => '@web/themes/fromvideo',
+            ],
+        ],
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'Wxk_V47W24rzFLXkrfnK96DJgR82fZFL',
