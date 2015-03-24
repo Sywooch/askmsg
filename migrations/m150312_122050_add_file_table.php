@@ -7,7 +7,7 @@ class m150312_122050_add_file_table extends Migration
 {
     public function up()
     {
-
+/*
         $tableOptionsMyISAM = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=MyISAM';
 
         $this->createTable('{{%file}}', [
@@ -22,11 +22,12 @@ class m150312_122050_add_file_table extends Migration
         ], $tableOptionsMyISAM);
 
         $this->createIndex('idx_file_msg_id', '{{%file}}', 'file_msg_id');
+*/
     }
 
     public function down()
     {
-        $this->dropTable('{{%file}}');
+//        $this->dropTable('{{%file}}');
 
         return true;
     }

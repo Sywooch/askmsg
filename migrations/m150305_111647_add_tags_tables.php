@@ -2,6 +2,7 @@
 
 use yii\db\Schema;
 use yii\db\Migration;
+use app\models\Tags;
 
 class m150305_111647_add_tags_tables extends Migration
 {
@@ -29,6 +30,19 @@ class m150305_111647_add_tags_tables extends Migration
             'mt_msg_id' => Schema::TYPE_INTEGER,
             'mt_tag_id' => Schema::TYPE_INTEGER,
         ], $tableOptionsMyISAM);
+
+        $aNames = ['Жалоба', 'Благодарность', 'Предложение'];
+        foreach($aNames As $v) {
+            $ob = new Tags();
+            $ob->attributes = [
+                'tag_active' => 1,
+                'tag_type' => Tags::TAGTYPE_SUBJECT,
+                'tag_title' => $v,
+            ];
+            if( !$ob->save() ) {
+                echo 'Subject ' . $v . ' hasnt saved' . "\n";
+            }
+        }
 
         $this->createIndex('idx_msgtags_msgid', '{{%msgtags}}', 'mt_msg_id');
         $this->createIndex('idx_msgtags_tagid', '{{%msgtags}}', 'mt_tag_id');

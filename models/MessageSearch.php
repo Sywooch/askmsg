@@ -64,6 +64,7 @@ class MessageSearch extends Message
             ->with('employee')
             ->with('answers')
             ->with('alltags')
+//            ->with('attachments')
             ->with('flag');
 
         $dataProvider = new ActiveDataProvider([
@@ -168,6 +169,7 @@ class MessageSearch extends Message
             ->with('answers')
             ->with('subject')
 //            ->with('alltags')
+            ->with('attachments')
             ->with('flag');
 
         $dataProvider = new ActiveDataProvider([

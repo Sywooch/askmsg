@@ -341,6 +341,21 @@ CREATE TABLE `b_iblock_element_prop_s52` (
             'reg_name' => Schema::TYPE_STRING . ' NOT NULL',  // ---------------------> NAME
             'reg_active' => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 0', // ---------------------> ACTIVE Y = 1, N = 0
         ], $tableOptionsMyISAM);
+
+        $this->createTable('{{%file}}', [
+            'file_id' => Schema::TYPE_PK,
+            'file_time' => Schema::TYPE_DATETIME,
+            'file_orig_name' => Schema::TYPE_STRING . ' NOT NULL',
+            'file_msg_id' => Schema::TYPE_INTEGER,
+            'file_user_id' => Schema::TYPE_INTEGER,
+            'file_size' => Schema::TYPE_INTEGER . ' NOT NULL',
+            'file_type' => Schema::TYPE_STRING,
+            'file_name' => Schema::TYPE_STRING . ' NOT NULL',
+        ], $tableOptionsMyISAM);
+
+        $this->createIndex('idx_file_msg_id', '{{%file}}', 'file_msg_id');
+        $this->createIndex('idx_file_name', '{{%file}}', 'file_name');
+
     }
 
     public function down()
@@ -353,6 +368,7 @@ CREATE TABLE `b_iblock_element_prop_s52` (
         $this->dropTable('{{%msganswers}}');
         $this->dropTable('{{%message}}');
         $this->dropTable('{{%regions}}');
+        $this->dropTable('{{%file}}');
 
         return true;
     }

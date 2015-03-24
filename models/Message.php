@@ -182,6 +182,27 @@ class Message extends \yii\db\ActiveRecord
             $a = array_merge(
                 $a,
                 [
+                    // поставим дату ответа
+                    [
+                        'class' => AttributewalkBehavior::className(),
+                        'attributes' => [
+                            ActiveRecord::EVENT_BEFORE_VALIDATE => ['msg_answertime'],
+                        ],
+                        'value' => function ($event, $attribute) {
+                            /** @var Message $model */
+                            if( $this->scenario != 'moderator' ) {
+                                return;
+                            }
+                            $model = $event->sender;
+                            $a = [Msgflags::MFLG_SHOW_ANSWER, Msgflags::MFLG_INT_FIN_INSTR];
+                            if( in_array($model->msg_flag, $a)
+                             && isset($model->_oldAttributes['msg_flag'])
+                             && !in_array($model->_oldAttributes['msg_flag'], $a) ) {
+                                $model->$attribute = new Expression('NOW()');
+                            }
+                        },
+                    ],
+
                     // поставим флаг нового сообщения
                     [
                         'class' => AttributeBehavior::className(),
@@ -241,6 +262,7 @@ class Message extends \yii\db\ActiveRecord
                                 Msgflags::MFLG_INT_FIN_INSTR => 'user_notif_intanswer',
                             ];
                             if( isset($aTemplates[$model->msg_flag]) ) {
+                                Yii::info("[{$model->msg_id}] mail send to {$model->msg_pers_email}");
                                 Yii::$app->mailer->compose($aTemplates[$model->msg_flag], ['model' => $model,])
                                     ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
                                     ->setTo($model->msg_pers_email)
@@ -441,6 +463,7 @@ class Message extends \yii\db\ActiveRecord
                 'msg_active',
                 'answers',
                 'alltags',
+                'msg_answertime',
             ]
         );
 

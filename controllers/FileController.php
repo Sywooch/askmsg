@@ -62,8 +62,10 @@ class FileController extends Controller
      */
     public function actionDownload($name = '')
     {
+        Yii::info("actionDownload({$name})");
         /** @var File $model */
-        $model = File::find(['file_name' => $name])->one();
+        $model = File::find()->where(['file_name' => $name])->one();
+        Yii::info(print_r($model->attributes, true));
         if( ($name == '') || ($model === null) ) {
             throw new NotFoundHttpException('The requested page does not exist.');
         }

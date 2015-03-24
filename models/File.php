@@ -66,8 +66,10 @@ class File extends \yii\db\ActiveRecord
      *
      */
     public function getFullpath() {
-        $sDir = Yii::getAlias(Yii::$app->params['message.file.uploaddir']) . DIRECTORY_SEPARATOR . sprintf("%02x", $this->file_id % 256);
-        if( !is_dir($sDir) && !mkdir($sDir) ) {
+        $sDir = str_replace('/', DIRECTORY_SEPARATOR, Yii::getAlias(Yii::$app->params['message.file.uploaddir'])) . DIRECTORY_SEPARATOR . sprintf("%02x", $this->file_id % 256);
+//        $sDir = Yii::getAlias(Yii::$app->params['message.file.uploaddir']) . DIRECTORY_SEPARATOR . substr($this->file_name, 0, 2);
+        if( !is_dir($sDir) && !@mkdir($sDir) ) {
+            echo "Error Dir: {$sDir}\n";
             return null;
         }
         return $sDir . DIRECTORY_SEPARATOR . $this->file_name;

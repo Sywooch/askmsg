@@ -9,17 +9,20 @@ use app\models\Message;
 use app\models\Msgflags;
 use app\models\Msganswers;
 use app\models\Regions;
+use app\models\File;
 
 class m150225_140020_importusers extends Migration
 {
     public function up()
     {
+        Yii::setAlias('@webroot', dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'web');
 //        return true;
 //        $sf = \Yii::getAlias('@app') . DIRECTORY_SEPARATOR . 'runtime' . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . 'migration.log';
 //        $stime = date('d.m.Y H:i:s');
 //        file_put_contents($sf, $stime . "\t" .print_r($aGr, true), FILE_APPEND);
 /*
 16:11:37 Dumping educom_site (, , )
+b_file
 b_group
 b_iblock_element
 b_iblock_element_prop_m52
@@ -30,6 +33,7 @@ b_user_group
 
 Running: mysqldump.exe --defaults-file="c:\users\kozminva\appdata\local\temp\tmpmzao03.cnf"  --set-gtid-purged=OFF --user=viktor_educom --host=localhost --protocol=tcp --port=24891 --default-character-set=utf8 --single-transaction=TRUE --no-data --skip-triggers "educom_site"
 
+b_file
 b_group
 b_iblock_element
 b_iblock_element_prop_m52
@@ -271,7 +275,7 @@ CREATE TABLE `b_user` (
         $sql = 'Select m.ID As MSGID, m.*, p.*, a.*, a.VALUE As dopuser '
               . 'From b_iblock_element_prop_s52 p, b_iblock_element m '
               . 'Left Outer Join b_iblock_element_prop_m52 a On a.IBLOCK_ELEMENT_ID = m.ID '
-              . 'Where m.IBLOCK_ID = 52 And p.IBLOCK_ELEMENT_ID = m.ID And LENGTH(m.PREVIEW_TEXT) > 0';
+              . 'Where m.IBLOCK_ID = 52 And p.IBLOCK_ELEMENT_ID = m.ID And LENGTH(m.PREVIEW_TEXT) > 0'; //  And m.ID > 82510 Order By m.ID Limit 20
 
         $aMsg = $oldConnection->createCommand($sql)->query();
         $nCount = $aMsg->count();
@@ -345,6 +349,12 @@ CREATE TABLE `b_user` (
                             echo 'Error insert into dopanswer : ' . print_r($oDop->getErrors(), true) . "\n";
                         }
                     }
+                    if( !empty($ad['PROPERTY_206']) ) {
+                        $aFile = $this->getFileData($ad['PROPERTY_206']);
+                        if( $aFile !== null ) {
+                            $this->addFileToMsg($oMsg, $aFile);
+                        }
+                    }
                 }
             }
             else {
@@ -364,6 +374,8 @@ CREATE TABLE `b_user` (
 
     public function down()
     {
+//        return true;
+        Yii::setAlias('@webroot', dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'web');
 //        echo "m150225_140020_importusers cannot be reverted.\n";
         $a = [
             Msganswers::tableName(),
@@ -380,6 +392,98 @@ CREATE TABLE `b_user` (
         }
         $this->dropColumn('{{%msgflags}}', 'fl_hint');
 
+        $this->delUploadFiles();
+
         return true;
+    }
+
+    /**
+     * @param integer $fileId id записи в таблице файлов
+     * @return array
+     *
+     */
+    public function getFileData($fileId) {
+        /* ************************************************************************
+         * import messages
+         *
+         */
+        $oldConnection = \Yii::$app->dbold;
+        $sql = 'Select * '
+            . 'From b_file '
+            . 'Where ID = ' . $fileId;
+
+        $aFile = $oldConnection->createCommand($sql)->queryOne();
+        if( $aFile === false ) {
+            return null;
+        }
+        if( !isset(Yii::$app->params['import.file.dir']) || !is_dir(Yii::$app->params['import.file.dir']) ) {
+            echo "Not exists src file dir";
+            return null;
+        }
+
+        $sFile = Yii::$app->params['import.file.dir'] . str_replace('/', DIRECTORY_SEPARATOR, $aFile['SUBDIR']) . DIRECTORY_SEPARATOR . $aFile['FILE_NAME'];
+        if( !file_exists($sFile) ) {
+            echo "Not exists file {$sFile} [{$fileId}]\n";
+            return null;
+        }
+        else {
+            echo "File {$sFile} [{$fileId}]\n";
+        }
+
+        $aFile['path'] = $sFile;
+        return $aFile;
+    }
+
+    /**
+     * @param Message $oMsg
+     * @param array $aFile
+     */
+    public function addFileToMsg($oMsg, $aFile) {
+//        echo 'addFileToMsg: ' . print_r($aFile, true) . "\n";
+        $oFile = new File();
+//        $a = explode(".", $aFile['ORIGINAL_NAME']);
+//        $ext = array_pop($a);
+
+        $oFile->attributes = [
+            'file_time' => $aFile['TIMESTAMP_X'],
+            'file_orig_name' => $aFile['ORIGINAL_NAME'],
+            'file_size' => $aFile['FILE_SIZE'],
+            'file_type' => $aFile['CONTENT_TYPE'],
+            'file_name' => $aFile['FILE_NAME'],
+            'file_user_id' => $oMsg->msg_empl_id,
+            'file_msg_id' => $oMsg->msg_id,
+        ];
+
+        if( $oFile->save() ) {
+//            echo "Copy {$aFile['path']} -> " . $oFile->getFullpath() . "\n";
+            copy($aFile['path'], $oFile->getFullpath());
+        }
+        else {
+//            echo "Not copy {$aFile['path']} -> " . $oFile->getFullpath() . "\n";
+            echo print_r($oFile->getErrors(), true);
+        }
+
+    }
+
+    /**
+     * @param string $sDir
+     */
+    public function delUploadFiles($sDir = '') {
+        if( $sDir === '' ) {
+            $sDir = rtrim(str_replace('/', DIRECTORY_SEPARATOR, Yii::getAlias(Yii::$app->params['message.file.uploaddir'])), DIRECTORY_SEPARATOR);
+        }
+        $a = glob($sDir . DIRECTORY_SEPARATOR . '*');
+        foreach( $a As $v ) {
+            $sName = basename($v);
+            if( ($sName == '.') || ($sName == '..') ) {
+                continue;
+            }
+            if( is_dir($v) ) {
+                $this->delUploadFiles($v);
+            }
+            else {
+                unlink($v);
+            }
+        }
     }
 }
