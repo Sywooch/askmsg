@@ -1,8 +1,14 @@
 <?php
 
+use yii\helpers\ArrayHelper;
+
 Yii::setAlias('@tests', dirname(__DIR__) . '/tests');
 
-$params = require(__DIR__ . '/params.php');
+$params = ArrayHelper::merge(
+    require(__DIR__ . '/params.php'),
+    require(__DIR__ . '/params-local.php')
+);
+
 
 return [
     'id' => 'basic-console',

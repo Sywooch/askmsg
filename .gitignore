@@ -29,3 +29,5 @@ phpunit.phar
 /models/_Rolesimport.php
 /web/upload
 /models/*.old
+
+*-local.php
