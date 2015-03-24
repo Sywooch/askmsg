@@ -140,10 +140,10 @@ class Msgflags extends \yii\db\ActiveRecord
             self::MFLG_THANK => [self::MFLG_NEW, ],
             self::MFLG_SHOW_NO_ANSWER => [self::MFLG_NEW, ],
             self::MFLG_SHOW_INSTR => [self::MFLG_NEW, ],
-            self::MFLG_SHOW_NEWANSWER => [self::MFLG_SHOW_ANSWER, self::MFLG_SHOW_REVIS, ],
+            self::MFLG_SHOW_NEWANSWER => [self::MFLG_SHOW_ANSWER, self::MFLG_SHOW_REVIS, self::MFLG_NEW, ],
             self::MFLG_SHOW_REVIS => [self::MFLG_NEW, ],
             self::MFLG_INT_INSTR => [self::MFLG_NEW, ],
-            self::MFLG_INT_NEWANSWER => [self::MFLG_INT_REVIS_INSTR, self::MFLG_INT_FIN_INSTR, ],
+            self::MFLG_INT_NEWANSWER => [self::MFLG_INT_REVIS_INSTR, self::MFLG_INT_FIN_INSTR, self::MFLG_NEW, ],
             self::MFLG_INT_REVIS_INSTR => [self::MFLG_NEW, ],
             self::MFLG_INT_FIN_INSTR => [self::MFLG_SHOW_ANSWER, self::MFLG_NOSHOW],
         ];

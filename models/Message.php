@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\components\ChangestateBehavior;
 use Yii;
 use yii\db\Expression;
 use yii\db\ActiveRecord;
@@ -127,7 +128,7 @@ class Message extends \yii\db\ActiveRecord
     }
 
     /**
-     *
+     * Первая версия для отправки писем - сейчас заменяю на поведение
      */
     public static function getNotificationFlags($sUserRole)
     {
@@ -218,7 +219,120 @@ class Message extends \yii\db\ActiveRecord
                         },
 
                     ],
+
+                    // Сообщение пользователю
+                    [
+                        'class' => ChangestateBehavior::className(),
+                        'transTable' => [
+//                            Msgflags::MFLG_NEW => [],
+                            Msgflags::MFLG_SHOW_NO_ANSWER => [Msgflags::MFLG_NEW],
+                            Msgflags::MFLG_SHOW_INSTR => [Msgflags::MFLG_NEW],
+                            Msgflags::MFLG_SHOW_ANSWER => [Msgflags::MFLG_SHOW_INSTR, Msgflags::MFLG_SHOW_NEWANSWER, Msgflags::MFLG_SHOW_REVIS, ],
+                            Msgflags::MFLG_INT_FIN_INSTR => [],
+//                            Msgflags::MFLG_NOSHOW => [],
+                        ],
+                        'value' => function ($event) {
+                            /** @var Message $model */
+                            $model = $event->sender;
+                            $aTemplates = [
+                                Msgflags::MFLG_SHOW_NO_ANSWER => 'user_notif_show',
+                                Msgflags::MFLG_SHOW_INSTR => 'user_notif_show',
+                                Msgflags::MFLG_SHOW_ANSWER => 'user_notif_answer',
+                                Msgflags::MFLG_INT_FIN_INSTR => 'user_notif_intanswer',
+                            ];
+                            if( isset($aTemplates[$model->msg_flag]) ) {
+                                Yii::$app->mailer->compose($aTemplates[$model->msg_flag], ['model' => $model,])
+                                    ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+                                    ->setTo($model->msg_pers_email)
+                                    ->setSubject('Обращение №' . $model->msg_id . ' от '. date('d.m.Y', strtotime($model->msg_createtime)))
+                                    ->send();
+                            }
+                            else {
+                                Yii::warning("Not found flag [{$model->msg_flag}] mail template for user notification.");
+                            }
+                        },
+
+                    ],
+
+                    // Сообщение ответчику
+                    [
+                        'class' => ChangestateBehavior::className(),
+                        'transTable' => [
+                            Msgflags::MFLG_SHOW_INSTR => [],
+                            Msgflags::MFLG_SHOW_REVIS => [],
+                            Msgflags::MFLG_INT_INSTR => [],
+                            Msgflags::MFLG_INT_REVIS_INSTR => [],
+                            Msgflags::MFLG_NEW => [
+                                Msgflags::MFLG_SHOW_INSTR,
+                                Msgflags::MFLG_SHOW_REVIS,
+                                Msgflags::MFLG_INT_INSTR,
+                                Msgflags::MFLG_INT_REVIS_INSTR,
+                                Msgflags::MFLG_INT_NEWANSWER,
+                                Msgflags::MFLG_SHOW_NEWANSWER,
+                            ],
+                        ],
+                        'value' => function ($event) {
+                            /** @var Message $model */
+                            $model = $event->sender;
+                            $aTemplates = [
+                                Msgflags::MFLG_SHOW_INSTR => 'ans_notif_instr',
+                                Msgflags::MFLG_INT_INSTR => 'ans_notif_instr',
+                                Msgflags::MFLG_SHOW_REVIS => 'ans_notif_revis',
+                                Msgflags::MFLG_INT_REVIS_INSTR => 'ans_notif_revis',
+                                Msgflags::MFLG_NEW => 'ans_notif_esc',
+                            ];
+                            if( isset($aTemplates[$model->msg_flag]) ) {
+                                Yii::$app->mailer->compose($aTemplates[$model->msg_flag], ['model' => $model,])
+                                    ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+                                    ->setTo($model->employee->us_email)
+                                    ->setSubject('Обращение №' . $model->msg_id . ' от '. date('d.m.Y', strtotime($model->msg_createtime)))
+                                    ->send();
+                            }
+                            else {
+                                Yii::warning("Not found flag [{$model->msg_flag}] mail template for answer notification.");
+                            }
+                        },
+                    ],
+
+                    // Сообщение соответчикам
+                    [
+                        'class' => ChangestateBehavior::className(),
+                        'transTable' => [
+                            Msgflags::MFLG_SHOW_INSTR => [],
+                            Msgflags::MFLG_INT_INSTR => [],
+                        ],
+                        'value' => function ($event) {
+                            /** @var Message $model */
+                            $model = $event->sender;
+                            $aTemplates = [
+                                Msgflags::MFLG_SHOW_INSTR => 'soans_notif_instr',
+                                Msgflags::MFLG_INT_INSTR => 'soans_notif_instr',
+                            ];
+                            $aFiles = $model->getUserFiles(true);
+                            if( isset($aTemplates[$model->msg_flag]) ) {
+                                $a = User::find()->where(['us_id' => array_slice($model->getAllanswers(), 1)])->all();
+                                foreach($a As $ob) {
+                                    $oMsg = Yii::$app->mailer->compose($aTemplates[$model->msg_flag], ['model' => $model, 'user'=>$ob, 'allusers' => $a, 'mainuser'=>$model->employee])
+                                        ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+                                        ->setTo($ob->us_email)
+                                        ->setSubject('Обращение №' . $model->msg_id . ' от '. date('d.m.Y', strtotime($model->msg_createtime)));
+                                    if( count($aFiles) > 0 ) {
+                                        foreach($aFiles As $obFile) {
+                                            /** @var File  $obFile */
+                                            $oMsg->attach($obFile->getFullpath(), ['fileName' => $obFile->file_orig_name]);
+                                        }
+                                    }
+                                    $oMsg->send();
+                                }
+                            }
+                            else {
+                                Yii::warning("Not found flag [{$model->msg_flag}] mail template for soanswer notification.");
+                            }
+                        },
+                    ],
+
                     // отправим оповещения
+/*
                     [
                         'class' => NotificateBehavior::className(),
                         'allevents' => [
@@ -226,7 +340,7 @@ class Message extends \yii\db\ActiveRecord
                             ActiveRecord::EVENT_AFTER_UPDATE,
                         ],
                         'value' => function ($event, $model) {
-                            /** @var $model Message */
+                            // @var $model Message
                             Yii::$app->cache->delete(Message::KEY_STATMSG_DATA); // удалим статистику
 
                             if( $model->isNeedUserNotify() ) {
@@ -252,6 +366,7 @@ class Message extends \yii\db\ActiveRecord
                             }
                         },
                     ],
+*/
                 ]
             );
         }
@@ -438,7 +553,7 @@ class Message extends \yii\db\ActiveRecord
     }
 
     /*
-     * Отношения к теме
+     * Отношения к файлам
      *
      */
     public function getAttachments() {
