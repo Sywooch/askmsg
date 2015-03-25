@@ -222,9 +222,11 @@ class Message extends \yii\db\ActiveRecord
                         'value' => function ($event) {
                             /** @var Message $model */
                             $model = $event->sender;
-                            $model->sendUserNotification(Message::USERTYPE_PERSON);
-                            $model->sendUserNotification(Message::USERTYPE_ANSWER);
-                            $model->sendUserNotification(Message::USERTYPE_SOANSWER);
+                            $model->sendUserNotification([
+                                Message::USERTYPE_PERSON,
+                                Message::USERTYPE_ANSWER,
+                                Message::USERTYPE_SOANSWER,
+                            ]);
                             return $model->msg_flag;
                         },
 
@@ -787,10 +789,15 @@ class Message extends \yii\db\ActiveRecord
 
     /**
      * Отправка уведомлений пользователю
-     * @param string $sType тип сообщений для отправки
+     * @param string|array $aType тип сообщений для отправки
      *
      */
-    public function sendUserNotification($sType = '') {
+    public function sendUserNotification($aType = '') {
+        $aMessages = [];
+        if( is_string($aType) ) {
+            $aType = [$aType];
+        }
+
         $aTemplates = [
             self::USERTYPE_PERSON => [
                 Msgflags::MFLG_SHOW_NO_ANSWER => 'user_notif_show',
@@ -810,52 +817,57 @@ class Message extends \yii\db\ActiveRecord
                 Msgflags::MFLG_INT_INSTR => 'soans_notif_instr',
             ]
         ];
-        if( $this->isNeedNotificate($sType) ) {
-            if( !isset($aTemplates[$sType]) ) {
-                Yii::info('sendUserNotification('.$sType.') ERROR: not found notification template');
-                return;
-            }
 
-            $sTemplate = $aTemplates[$sType][$this->msg_flag];
+        foreach($aType As $sType) {
+            if ($this->isNeedNotificate($sType)) {
+                if (!isset($aTemplates[$sType])) {
+                    Yii::info('sendUserNotification(' . $sType . ') ERROR: not found notification template');
+                    continue;
+                }
 
-            switch($sType) {
-                case self::USERTYPE_PERSON:
-                    Yii::info('sendUserNotification('.$sType.') ['.$sTemplate.'] ' . $this->msg_id . ' -> ' . $this->msg_pers_email);
-                    Yii::$app->mailer->compose($sTemplate, ['model' => $this,])
-                        ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
-                        ->setTo($this->msg_pers_email)
-                        ->setSubject('Обращение №' . $this->msg_id . ' от '. date('d.m.Y', strtotime($this->msg_createtime)))
-                        ->send();
-                    break;
+                $sTemplate = $aTemplates[$sType][$this->msg_flag];
 
-                case self::USERTYPE_ANSWER:
-                    Yii::info('sendUserNotification('.$sType.') ['.$sTemplate.'] ' . $this->msg_id . ' -> ' . $this->employee->us_email);
-                    Yii::$app->mailer->compose($sTemplate, ['model' => $this,])
-                        ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
-                        ->setTo($this->employee->us_email)
-                        ->setSubject('Обращение №' . $this->msg_id . ' от '. date('d.m.Y', strtotime($this->msg_createtime)))
-                        ->send();
-                    break;
-
-                case self::USERTYPE_SOANSWER:
-                    $aFiles = $this->getUserFiles(true);
-                    $a = User::find()->where(['us_id' => array_slice($this->getAllanswers(), 1)])->all();
-                    foreach($a As $ob) {
-                        Yii::info('sendUserNotification('.$sType.') ['.$sTemplate.'] ' . $this->msg_id . ' -> ' . $ob->us_email);
-                        $oMsg = Yii::$app->mailer->compose($sTemplate, ['model' => $this, 'user'=>$ob, 'allusers' => $a, 'mainuser'=>$this->employee])
+                switch ($sType) {
+                    case self::USERTYPE_PERSON:
+                        Yii::info('sendUserNotification(' . $sType . ') [' . $sTemplate . '] ' . $this->msg_id . ' -> ' . $this->msg_pers_email);
+                        $aMessages[] = Yii::$app->mailer->compose($sTemplate, ['model' => $this,])
                             ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
-                            ->setTo($ob->us_email)
-                            ->setSubject('Обращение №' . $this->msg_id . ' от '. date('d.m.Y', strtotime($this->msg_createtime)));
-                        if( count($aFiles) > 0 ) {
-                            foreach($aFiles As $obFile) {
-                                /** @var File  $obFile */
-                                $oMsg->attach($obFile->getFullpath(), ['fileName' => $obFile->file_orig_name]);
+                            ->setTo($this->msg_pers_email)
+                            ->setSubject('Обращение №' . $this->msg_id . ' от ' . date('d.m.Y', strtotime($this->msg_createtime)));
+                        break;
+
+                    case self::USERTYPE_ANSWER:
+                        Yii::info('sendUserNotification(' . $sType . ') [' . $sTemplate . '] ' . $this->msg_id . ' -> ' . $this->employee->us_email);
+                        $aMessages[] = Yii::$app->mailer->compose($sTemplate, ['model' => $this,])
+                            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+                            ->setTo($this->employee->us_email)
+                            ->setSubject('Обращение №' . $this->msg_id . ' от ' . date('d.m.Y', strtotime($this->msg_createtime)));
+                        break;
+
+                    case self::USERTYPE_SOANSWER:
+                        $aFiles = $this->getUserFiles(true);
+                        $a = User::find()->where(['us_id' => array_slice($this->getAllanswers(), 1)])->all();
+                        foreach ($a As $ob) {
+                            Yii::info('sendUserNotification(' . $sType . ') [' . $sTemplate . '] ' . $this->msg_id . ' -> ' . $ob->us_email);
+                            $oMsg = Yii::$app->mailer->compose($sTemplate, ['model' => $this, 'user' => $ob, 'allusers' => $a, 'mainuser' => $this->employee])
+                                ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+                                ->setTo($ob->us_email)
+                                ->setSubject('Обращение №' . $this->msg_id . ' от ' . date('d.m.Y', strtotime($this->msg_createtime)));
+                            if (count($aFiles) > 0) {
+                                foreach ($aFiles As $obFile) {
+                                    /** @var File $obFile */
+                                    $oMsg->attach($obFile->getFullpath(), ['fileName' => $obFile->file_orig_name]);
+                                }
                             }
+                            $aMessages[] = $oMsg;
                         }
-                        $oMsg->send();
-                    }
-                    break;
-            }
+                        break;
+                } // switch ($sType)
+            } // if ($this->isNeedNotificate($sType))
+        } // foreach($aType As $sType)
+
+        if( count($aMessages) > 0 ) {
+            Yii::$app->mailer->sendMultiple($aMessages);
         }
     }
 }

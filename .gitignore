@@ -30,4 +30,4 @@ phpunit.phar
 /web/upload
 /models/*.old
 
-*-local.php
+*local.php

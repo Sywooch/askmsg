@@ -426,9 +426,9 @@ CREATE TABLE `b_user` (
             echo "Not exists file {$sFile} [{$fileId}]\n";
             return null;
         }
-        else {
-            echo "File {$sFile} [{$fileId}]\n";
-        }
+//        else {
+//            echo "File {$sFile} [{$fileId}]\n";
+//        }
 
         $aFile['path'] = $sFile;
         return $aFile;

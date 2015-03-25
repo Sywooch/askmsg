@@ -33,9 +33,7 @@ if( !empty($model->answers) ) {
     <?php
     endif;
     foreach($a As $ob) { ?>
-<p><?= Html::encode($ob->getFullName()) ?></p>
-<p><?= Html::encode($ob->us_workposition) ?></p>
-<p><?= Html::encode($ob->us_email) ?></p>
+<p><?= Html::encode($ob->getFullName()) ?> <?= Html::encode($ob->us_workposition) ?> <?= Html::encode($ob->us_email) ?></p>
 <p> </p>
     <?php
     }
