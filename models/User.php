@@ -374,7 +374,11 @@ class User extends ActiveRecord  implements IdentityInterface
      *  Полное имя пользователя
      */
     public function getFullName() {
-        return $this->us_lastname . ' ' . $this->us_name . ' ' . $this->us_secondname;
+        $s = trim($this->us_name . ' ' . $this->us_secondname);
+        if( $s == '' ) {
+            $s = $this->us_login;
+        }
+        return $this->us_lastname . ' ' . $s;
     }
 
     /**
@@ -427,12 +431,12 @@ class User extends ActiveRecord  implements IdentityInterface
             function($ob) use ($format) {
                 return ( $format === '' ) ? [
                     'id' => $ob->us_id,
-                    'val' => $ob->getFullName(),
+                    'val' => $ob->getFullName() . ' (' . $ob->us_login . ')',
                     'pos' => $ob->us_workposition,
                 ] :
                 str_replace(
                     array('{{id}}', '{{val}}', '{{pos}}'),
-                    array($ob->us_id, $ob->getFullName(), $ob->us_workposition),
+                    array($ob->us_id, $ob->getFullName() . ($ob->us_lastname == '' ? (' (' . $ob->us_login . ')') : ''), $ob->us_workposition),
                     $format
                 );
             }

@@ -60,6 +60,9 @@ class Message extends \yii\db\ActiveRecord
 {
     const MAX_PERSON_TEXT_LENGTH = 4000;
     const KEY_STATMSG_DATA = 'count_message_flags';
+    const USERTYPE_PERSON = 'user';
+    const USERTYPE_ANSWER = 'answer';
+    const USERTYPE_SOANSWER = 'soanswer';
 
     public $employer; // Ответчик
     public $asker; // Проситель
@@ -82,7 +85,7 @@ class Message extends \yii\db\ActiveRecord
     }
 
     /**
-     *
+     * @return array флаги, сообщения с которыми выводятся для пользователя с определенным уровнем доступа
      */
     public static function getMessageFilters()
     {
@@ -125,34 +128,6 @@ class Message extends \yii\db\ActiveRecord
             ],
         ];
         return $_flagFilter;
-    }
-
-    /**
-     * Первая версия для отправки писем - сейчас заменяю на поведение
-     */
-    public static function getNotificationFlags($sUserRole)
-    {
-        // Флаги сообщений для разных пользователей
-        $_flagFilter = [
-            Rolesimport::ROLE_GUEST => [
-                Msgflags::MFLG_THANK,
-                Msgflags::MFLG_SHOW_NO_ANSWER,
-                Msgflags::MFLG_SHOW_ANSWER,
-                Msgflags::MFLG_SHOW_INSTR,
-            ],
-            Rolesimport::ROLE_MODERATE_DOGM => [
-                Msgflags::MFLG_NEW,
-                Msgflags::MFLG_INT_NEWANSWER,
-                Msgflags::MFLG_SHOW_NEWANSWER,
-            ],
-            Rolesimport::ROLE_ANSWER_DOGM => [
-                Msgflags::MFLG_INT_REVIS_INSTR,
-                Msgflags::MFLG_INT_INSTR,
-                Msgflags::MFLG_SHOW_REVIS,
-                Msgflags::MFLG_SHOW_INSTR,
-            ],
-        ];
-        return isset($_flagFilter[$sUserRole]) ? $_flagFilter[$sUserRole] : [];
     }
 
     /**
@@ -203,27 +178,24 @@ class Message extends \yii\db\ActiveRecord
                         },
                     ],
 
-                    // поставим флаг нового сообщения
+                    // при добавлении сообщения
                     [
-                        'class' => AttributeBehavior::className(),
+                        'class' =>  AttributewalkBehavior::className(),
                         'attributes' => [
-                            ActiveRecord::EVENT_BEFORE_INSERT => 'msg_flag',
+                            ActiveRecord::EVENT_BEFORE_INSERT => ['msg_flag', 'msg_active'],
                         ],
-                        'value' => function ($event) {
-                            return Msgflags::MFLG_NEW;
+                        'value' => function ($event, $attribute) {
+                            $aVal = [
+                                'msg_flag' => Msgflags::MFLG_NEW, // поставим флаг нового сообщения
+                                'msg_active' => 1,                // поставим флаг активности сообщения
+                            ];
+                            if( isset($aVal[$attribute]) ) {
+                                return $aVal[$attribute];
+                            }
+                            return null;
                         },
                     ],
-                    // поставим флаг активности сообщения
-                    [
-                        'class' => AttributeBehavior::className(),
-                        'attributes' => [
-                            ActiveRecord::EVENT_BEFORE_INSERT => 'msg_active',
-                        ],
-                        'value' => function ($event) {
-                            return 1;
-                        },
 
-                    ],
                     // сохраним предыдущие аттрибуты
                     [
                         'class' => AttributeBehavior::className(),
@@ -241,154 +213,23 @@ class Message extends \yii\db\ActiveRecord
 
                     ],
 
-                    // Сообщение пользователю
+                    // пробуем посмотреть нужна ли отправка
                     [
-                        'class' => ChangestateBehavior::className(),
-                        'transTable' => [
-//                            Msgflags::MFLG_NEW => [],
-                            Msgflags::MFLG_SHOW_NO_ANSWER => [Msgflags::MFLG_NEW],
-                            Msgflags::MFLG_SHOW_INSTR => [Msgflags::MFLG_NEW],
-                            Msgflags::MFLG_SHOW_ANSWER => [Msgflags::MFLG_SHOW_INSTR, Msgflags::MFLG_SHOW_NEWANSWER, Msgflags::MFLG_SHOW_REVIS, ],
-                            Msgflags::MFLG_INT_FIN_INSTR => [],
-//                            Msgflags::MFLG_NOSHOW => [],
+                        'class' => AttributeBehavior::className(),
+                        'attributes' => [
+                            ActiveRecord::EVENT_AFTER_UPDATE => 'msg_flag',
                         ],
                         'value' => function ($event) {
                             /** @var Message $model */
                             $model = $event->sender;
-                            $aTemplates = [
-                                Msgflags::MFLG_SHOW_NO_ANSWER => 'user_notif_show',
-                                Msgflags::MFLG_SHOW_INSTR => 'user_notif_show',
-                                Msgflags::MFLG_SHOW_ANSWER => 'user_notif_answer',
-                                Msgflags::MFLG_INT_FIN_INSTR => 'user_notif_intanswer',
-                            ];
-                            if( isset($aTemplates[$model->msg_flag]) ) {
-                                Yii::info("[{$model->msg_id}] mail send to {$model->msg_pers_email}");
-                                Yii::$app->mailer->compose($aTemplates[$model->msg_flag], ['model' => $model,])
-                                    ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
-                                    ->setTo($model->msg_pers_email)
-                                    ->setSubject('Обращение №' . $model->msg_id . ' от '. date('d.m.Y', strtotime($model->msg_createtime)))
-                                    ->send();
-                            }
-                            else {
-                                Yii::warning("Not found flag [{$model->msg_flag}] mail template for user notification.");
-                            }
+                            $model->sendUserNotification(Message::USERTYPE_PERSON);
+                            $model->sendUserNotification(Message::USERTYPE_ANSWER);
+                            $model->sendUserNotification(Message::USERTYPE_SOANSWER);
+                            return $model->msg_flag;
                         },
 
                     ],
 
-                    // Сообщение ответчику
-                    [
-                        'class' => ChangestateBehavior::className(),
-                        'transTable' => [
-                            Msgflags::MFLG_SHOW_INSTR => [],
-                            Msgflags::MFLG_SHOW_REVIS => [],
-                            Msgflags::MFLG_INT_INSTR => [],
-                            Msgflags::MFLG_INT_REVIS_INSTR => [],
-                            Msgflags::MFLG_NEW => [
-                                Msgflags::MFLG_SHOW_INSTR,
-                                Msgflags::MFLG_SHOW_REVIS,
-                                Msgflags::MFLG_INT_INSTR,
-                                Msgflags::MFLG_INT_REVIS_INSTR,
-                                Msgflags::MFLG_INT_NEWANSWER,
-                                Msgflags::MFLG_SHOW_NEWANSWER,
-                            ],
-                        ],
-                        'value' => function ($event) {
-                            /** @var Message $model */
-                            $model = $event->sender;
-                            $aTemplates = [
-                                Msgflags::MFLG_SHOW_INSTR => 'ans_notif_instr',
-                                Msgflags::MFLG_INT_INSTR => 'ans_notif_instr',
-                                Msgflags::MFLG_SHOW_REVIS => 'ans_notif_revis',
-                                Msgflags::MFLG_INT_REVIS_INSTR => 'ans_notif_revis',
-                                Msgflags::MFLG_NEW => 'ans_notif_esc',
-                            ];
-                            if( isset($aTemplates[$model->msg_flag]) ) {
-                                Yii::$app->mailer->compose($aTemplates[$model->msg_flag], ['model' => $model,])
-                                    ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
-                                    ->setTo($model->employee->us_email)
-                                    ->setSubject('Обращение №' . $model->msg_id . ' от '. date('d.m.Y', strtotime($model->msg_createtime)))
-                                    ->send();
-                            }
-                            else {
-                                Yii::warning("Not found flag [{$model->msg_flag}] mail template for answer notification.");
-                            }
-                        },
-                    ],
-
-                    // Сообщение соответчикам
-                    [
-                        'class' => ChangestateBehavior::className(),
-                        'transTable' => [
-                            Msgflags::MFLG_SHOW_INSTR => [],
-                            Msgflags::MFLG_INT_INSTR => [],
-                        ],
-                        'value' => function ($event) {
-                            /** @var Message $model */
-                            $model = $event->sender;
-                            $aTemplates = [
-                                Msgflags::MFLG_SHOW_INSTR => 'soans_notif_instr',
-                                Msgflags::MFLG_INT_INSTR => 'soans_notif_instr',
-                            ];
-                            $aFiles = $model->getUserFiles(true);
-                            if( isset($aTemplates[$model->msg_flag]) ) {
-                                $a = User::find()->where(['us_id' => array_slice($model->getAllanswers(), 1)])->all();
-                                foreach($a As $ob) {
-                                    $oMsg = Yii::$app->mailer->compose($aTemplates[$model->msg_flag], ['model' => $model, 'user'=>$ob, 'allusers' => $a, 'mainuser'=>$model->employee])
-                                        ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
-                                        ->setTo($ob->us_email)
-                                        ->setSubject('Обращение №' . $model->msg_id . ' от '. date('d.m.Y', strtotime($model->msg_createtime)));
-                                    if( count($aFiles) > 0 ) {
-                                        foreach($aFiles As $obFile) {
-                                            /** @var File  $obFile */
-                                            $oMsg->attach($obFile->getFullpath(), ['fileName' => $obFile->file_orig_name]);
-                                        }
-                                    }
-                                    $oMsg->send();
-                                }
-                            }
-                            else {
-                                Yii::warning("Not found flag [{$model->msg_flag}] mail template for soanswer notification.");
-                            }
-                        },
-                    ],
-
-                    // отправим оповещения
-/*
-                    [
-                        'class' => NotificateBehavior::className(),
-                        'allevents' => [
-                            ActiveRecord::EVENT_AFTER_INSERT,
-                            ActiveRecord::EVENT_AFTER_UPDATE,
-                        ],
-                        'value' => function ($event, $model) {
-                            // @var $model Message
-                            Yii::$app->cache->delete(Message::KEY_STATMSG_DATA); // удалим статистику
-
-                            if( $model->isNeedUserNotify() ) {
-                                Yii::$app->mailer->compose('notificateUser', ['model' => $model, 'flag' => isset($model->_oldAttributes['msg_flag']) ? $model->_oldAttributes['msg_flag'] : 0])
-                                    ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
-                                    ->setTo($model->msg_pers_email)
-                                    ->setSubject('Обращение №' . $model->msg_id)
-                                    ->send();
-                            }
-                            if( $model->isNeedAnswerNotify() ) {
-                                $aId = $model->getAnswerDiff();
-                                $aUser = User::findAll(['us_id' => $aId]);
-//                                Yii::info('Event: aUser = ' . print_r($aUser, true));
-                                $aUser = ArrayHelper::map($aUser, 'us_id', function($ob){ $a = $ob->attributes; $a['fullname'] = $ob->getFullName(); $a['shortname'] = $ob->getShortName(); return $a; });
-//                                Yii::info('Event: aUser = ' . print_r($aUser, true));
-                                foreach($aUser As $ob) {
-                                    Yii::$app->mailer->compose('notificateAnswer', ['model' => $model, 'user'=>$ob])
-                                        ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
-                                        ->setTo([$ob['us_email'] => $ob['fullname']])
-                                        ->setSubject('Обращение №' . $model->msg_id)
-                                        ->send();
-                                }
-                            }
-                        },
-                    ],
-*/
                 ]
             );
         }
@@ -873,56 +714,148 @@ class Message extends \yii\db\ActiveRecord
      *
      */
     public function isFlagChanged() {
-        $bRet = false;
-        if( isset($this->_oldAttributes['msg_flag']) ) {
-            $bRet = ($this->_oldAttributes['msg_flag'] != $this->msg_flag);
+        if( !isset($this->_oldAttributes['msg_flag']) ) {
+            $this->_oldAttributes['msg_flag'] = 0;
         }
-        else {
-            $bRet = ($this->msg_flag > 0);
-        }
-        return $bRet;
-    }
 
-    /**
-     * Проверка на необходимость извещения пользователя
-     * @return boolean
-     *
-     */
-    public function isNeedUserNotify() {
-        $bRet = $this->isFlagChanged()
-            && in_array($this->msg_flag, $this->getNotificationFlags(Rolesimport::ROLE_GUEST));
+        $bRet = ($this->_oldAttributes['msg_flag'] != $this->msg_flag);
         return $bRet;
     }
 
     /**
      *
-     * Проверка на необходимость извещения ответчиков
-     * @return boolean
+     * @param string $sType тип данных для возврата: флаги для отправки уведомлений по пользователям, ответчикам и соответчикам
+     * @return array массив переходов флагов: ключ - текущий флаг, значение - массив флагов, при переходе из которых будет присходить отправка писем
      *
      */
-    public function isNeedAnswerNotify() {
-        return count($this->getAnswerDiff()) > 0;
+    public function getTransflags($sType = '')
+    {
+        $transTable = [
+            self::USERTYPE_PERSON => [
+                Msgflags::MFLG_SHOW_NO_ANSWER => [Msgflags::MFLG_NEW],
+                Msgflags::MFLG_SHOW_INSTR => [Msgflags::MFLG_NEW],
+                Msgflags::MFLG_SHOW_ANSWER => [Msgflags::MFLG_SHOW_INSTR, Msgflags::MFLG_SHOW_NEWANSWER, Msgflags::MFLG_SHOW_REVIS,],
+                Msgflags::MFLG_INT_FIN_INSTR => [],
+            ],
+            self::USERTYPE_ANSWER => [
+                Msgflags::MFLG_SHOW_INSTR => [],
+                Msgflags::MFLG_SHOW_REVIS => [],
+                Msgflags::MFLG_INT_INSTR => [],
+                Msgflags::MFLG_INT_REVIS_INSTR => [],
+                Msgflags::MFLG_NEW => [
+                    Msgflags::MFLG_SHOW_INSTR,
+                    Msgflags::MFLG_SHOW_REVIS,
+                    Msgflags::MFLG_INT_INSTR,
+                    Msgflags::MFLG_INT_REVIS_INSTR,
+                    Msgflags::MFLG_INT_NEWANSWER,
+                    Msgflags::MFLG_SHOW_NEWANSWER,
+                ],
+            ],
+            self::USERTYPE_SOANSWER => [
+                Msgflags::MFLG_SHOW_INSTR => [],
+                Msgflags::MFLG_INT_INSTR => [],
+            ],
+        ];
+
+        return $transTable[$sType];
     }
 
     /**
      *
-     * Получение новых ответчиков
-     * @return array
+     * @param string $sType тип данных для возврата: флаги для отправки уведомлений по пользователям, ответчикам и соответчикам
+     * @return boolean надо ли отправлять уведомление
      *
      */
-    public function getAnswerDiff() {
-        // TODO: добавить проверку на флаг сообщения: когда текущий флаг стал на доработку - тоже нужно всем уведомление
-        // Msgflags::MFLG_INT_REVIS_INSTR,
-        // Msgflags::MFLG_SHOW_REVIS,
-        $a = array_diff(
-            $this->allanswers,
-            isset($this->_oldAttributes['answers']) ? $this->_oldAttributes['answers'] : []
-        );
-        if( $this->isFlagChanged()
-            && in_array($this->msg_flag, $this->getNotificationFlags(Rolesimport::ROLE_ANSWER_DOGM)) ) {
-            $a = $this->allanswers;
+    public function isNeedNotificate($sType = '') {
+        $bRet = $this->isFlagChanged();
+        Yii::info('isNeedNotificate('.$sType.') flag ' . ($bRet ? '' : 'not ') . 'changed');
+
+        if( $bRet ) {
+            $transTable = $this->getTransflags($sType);
+            if( !isset($transTable[$this->msg_flag])
+             || ( !empty($transTable[$this->msg_flag]) && !in_array($this->_oldAttributes['msg_flag'], $transTable[$this->msg_flag]))
+            ) {
+                $bRet = false;
+                Yii::info('isNeedNotificate('.$sType.') = false [' . implode(',', (isset($transTable[$this->msg_flag]) && is_array($transTable[$this->msg_flag])) ? $transTable[$this->msg_flag] : []) . '] ' . $this->_oldAttributes['msg_flag'] . ' -> ' . $this->msg_flag);
+            }
+            else {
+                Yii::info('isNeedNotificate('.$sType.') = true [' . implode(',', $transTable[$this->msg_flag]) . '] ' . $this->_oldAttributes['msg_flag'] . ' -> ' . $this->msg_flag);
+            }
         }
-        return $a;
+        return $bRet;
     }
 
+    /**
+     * Отправка уведомлений пользователю
+     * @param string $sType тип сообщений для отправки
+     *
+     */
+    public function sendUserNotification($sType = '') {
+        $aTemplates = [
+            self::USERTYPE_PERSON => [
+                Msgflags::MFLG_SHOW_NO_ANSWER => 'user_notif_show',
+                Msgflags::MFLG_SHOW_INSTR => 'user_notif_show',
+                Msgflags::MFLG_SHOW_ANSWER => 'user_notif_answer',
+                Msgflags::MFLG_INT_FIN_INSTR => 'user_notif_intanswer',
+            ],
+            self::USERTYPE_ANSWER => [
+                Msgflags::MFLG_SHOW_INSTR => 'ans_notif_instr',
+                Msgflags::MFLG_INT_INSTR => 'ans_notif_instr',
+                Msgflags::MFLG_SHOW_REVIS => 'ans_notif_revis',
+                Msgflags::MFLG_INT_REVIS_INSTR => 'ans_notif_revis',
+                Msgflags::MFLG_NEW => 'ans_notif_esc',
+            ],
+            self::USERTYPE_SOANSWER => [
+                Msgflags::MFLG_SHOW_INSTR => 'soans_notif_instr',
+                Msgflags::MFLG_INT_INSTR => 'soans_notif_instr',
+            ]
+        ];
+        if( $this->isNeedNotificate($sType) ) {
+            if( !isset($aTemplates[$sType]) ) {
+                Yii::info('sendUserNotification('.$sType.') ERROR: not found notification template');
+                return;
+            }
+
+            $sTemplate = $aTemplates[$sType][$this->msg_flag];
+
+            switch($sType) {
+                case self::USERTYPE_PERSON:
+                    Yii::info('sendUserNotification('.$sType.') ['.$sTemplate.'] ' . $this->msg_id . ' -> ' . $this->msg_pers_email);
+                    Yii::$app->mailer->compose($sTemplate, ['model' => $this,])
+                        ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+                        ->setTo($this->msg_pers_email)
+                        ->setSubject('Обращение №' . $this->msg_id . ' от '. date('d.m.Y', strtotime($this->msg_createtime)))
+                        ->send();
+                    break;
+
+                case self::USERTYPE_ANSWER:
+                    Yii::info('sendUserNotification('.$sType.') ['.$sTemplate.'] ' . $this->msg_id . ' -> ' . $this->employee->us_email);
+                    Yii::$app->mailer->compose($sTemplate, ['model' => $this,])
+                        ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+                        ->setTo($this->employee->us_email)
+                        ->setSubject('Обращение №' . $this->msg_id . ' от '. date('d.m.Y', strtotime($this->msg_createtime)))
+                        ->send();
+                    break;
+
+                case self::USERTYPE_SOANSWER:
+                    $aFiles = $this->getUserFiles(true);
+                    $a = User::find()->where(['us_id' => array_slice($this->getAllanswers(), 1)])->all();
+                    foreach($a As $ob) {
+                        Yii::info('sendUserNotification('.$sType.') ['.$sTemplate.'] ' . $this->msg_id . ' -> ' . $ob->us_email);
+                        $oMsg = Yii::$app->mailer->compose($sTemplate, ['model' => $this, 'user'=>$ob, 'allusers' => $a, 'mainuser'=>$this->employee])
+                            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+                            ->setTo($ob->us_email)
+                            ->setSubject('Обращение №' . $this->msg_id . ' от '. date('d.m.Y', strtotime($this->msg_createtime)));
+                        if( count($aFiles) > 0 ) {
+                            foreach($aFiles As $obFile) {
+                                /** @var File  $obFile */
+                                $oMsg->attach($obFile->getFullpath(), ['fileName' => $obFile->file_orig_name]);
+                            }
+                        }
+                        $oMsg->send();
+                    }
+                    break;
+            }
+        }
+    }
 }

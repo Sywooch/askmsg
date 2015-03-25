@@ -27,7 +27,7 @@ class ChangestateBehavior extends Behavior {
      * }
      * ```
      */
-    public $value;
+    public $action;
 
     /**
      * @var array таблица переходов,
@@ -56,13 +56,13 @@ class ChangestateBehavior extends Behavior {
         }
 
         $sOut = 'testStateFlag(' . $event->name . ') flags: ' . $model->_oldAttributes['msg_flag'] . ' -> ' . $model->msg_flag
-        . ' this->transTable['.$model->msg_flag.']: ' . (isset($this->transTable[$model->msg_flag]) ? ('[' . implode(', ', $this->transTable[$model->msg_flag]) . ']') : '---');
+        . ' this->transTable['.$model->msg_flag.']: ' . (isset($this->transTable[$model->msg_flag]) ? ('[' . implode(', ', $this->transTable[$model->msg_flag]) . ']') : '- not in transtable -');
 
         if( ($model->msg_flag != $model->_oldAttributes['msg_flag'])
          && isset($this->transTable[$model->msg_flag])
          && (empty($this->transTable[$model->msg_flag]) || in_array($model->_oldAttributes['msg_flag'], $this->transTable[$model->msg_flag])) ) {
             $sOut .= "testStateFlag(): run user func";
-            call_user_func($this->value, $event);
+            call_user_func($this->action, $event);
         }
         else {
             $sOut .= "testStateFlag(): not run user func";
