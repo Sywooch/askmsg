@@ -32,7 +32,10 @@ $config = [
                 kartik\datecontrol\Module::FORMAT_TIME => 'php:H:i:s',
                 kartik\datecontrol\Module::FORMAT_DATETIME => 'php:Y-m-d H:i:s',
             ],
-        ]
+        ],
+        'v1' => [
+            'class' => 'app\api\modules\v1\Module',
+        ],
     ],
     'components' => [
         'view' => [
@@ -73,6 +76,18 @@ $config = [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
+            'rules' => [
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => ['v1/user', 'v1/message']
+                ],
+/*
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => ['v2/user', 'v2/post']
+                ],
+*/
+            ],
 //            'enableStrictParsing' => true,
                 /*
             'rules' => [

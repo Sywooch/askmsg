@@ -97,12 +97,15 @@ $aMenuItems[] = Yii::$app->user->isGuest ?
                                             <?= Nav::widget([
                                                 'options' => ['class' => 'nav menu'],
                                                 'items' => $aMenuItems,
-                                            ]); ?>
+                                            ]);
+                                            /*
                                             <!-- ul class="nav menu">
                                                 <li class="item-126 current active"><a href="/" >Циклограмма</a></li>
                                                 <li class="item-101 parent"><a href="/online.html" >Трансляции</a></li>
                                                 <li class="item-102"><a href="/archive.html" >Видеоархив</a></li>
                                             </ul -->
+                                             */
+                                            ?>
                                         </div>
                                     </div>
                                 </div>
