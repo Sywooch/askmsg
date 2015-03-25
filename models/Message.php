@@ -68,7 +68,8 @@ class Message extends \yii\db\ActiveRecord
     public $asker; // Проситель
     public $askid; // Номер и дата
     public $askcontacts; // Email и телефон
-    public $tags; // округ, комментарии
+    public $tags; //
+    public $_tagsstring; // теги строкой
     /**
      * @var mixed file аттрибут для генерации поля добавления файла
      */
@@ -266,6 +267,7 @@ class Message extends \yii\db\ActiveRecord
             [['msg_answer'], 'filter', 'filter' => function($v){ return strip_tags($v, '<p><a><li><ol><ul><strong><b><em><i><u><h1><h2><h3><h4><h5><blockquote><pre><del><br>');  }],
             [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_oldcomment'], 'string', 'max' => 255],
             [['employer', 'asker', 'askid', 'askcontacts', 'tags'], 'string', 'max' => 255],
+            [['tagsstring'], 'string', 'max' => 1024],
             [['msg_empl_id', 'msg_empl_command'], 'required',
                 'when' => function($model) use ($aFlagsToAnswer) { return ($this->scenario != 'importdata') && in_array($this->msg_flag, $aFlagsToAnswer); },
                 'whenClient' => "function (attribute, value) { return [".implode(',', $aFlagsToAnswer)."].indexOf(parseInt($('#".Html::getInputId($this, 'msg_flag') ."').val())) != -1 ;}"
@@ -305,7 +307,8 @@ class Message extends \yii\db\ActiveRecord
                 'msg_flag',
                 'msg_active',
                 'answers',
-                'alltags',
+//                'alltags',
+                'tagsstring',
                 'msg_answertime',
             ]
         );
@@ -514,6 +517,28 @@ class Message extends \yii\db\ActiveRecord
     }
 
     /**
+     *  Связь сообщения и его тегов строкой с разделителями ','
+     */
+    public function getTagsstring() {
+        return implode(',', ArrayHelper::map($this->alltags, 'tag_id', 'tag_title'));
+    }
+
+    /**
+     *  Установка тегов по строке с разделителями ','
+     * @param string $val
+     */
+    public function setTagsstring($val) {
+        $a = explode(',', $val);
+        foreach($a As $k => $v) {
+            $v = trim($v);
+            if( $v === '' ) {
+                unset($a[$k]);
+            }
+        }
+        $this->_tagsstring = $a;
+    }
+
+    /**
      *  Получение всех ответчиков
      * @return array
      */
@@ -594,13 +619,15 @@ class Message extends \yii\db\ActiveRecord
      */
     public function saveAlltags($event) {
         $model = $event->sender;
+        $aTagId = Tags::getIdByNames($this->_tagsstring);
 
         $model->saveRelateddata([
             'eventname' => $event->name,
             'reltableclass' => Msgtags::className(),
             'msgidfield' => 'mt_msg_id',
             'relateidfield' => 'mt_tag_id',
-            'relateidarray' => $model->alltags,
+            'relateidarray' => $aTagId,
+//            'relateidarray' => $model->alltags,
         ]);
     }
 

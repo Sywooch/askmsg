@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%tags}}".
@@ -69,6 +70,46 @@ class Tags extends \yii\db\ActiveRecord
     }
 
     /**
+     * Получаем id тегов по их тесту
+     * @param string|array $aNames текст тега или массив имен тегов
+     * @param integer $nType тип для поиска
+     * @return array
+     */
+    public static function getIdByNames($aNames, $nType = self::TAGTYPE_TAG)
+    {
+        if( is_string($aNames) ) {
+            $aNames = [$aNames];
+        }
+        $aId = [];
+        $aOb = ArrayHelper::map(
+            self::getTagslist($nType),
+            function($item) { return mb_strtolower($item->tag_title, 'UTF-8'); },
+            'tag_id'
+        );
+        foreach($aNames As $v) {
+            $st = mb_strtolower($v, 'UTF-8');
+            if( !isset($aOb[$st]) ) {
+                $model = new Tags();
+                $model->attributes = [
+                    'tag_active' => 1,
+                    'tag_title' => $v,
+                    'tag_type' => $nType,
+                ];
+                if( !$model->save() ) {
+                    Yii::warning('Tags::getIdByNames() ERROR ' . print_r($model->getErrors(), true));
+                    continue;
+                }
+                $id = $model->tag_id;
+            }
+            else {
+                $id = $aOb[$st];
+            }
+            $aId[] = $id;
+        }
+        return $aId;
+    }
+
+    /**
      * Возвращаем записи определенного типа
      * @param int $nType тип возвращаемых значений
      * @return array
@@ -87,6 +128,7 @@ class Tags extends \yii\db\ActiveRecord
         if( isset(self::$_aTypes[$nType]) ) {
             $aRet = self::find()
                 ->where(['tag_type' => $nType, 'tag_active' => 1,])
+                ->orderBy('tag_title')
                 ->all();
         }
         self::$_cache[$nType] = $aRet;

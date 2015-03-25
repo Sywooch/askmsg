@@ -306,6 +306,18 @@ $aFieldParam = [
             'allowClear' => true,
         ],
     ],
+    'tagsstring' => [
+        'language' => 'ru',
+        'options' => [
+            'multiple' => true,
+//           'tags' => true,
+            'placeholder' => 'Выберите теги ...',
+        ],
+        'pluginOptions' => [
+            'tags' => array_values(ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_title')),
+            'allowClear' => true,
+        ],
+    ],
     'subject' => [
         'data' => ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_SUBJECT), 'tag_id', 'tag_title'),
         'language' => 'ru',
@@ -600,8 +612,10 @@ $aFieldParam = [
 
         <div class="col-sm-6">
             <?= $form
-                ->field($model, 'alltags')
-                ->widget(Select2::classname(), $aFieldParam['tags'])
+                ->field($model, 'tagsstring')
+                ->widget(Select2::classname(), $aFieldParam['tagsstring'])
+            //    ->field($model, 'alltags')
+            //    ->widget(Select2::classname(), $aFieldParam['tags'])
             ?>
         </div>
         <div class="clearfix"></div>
