@@ -76,10 +76,12 @@ $config = [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
+//            'cache' => false,
             'rules' => [
                 [
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => ['v1/user', 'v1/message']
+                    'controller' => ['v1/user', 'v1/message'],
+                    'except' => ['delete'],
                 ],
 /*
                 [
@@ -87,6 +89,10 @@ $config = [
                     'controller' => ['v2/user', 'v2/post']
                 ],
 */
+                '<_c:[\w\-]+>/<_a:[\w\-]+>/<id:\d+>' => '<_c>/<_a>',
+                '<_c:[\w\-]+>/<id:\d+>' => '<_c>/view',
+                '<_c:[\w\-]+>/<_a:[\w\-]+>' => '<_c>/<_a>',
+                '<_c:[\w\-]+>' => '<_c>/index',
             ],
 //            'enableStrictParsing' => true,
                 /*

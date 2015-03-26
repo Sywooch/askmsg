@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Msgflags;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\web\Controller;
@@ -289,9 +290,13 @@ class MessageController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        // $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        $model->scenario = 'delete';
+        $model->msg_flag = $model->msg_flag == Msgflags::MFLG_NOSHOW ? Msgflags::MFLG_NEW : Msgflags::MFLG_NOSHOW;
+        $model->save();
 
-        return $this->redirect(['index']);
+        return $this->redirect(Yii::$app->request->getReferrer());
     }
 
     /**

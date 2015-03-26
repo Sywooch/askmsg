@@ -352,6 +352,10 @@ class Message extends \yii\db\ActiveRecord
             'file',
         ];
 
+        $scenarios['delete'] = [
+            'msg_flag',
+        ];
+
         return $scenarios;
     }
 

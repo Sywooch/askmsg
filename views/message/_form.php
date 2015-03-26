@@ -709,7 +709,7 @@ $aFieldParam = [
             endif;
             ?>
 
-        </div>
+            </div>
         </div>
         <?php endif; ?>
 

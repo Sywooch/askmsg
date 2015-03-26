@@ -5,6 +5,7 @@ namespace app\api\modules\v1\controllers;
 use yii;
 use yii\filters\auth\HttpBasicAuth;
 use app\models\User;
+use app\api\modules\v1\models\MessageSearch;
 use app\api\modules\v1\models\Message;
 
 
@@ -20,11 +21,23 @@ class MessageController extends \yii\rest\ActiveController
         $actions = parent::actions();
     // disable the "delete" and "create" actions
         unset($actions['delete']); // $actions['create']
+        $actions['index'] = [
+            'class' => 'yii\rest\IndexAction',
+            'modelClass' => Message::className(),
+            'checkAccess' => [$this, 'checkAccess'],
+            'prepareDataProvider' =>
+            function($action) {
+                /** @var MessageSearch $model */
+                $model = new MessageSearch();
+                return $model->searchindex([]) ;
+            },
+        ];
         return $actions;
     }
 
     public function behaviors(){
         $behaviors = parent::behaviors();
+
         $request = Yii::$app->request;
         $username = $request->getAuthUser();
         if( $username !== null ) {
@@ -74,16 +87,16 @@ class MessageController extends \yii\rest\ActiveController
         );
     }
 
-/*
-    public function actionIndex()
-    {
-        return $this->render('index');
-    }
+        /*
+            public function actionIndex()
+            {
+                return $this->render('index');
+            }
 
-    public function actionView($id)
-    {
-        return User::findOne($id);
-    }
-*/
+            public function actionView($id)
+            {
+                return User::findOne($id);
+            }
+        */
 
 }
