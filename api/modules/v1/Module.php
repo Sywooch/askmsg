@@ -13,6 +13,8 @@ class Module extends \yii\base\Module
         parent::init();
         Yii::$app->user->enableSession = false;
         Yii::$app->user->loginUrl = null;
+        Yii::$app->user->enableAutoLogin = false;
+        Yii::$app->user->autoRenewCookie = false;
 
         // custom initialization code goes here
     }

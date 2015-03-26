@@ -47,6 +47,7 @@ use app\components\NotificateBehavior;
  * @property integer $msg_flag
  * @property integer $msg_subject
  * @property string $fl_hint
+ * @property integer $ekis_id
  *
  *
  * @property string $employer
