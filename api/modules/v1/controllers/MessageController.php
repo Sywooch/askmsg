@@ -33,10 +33,20 @@ class MessageController extends \yii\rest\ActiveController
                 return $model->searchindex([]) ;
             },
         ];
+        $actions['field'] = [
+            'class' => 'app\components\FieldAction',
+            'modelClass' => \app\models\Message::className(),
+            'checkAccess' => [$this, 'checkAccess'],
+            'defaultfield' => 'msg_id',
+        ];
         $actions['create']['scenario'] = 'person';
         return $actions;
     }
 
+    /**
+     * Список заголовков полей
+     * @return mixed
+     */
     public function actionTitle() {
         $aLabels = (new $this->modelClass())->attributeLabels();
         foreach($aLabels As $k=>$v) {
@@ -47,6 +57,25 @@ class MessageController extends \yii\rest\ActiveController
         return $aLabels;
     }
 
+    /**
+     * Данные по одному полю
+     *
+     * @param $id
+     * @return mixed
+     *
+     */
+/*
+    public function actionField($id) {
+        $model = $this->runAction('view', ['id' => $id]);
+        Yii::info('$model = ' . print_r($model, true));
+        $sFld = Yii::$app->request->getQueryParam('name', 'msg_id');
+        $data = null;
+        if( $model !== null ) {
+            $data = isset($model->attributes[$sFld]) ? $model->attributes[$sFld] : '';
+        }
+        return $data;
+    }
+*/
     public function behaviors(){
         $behaviors = parent::behaviors();
 

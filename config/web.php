@@ -84,6 +84,7 @@ $config = [
                     'except' => ['delete'],
                     'extraPatterns' => [
                         'GET' => 'title',
+                        'GET field/{id}' => 'field',
                     ],
                 ],
 /*

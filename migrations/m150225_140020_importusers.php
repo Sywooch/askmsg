@@ -313,7 +313,7 @@ CREATE TABLE `b_user` (
                     'msg_id' => $ad['MSGID'],
                     'msg_createtime' => $ad['DATE_CREATE'],
                     'msg_active' => $ad['ACTIVE'] == 'Y' ? 1 : 0,
-                    'msg_pers_text' => htmlspecialchars_decode($ad['PREVIEW_TEXT']),
+                    'msg_pers_text' => strip_tags(htmlspecialchars_decode($ad['PREVIEW_TEXT'])),
                     'msg_answer' => $ad['DETAIL_TEXT'],
                     'msg_oldcomment' => $ad['TAGS'],
                     'msg_pers_lastname' => $ad['PROPERTY_194'],
