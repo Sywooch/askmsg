@@ -14,6 +14,7 @@ use Yii;
  * @property string $fl_glyth
  * @property string $fl_glyth_color
  * @property string $fl_sname
+ * @property string $fl_hint
  */
 class Msgflags extends \yii\db\ActiveRecord
 {

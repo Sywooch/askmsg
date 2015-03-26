@@ -76,12 +76,15 @@ $config = [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
-//            'cache' => false,
+            'cache' => false,
             'rules' => [
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => ['v1/user', 'v1/message'],
                     'except' => ['delete'],
+                    'extraPatterns' => [
+                        'GET' => 'title',
+                    ],
                 ],
 /*
                 [

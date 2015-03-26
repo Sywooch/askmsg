@@ -29,10 +29,22 @@ class MessageController extends \yii\rest\ActiveController
             function($action) {
                 /** @var MessageSearch $model */
                 $model = new MessageSearch();
+                // TODO: тут поставить входные параметры
                 return $model->searchindex([]) ;
             },
         ];
+        $actions['create']['scenario'] = 'person';
         return $actions;
+    }
+
+    public function actionTitle() {
+        $aLabels = (new $this->modelClass())->attributeLabels();
+        foreach($aLabels As $k=>$v) {
+            if( (substr($k, 0, 4) !== 'msg_') && (strpos($k, '_id') === false) ) {
+                unset($aLabels[$k]);
+            }
+        }
+        return $aLabels;
     }
 
     public function behaviors(){
@@ -74,17 +86,6 @@ class MessageController extends \yii\rest\ActiveController
                 ];
         */
         return $behaviors;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function verbs()
-    {
-        return array_merge(
-            parent::verbs(),
-            ['options' => ['OPTIONS']]
-        );
     }
 
         /*

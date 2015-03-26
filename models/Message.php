@@ -46,7 +46,6 @@ use app\components\NotificateBehavior;
  * @property string $msg_oldcomment
  * @property integer $msg_flag
  * @property integer $msg_subject
- * @property string $fl_hint
  * @property integer $ekis_id
  *
  *
@@ -264,7 +263,7 @@ class Message extends \yii\db\ActiveRecord
 //            [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}')), 'allowArray' => true],
             [['msg_id', 'msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject', 'ekis_id'], 'integer'],
             [['msg_pers_text'], 'string', 'max' => self::MAX_PERSON_TEXT_LENGTH, 'on' => 'person'],
-            [['msg_answer', 'msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_pers_org', 'fl_hint'], 'string'],
+            [['msg_answer', 'msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_pers_org'], 'string'],
             [['msg_answer'], 'filter', 'filter' => function($v){ return strip_tags($v, '<p><a><li><ol><ul><strong><b><em><i><u><h1><h2><h3><h4><h5><blockquote><pre><del><br>');  }],
             [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_oldcomment'], 'string', 'max' => 255],
             [['employer', 'asker', 'askid', 'askcontacts', 'tags'], 'string', 'max' => 255],
@@ -405,7 +404,7 @@ class Message extends \yii\db\ActiveRecord
             'msg_flag' => 'Состояние',
             'msg_subject' => 'Тема',
             'ekis_id' => 'Учреждение',
-            'fl_hint' => 'Описание',
+//            'fl_hint' => 'Описание',
 
             'employer' => 'Ответчик',
             'asker' => 'Проситель',
