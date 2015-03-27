@@ -139,9 +139,20 @@ class MessageSearch extends Message
             'msg_flag' => $this->msg_flag ? $this->msg_flag : $this->msgflags,
         ]);
 
+        if( !empty($this->msg_pers_lastname) ) {
+            $a = explode(' ', $this->msg_pers_lastname);
+            foreach($a As $v) {
+                $v = trim($v);
+                if( $v === '' ) {
+                    continue;
+                }
+                $query->andFilterWhere(['or', ['like', 'msg_pers_lastname', $v], ['like', 'msg_pers_name', $v], ['like', 'msg_pers_secname', $v]] );
+            }
+        }
+
         $query->andFilterWhere(['like', 'msg_pers_name', $this->msg_pers_name])
             ->andFilterWhere(['like', 'msg_pers_secname', $this->msg_pers_secname])
-            ->andFilterWhere(['like', 'msg_pers_lastname', $this->msg_pers_lastname])
+//            ->andFilterWhere(['like', 'msg_pers_lastname', $this->msg_pers_lastname])
             ->andFilterWhere(['like', 'msg_pers_email', $this->msg_pers_email])
             ->andFilterWhere(['like', 'msg_pers_phone', $this->msg_pers_phone])
             ->andFilterWhere(['like', 'msg_pers_org', $this->msg_pers_org]);

@@ -18,13 +18,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Изменить', ['update', 'id' => $model->us_id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Удалить', ['delete', 'id' => $model->us_id], [
+        <?php /* = Html::a('Удалить', ['delete', 'id' => $model->us_id], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Вы уверены, что хотите удалить пользователя?',
                 'method' => 'post',
             ],
-        ]) ?>
+        ]) */ ?>
         <?= Html::a('Вернуться к списку', ['index'], ['class' => 'btn btn-default']) ?>
     </p>
 

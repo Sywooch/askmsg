@@ -19,6 +19,8 @@ if( is_dir($sBower) ) {
 }
 */
 
+Yii::setAlias('@web', __DIR__);
+
 $config = yii\helpers\ArrayHelper::merge(
 //    require(__DIR__ . '/../config/common.php'),
 //    require(__DIR__ . '/../config/common-local.php'),
