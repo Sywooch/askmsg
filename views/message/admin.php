@@ -104,6 +104,7 @@ EOT;
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
+        'filterRowOptions' => ['style' => 'display: none;'],
         'columns' => [
 //            ['class' => 'yii\grid\SerialColumn'],
             [
@@ -111,6 +112,7 @@ EOT;
 //                'attribute' => 'msg_id',
                 'attribute' => 'askid',
                 'header' => 'Номер и дата',
+                'filter' => false,
                 'filterOptions' => ['class' => 'gridwidth7'],
                 'content' => function ($model, $key, $index, $column) {
                     $url = Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM) ?
@@ -128,7 +130,8 @@ EOT;
                 'class' => 'yii\grid\DataColumn',
                 'header' => 'Состояние',
                 'attribute' => 'msg_flag',
-                'filter' => ArrayHelper::map(Msgflags::getStateData(), 'fl_id', 'fl_sname'),
+                'filter' => false,
+//                'filter' => ArrayHelper::map(Msgflags::getStateData(), 'fl_id', 'fl_sname'),
                 'filterOptions' => ['class' => 'gridwidth7'],
                 'content' => function ($model, $key, $index, $column) {
                     return '<span class="glyphicon glyphicon-'.$model->flag->fl_glyth.'" style="color: '.$model->flag->fl_glyth_color.'; font-size: 1.25em;"></span>' //  font-size: 1.25em;
@@ -142,6 +145,7 @@ EOT;
                 'class' => 'yii\grid\DataColumn',
                 'attribute' => 'msg_pers_lastname',
                 'header' => 'Проситель',
+                'filter' => false,
                 'content' => function ($model, $key, $index, $column) {
                     return Html::encode($model->msg_pers_lastname . ' ' . $model->msg_pers_name . ' ' . $model->msg_pers_secname )
                         . '<span>' // . ($model->msg_flag ? $model->flag->fl_name : '--')
@@ -155,6 +159,7 @@ EOT;
             [
                 'class' => 'yii\grid\DataColumn',
                 'attribute' => 'askcontacts',
+                'filter' => false,
                 'content' => function ($model, $key, $index, $column) {
                     return Html::encode($model->msg_pers_email) . '<span>' . $model->msg_pers_phone . '</span>';
                 },
@@ -165,7 +170,8 @@ EOT;
             [
                 'class' => 'yii\grid\DataColumn',
                 'attribute' => 'alltags',
-                'filter' => $aTags,
+//                'filter' => $aTags,
+                'filter' => false,
                 'filterOptions' => ['class' => 'gridwidth7'],
                 'content' => function ($model, $key, $index, $column) {
                     return Html::encode(implode(', ', ArrayHelper::map($model->alltags, 'tag_id', 'tag_title')));

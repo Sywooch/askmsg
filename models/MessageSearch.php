@@ -20,14 +20,16 @@ use app\models\Msgtags;
 class MessageSearch extends Message
 {
     public $msgflags = [];
+    public $_flagsstring = '';
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['msg_id', 'msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject', 'ekis_id'], 'integer'],
-            [['askid', ], 'string'],
+            [['msg_id', 'msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_subject', 'ekis_id'], 'integer'],
+            [['askid', '_flagsstring', ], 'string'],
+            [['msg_flag', ], 'in', 'range' => array_keys(ArrayHelper::map(Msgflags::getStateData(), 'fl_id', 'fl_sname')), 'allowArray' => true],
             [['alltags'], 'in', 'range' => array_keys(ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_title')), 'allowArray' => true],
             [['msg_createtime', 'msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_org', 'msg_pers_text', 'msg_comment', 'msg_empl_command', 'msg_empl_remark', 'msg_answer', 'msg_answertime', 'msg_oldcomment'], 'safe'],
         ];
@@ -59,6 +61,7 @@ class MessageSearch extends Message
         $a = parent::attributeLabels();
         $a['msg_pers_lastname'] = 'Проситель';
         $a['msg_oldcomment'] = 'Школа';
+        $a['_flagsstring'] = 'Состояние';
 
         return $a;
 /*        [
@@ -104,8 +107,49 @@ class MessageSearch extends Message
      *
      * @return ActiveDataProvider
      */
+    public function maderateSearch($params)
+    {
+        $this->load($params);
+
+        if( empty($this->msg_id) && empty($this->msg_flag) ) {
+            $a = [
+//                'msg_pers_name',
+//                'msg_pers_secname',
+                'msg_createtime',
+                'msg_pers_email',
+                'msg_pers_lastname',
+                'msg_empl_id',
+//                'msg_pers_phone',
+                'msg_pers_org',
+//                'msg_flag',
+//                'msg_pers_region',
+                'msg_subject',
+                'alltags',
+            ];
+
+            foreach($a As $v) {
+                if( !empty($this->$v) ) {
+                    $this->msg_flag = array_keys(ArrayHelper::map(Msgflags::getStateData(), 'fl_id', 'fl_sname'));
+                    break;
+                }
+            }
+        }
+
+        return $this->search(null);
+    }
+    /**
+     * Creates data provider instance with search query applied
+     *
+     * @param array $params
+     *
+     * @return ActiveDataProvider
+     */
     public function search($params)
     {
+        if( $params !== null ) {
+            $this->load($params);
+        }
+
         $query = Message::find()
             ->with('employee')
             ->with('answers')
@@ -127,8 +171,6 @@ class MessageSearch extends Message
 
         ]);
 
-
-        $this->load($params);
 
         // если указан id записи, все остальное сбрасываем
         if( !empty($this->msg_id) ) {
@@ -157,6 +199,11 @@ class MessageSearch extends Message
                 ->where(['mt_tag_id' => $this->alltags])
                 ->distinct();
             $query->andFilterWhere(['msg_id' => $tagsQuery]);
+        }
+
+        if( !empty($this->_flagsstring) ) {
+            $this->msgflags = Msgflags::getIdByNames(explode(',', $this->_flagsstring));
+            Yii::info('this->_flagsstring = ' . $this->_flagsstring . "\nthis->msgflags = " . implode(', ', $this->msgflags) . "\n this->msg_flag = " . ($this->msg_flag? 'use' : 'not use'));
         }
 
         $a = $this->makeDateRange('msg_createtime');
@@ -379,9 +426,9 @@ class MessageSearch extends Message
                 continue;
             }
             $b = $b && empty($this->attributes[$v]);
-            if( !empty($this->attributes[$v]) ) {
-                Yii::info('Not empty: ' . $v . ' = ' . print_r($this->attributes[$v], true));
-            }
+//            if( !empty($this->attributes[$v]) ) {
+//                Yii::info('Not empty: ' . $v . ' = ' . print_r($this->attributes[$v], true));
+//            }
         }
         return $b;
     }

@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%msgflags}}".
@@ -167,6 +168,28 @@ class Msgflags extends \yii\db\ActiveRecord
             self::MFLG_INT_REVIS_INSTR => [self::MFLG_INT_NEWANSWER],
         ];
         return isset($aTrans[$nState]) ? $aTrans[$nState] : [];
+    }
+
+    /**
+     * Получение id флагов по их тесту
+     *
+     * @param string|array $title текст состояния или массив тестов
+     * @return array id состояний
+     *
+     */
+    public static function getIdByNames($title)
+    {
+        if( is_string($title) ) {
+            $title = [$title];
+        }
+        $aRet = [];
+        $aNames = array_flip(ArrayHelper::map(Msgflags::getStateData(), 'fl_id', 'fl_sname'));
+        foreach($title As $v) {
+            if( isset($aNames[$v]) ) {
+                $aRet[] = $aNames[$v];
+            }
+        }
+        return $aRet;
     }
 
     /**

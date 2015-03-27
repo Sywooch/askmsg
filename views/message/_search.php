@@ -45,7 +45,17 @@ if( !isset($action) ) {
 //                    'hint' => '',
             ],
         ],
-    ]); ?>
+    ]);
+
+    $aParam12 = [
+        'horizontalCssClasses' => [
+            'label' => 'col-sm-1',
+            'offset' => 'col-sm-offset-1',
+            'wrapper' => 'col-sm-11',
+        ],
+    ];
+
+    ?>
 
     <div class="col-sm-4">
     <?= $form->field($model, 'msg_id') ?>
@@ -107,35 +117,6 @@ if( !isset($action) ) {
 
     <div class="col-sm-4">
         <?= $form->field($model, 'msg_pers_lastname') ?>
-    </div>
-
-    <div class="col-sm-4">
-        <?= $form
-            ->field($model, 'msg_flag')
-            ->widget(Select2::classname(), [
-                'data' => ArrayHelper::map(
-                    Msgflags::find()
-//                    ->where(['status' => 1])
-                    ->asArray()
-                    ->all(), 'fl_id', 'fl_sname' /* function($item, $default){ return $item; } */),
-                'language' => 'ru',
-                'options' => ['placeholder' => 'Выберите состояние ...'],
-                'pluginOptions' => [
-                    'allowClear' => true,
-/*
-                    'formatResult' => new JsExpression(
-                        'function (item) {
-                        return "<span class=\\"glyphicon glyphicon-" + item.fl_glyth + "\\" style=\\"color: " + item.fl_glyth_color + "; font-size: 1.25em;\\"></span><span>"+item.fl_sname+"</span>";
-                    }'
-                    ),
-                    'escapeMarkup' => new JsExpression('function (m) { return m; }'),
-*/
-                ],
-                'pluginEvents' => [
-//                        'change' => 'function(event) { jQuery("#'.Html::getInputId($model, 'msg_empl_id').'").val(event.val); console.log("change", event); }',
-                ],
-            ]);
-        ?>
     </div>
 
     <div class="col-sm-4">
@@ -250,11 +231,11 @@ if( !isset($action) ) {
 
     </div>
 
-    <div class="col-sm-4">
+    <div class="col-sm-12">
     <?= $form
         ->field(
             $model,
-            'msg_subject')
+            'msg_subject', $aParam12)
         ->widget(Select2::classname(), [
             'data' => ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_SUBJECT), 'tag_id', 'tag_title'),
             'language' => 'ru',
@@ -268,9 +249,9 @@ if( !isset($action) ) {
         ]) ?>
     </div>
 
-    <div class="col-sm-4">
+    <div class="col-sm-12">
     <?= $form
-        ->field($model, 'alltags')
+        ->field($model, 'alltags', $aParam12)
         ->widget(Select2::classname(), [
             'data' => ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_title'),
             'language' => 'ru',
@@ -284,6 +265,25 @@ if( !isset($action) ) {
             ],
         ]) ?>
 
+    </div>
+
+    <div class="col-sm-12">
+        <?= $form
+            ->field($model, 'msg_flag', $aParam12)
+//            ->field($model, '_flagsstring')
+            ->widget(Select2::classname(), [
+                'data' => ArrayHelper::map(Msgflags::find()->asArray()->all(), 'fl_id', 'fl_sname' ),
+                'language' => 'ru',
+                'options' => [
+                    'placeholder' => 'Выберите состояние ...',
+                    'multiple' => true,
+                ],
+                'pluginOptions' => [
+//                    'tags' => array_values(ArrayHelper::map(Msgflags::getStateData(), 'fl_id', 'fl_sname' )),
+                    'allowClear' => true,
+                ],
+            ]);
+        ?>
     </div>
 
     <?php /* echo $form->field($model, 'msg_active') ?>
