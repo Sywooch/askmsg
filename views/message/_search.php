@@ -160,6 +160,10 @@ if( !isset($action) ) {
     </div>
 
     <div class="col-sm-4">
+
+        <?= $form->field($model, 'msg_pers_org') ?>
+<?php
+/*
     <?= $form->field(
         $model,
         'ekis_id'
@@ -240,16 +244,9 @@ if( !isset($action) ) {
                 'placeholder' => 'Выберите учреждение ...',
             ],
         ])
-    /* . $form->field(
-        $model,
-        'msg_pers_org',
-        ['template' => "{input}", 'options' => ['tag' => 'span']]
-    )->hiddenInput()
-    . $form->field(
-        $model,
-        'msg_pers_region',
-        ['template' => "{input}", 'options' => ['tag' => 'span']]
-    )->hiddenInput() */ ?>
+ ?>
+*/
+?>
 
     </div>
 

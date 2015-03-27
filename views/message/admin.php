@@ -264,11 +264,11 @@ EOT;
                             return $model->flag->fl_sname;
                         },
                     ],
-                    [
+/*                    [
                         'class' => 'yii\grid\DataColumn',
                         'header' => 'Состояние',
                         'attribute' => 'flag.fl_sname',
-                    ],
+                    ], */
                     [
                         'class' => 'yii\grid\DataColumn',
                         'attribute' => 'msg_pers_lastname',

@@ -52,6 +52,52 @@ class MessageSearch extends Message
     }
 
     /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        $a = parent::attributeLabels();
+        $a['msg_pers_lastname'] = 'Проситель';
+        $a['msg_oldcomment'] = 'Школа';
+
+        return $a;
+/*        [
+            'msg_id' => 'Номер',
+            'msg_createtime' => 'Дата',
+            'msg_active' => 'Видимо',
+            'msg_pers_name' => 'Имя',
+            'msg_pers_secname' => 'Отчество',
+            'msg_pers_lastname' => 'Фамилия',
+            'msg_pers_email' => 'Email',
+            'msg_pers_phone' => 'Телефон',
+            'msg_pers_org' => 'Учреждение',
+            'msg_pers_region' => 'Район',
+            'msg_pers_text' => 'Обращение',
+            'msg_comment' => 'Комментарий',
+            'msg_empl_id' => 'Ответчик',
+            'msg_empl_command' => 'Поручение ответчику',
+            'msg_empl_remark' => 'Замечание ответчику',
+            'msg_answer' => 'Ответ',
+            'msg_answertime' => 'Дата ответа',
+            'msg_oldcomment' => 'Старые теги',
+            'msg_flag' => 'Состояние',
+            'msg_subject' => 'Тема',
+            'ekis_id' => 'Учреждение',
+//            'fl_hint' => 'Описание',
+
+            'employer' => 'Ответчик',
+            'asker' => 'Проситель',
+            'answers' => 'Соответчики',
+            'askid' => 'Номер и дата',
+            'askcontacts' => 'Контакты',
+            'tags' => 'Теги',
+            'alltags' => 'Теги',
+            'file' => 'Файл',
+        ];
+*/
+    }
+
+    /**
      * Creates data provider instance with search query applied
      *
      * @param array $params
@@ -230,7 +276,18 @@ class MessageSearch extends Message
             'ekis_id' => $this->ekis_id,
         ]);
 
-        $query->andFilterWhere(['like', 'msg_pers_lastname', $this->msg_pers_lastname]);
+        if( !empty($this->msg_pers_lastname) ) {
+            $a = explode(' ', $this->msg_pers_lastname);
+            foreach($a As $v) {
+                $v = trim($v);
+                if( $v === '' ) {
+                    continue;
+                }
+                $query->andFilterWhere(['or', ['like', 'msg_pers_lastname', $v], ['like', 'msg_pers_name', $v], ['like', 'msg_pers_secname', $v]] );
+            }
+        }
+
+//        $query->andFilterWhere(['like', 'msg_pers_lastname', $this->msg_pers_lastname]);
 //        $query->andFilterWhere(['like', 'msg_pers_org', $this->msg_pers_org]);
 
         return $dataProvider;
