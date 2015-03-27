@@ -42,7 +42,9 @@ class User extends ActiveRecord  implements IdentityInterface
 
     public static $_model = null;
     public static $_cache = [];
+
     public $selectedGroups = null;
+    public $newPassword = null;
 
     public function behaviors()
     {
@@ -50,11 +52,14 @@ class User extends ActiveRecord  implements IdentityInterface
             return [];
         }
         return [
+            // устанавливаем пароль для нового пользователя и отправляем ему письмо
             'passwordBehavior' => [
                 'class' => PasswordBehavior::className(),
                 'attributes' => [
                     ActiveRecord::EVENT_BEFORE_INSERT => true,
-                ]
+                ],
+                'template' => 'user_create_info',
+                'subject' => 'Регистрация на портале ' . Yii::$app->name,
             ],
             'timestampBehavior' => [
                 'class' => TimestampBehavior::className(),
@@ -63,6 +68,12 @@ class User extends ActiveRecord  implements IdentityInterface
                     ActiveRecord::EVENT_BEFORE_UPDATE => [],
                 ],
                 'value' => new Expression('NOW()'),
+            ],
+            'passwordBehavior' => [
+                'class' => PasswordBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => true,
+                ]
             ],
         ];
     }
@@ -446,6 +457,24 @@ class User extends ActiveRecord  implements IdentityInterface
         );
         self::$_cache[$sKey] = $aData;
         return $aData;
+    }
+
+    /**
+     * Отправка письма пользователю
+     *
+     * @param string $template имя шаблона письма
+     * @param string $subject тема письма
+     * @param array $data данные для письма
+     */
+    public function sendNotificate($template, $subject = '', $data = []) {
+        if( $subject === '' ) {
+            $subject = 'Уведомление портала ' . Yii::$app->name;
+        }
+        Yii::$app->mailer->compose($template, ['model' => $this,])
+            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+            ->setTo($this->us_email)
+            ->setSubject($subject)
+            ->send();
     }
 
 }

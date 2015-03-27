@@ -22,7 +22,7 @@ use app\models\Group;
 */
 ?>
 
-<div class="user-form">
+<div class="user-form" style="margin-bottom: 3em;">
 
     <?php $form = ActiveForm::begin([
             'layout' => 'horizontal',
@@ -62,6 +62,7 @@ use app\models\Group;
             <div class="col-sm-6 col-sm-offset-3">
                 <?= Html::submitButton($model->isNewRecord ? 'Создать' : 'Изменить', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
             </div>
+    <div class="clearfix"></div>
 
     <?php ActiveForm::end(); ?>
 

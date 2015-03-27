@@ -39,6 +39,16 @@ class PasswordBehavior extends Behavior
     public $attributes = [];
 
     /**
+     * @var string шаблон письма о пароле
+     */
+    public $template = '';
+
+    /**
+     * @var string тема письма о пароле
+     */
+    public $subject = '';
+
+    /**
      * Назначаем обработчик для [[owner]] событий.
      * @return array События (array keys) с назначеными им обработчиками (array values).
      */
@@ -58,14 +68,16 @@ class PasswordBehavior extends Behavior
     {
         if ( isset($this->attributes[$event->name]) && $this->attributes[$event->name] ) {
             $sPassword = substr(str_replace(['_', '-'], ['', ''], Yii::$app->security->generateRandomString()), 0, 8);
-            $this->owner->setPassword($sPassword);
-            $this->owner->generateAuthKey();
+            /** @var User $model */
+            $model = $this->owner;
+            $model->newPassword = $sPassword;
 
-            Yii::$app->mailer->compose('newUser', ['user' => $this->owner, 'password' => $sPassword])
-                ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
-                ->setTo($this->owner->us_email)
-                ->setSubject('Регистрация в приложении ' . Yii::$app->name)
-                ->send();
+            $model->setPassword($sPassword);
+            $model->generateAuthKey();
+            $template = empty($this->template) ? 'user_create_info' : $this->template;
+            $subject = empty($this->subject) ? ('Уведомление портала ' . Yii::$app->name) : $this->subject;
+            $model->sendNotificate($template, $subject, ['model' => $model] );
+
         }
     }
 

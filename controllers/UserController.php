@@ -130,10 +130,11 @@ class UserController extends Controller
                 $oGroup = Group::getGroupById($gid);
                 if( $oGroup !== null ) {
                     $model->link('permissions', $oGroup);
-                    Yii::info('Add group ' . $gid);
+//                    Yii::info('Add group ' . $gid);
                 }
             }
-            return $this->redirect(['view', 'id' => $model->us_id]);
+            return $this->redirect(['index']);
+//            return $this->redirect(['view', 'id' => $model->us_id]);
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -159,11 +160,11 @@ class UserController extends Controller
                 $oGroup = Group::getGroupById($gid);
                 if( $oGroup !== null ) {
                     $model->link('permissions', $oGroup);
-                    Yii::info('Add group ' . $gid);
+//                    Yii::info('Add group ' . $gid);
                 }
-                else {
-                    Yii::info("No group: {$gid}");
-                }
+//                else {
+//                    Yii::info("No group: {$gid}");
+//                }
             }
 //            return $this->redirect(['view', 'id' => $model->us_id]);
         }
@@ -184,7 +185,7 @@ class UserController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+//        $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
     }

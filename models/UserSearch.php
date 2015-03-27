@@ -5,6 +5,7 @@ namespace app\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\db\Query;
 use app\models\User;
 
 /**
@@ -12,6 +13,7 @@ use app\models\User;
  */
 class UserSearch extends User
 {
+    public $selectedGroups;
     /**
      * @inheritdoc
      */
@@ -19,7 +21,7 @@ class UserSearch extends User
     {
         return [
             [['us_id', 'us_active'], 'integer'],
-            [['us_xtime', 'us_login', 'us_password_hash', 'us_chekword_hash', 'us_name', 'us_secondname', 'us_lastname', 'us_email', 'us_logintime', 'us_regtime', 'us_workposition', 'us_checkwordtime', 'auth_key', 'email_confirm_token', 'password_reset_token'], 'safe'],
+            [['selectedGroups', 'us_xtime', 'us_login', 'us_password_hash', 'us_chekword_hash', 'us_name', 'us_secondname', 'us_lastname', 'us_email', 'us_logintime', 'us_regtime', 'us_workposition', 'us_checkwordtime', 'auth_key', 'email_confirm_token', 'password_reset_token'], 'safe'],
         ];
     }
 
@@ -64,10 +66,30 @@ class UserSearch extends User
             'us_checkwordtime' => $this->us_checkwordtime,
         ]);
 
+        if( !empty($this->us_name) ) {
+            $a = explode(' ', $this->us_name);
+            foreach($a As $v) {
+                $v = trim($v);
+                if( $v === '' ) {
+                    continue;
+                }
+                $query->andFilterWhere(['or', ['like', 'us_name', $v], ['like', 'us_secondname', $v], ['like', 'us_lastname', $v], ['like', 'us_workposition', $v]] );
+            }
+        }
+
+        if( !empty($this->selectedGroups) ) {
+            $grQuery = (new Query)
+                ->select('usgr_uid')
+                ->from(Usergroup::tableName())
+                ->where(['usgr_gid' => $this->selectedGroups])
+                ->distinct();
+            $query->andFilterWhere(['us_id' => $grQuery]);
+        }
+
         $query->andFilterWhere(['like', 'us_login', $this->us_login])
             ->andFilterWhere(['like', 'us_password_hash', $this->us_password_hash])
             ->andFilterWhere(['like', 'us_chekword_hash', $this->us_chekword_hash])
-            ->andFilterWhere(['like', 'us_name', $this->us_name])
+//            ->andFilterWhere(['like', 'us_name', $this->us_name])
             ->andFilterWhere(['like', 'us_secondname', $this->us_secondname])
             ->andFilterWhere(['like', 'us_lastname', $this->us_lastname])
             ->andFilterWhere(['like', 'us_email', $this->us_email])

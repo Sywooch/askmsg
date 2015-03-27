@@ -25,6 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
+        <?= Html::a('Вернуться к списку', ['index'], ['class' => 'btn btn-default']) ?>
     </p>
 
     <?= DetailView::widget([
