@@ -17,6 +17,7 @@ use app\models\User;
 use app\models\Message;
 use app\models\Regions;
 use app\models\Rolesimport;
+use Httpful\Request;
 
 class SiteController extends Controller
 {
@@ -232,6 +233,40 @@ class SiteController extends Controller
             }
         }
         return $sOut;
+    }
+
+    /*
+     * Вставка фейковых записей
+     * сначала генерим фикстуры php yii fixture/generate-all --count=10
+     * потом выполняем этот экшен, чтобы получить тестовые данные
+     * https://github.com/fzaninotto/Faker - полный список вариантов
+     * https://github.com/yiisoft/yii2/tree/master/extensions/faker - как в yii запускать
+     */
+    public function actionTesthttp()
+    {
+        $id = 12241;
+        $sOut = 'No result';
+        if( $id > 0 ) {
+            $data = [
+                'filters' => [
+                    'eo_id' => $id,
+                ],
+/*                'maskarade' => [
+                    'eo_id' => "id",
+                    'eo_short_name' => "text",
+                ],*/
+//                'fields' => implode(";", ["eo_id", "eo_short_name", "eo_district_name_id"]),
+            ];
+            $request = Request::get('http://hastur.temocenter.ru/task/eo.search/', http_build_query($data), 'application/x-www-form-urlencoded')
+                ->addHeader('Accept', 'application/json; charset=UTF-8');
+//                ->body(http_build_query($data))
+//                ->contentType('application/x-www-form-urlencoded');
+
+            $response = $request->send();
+
+            $sOut = "\n" . http_build_query($data) . "\n" . print_r($response, true);
+        }
+        return $id . str_replace("\n", "<br />", htmlspecialchars($sOut));
     }
 
 }

@@ -22,6 +22,7 @@ use app\models\Msgtags;
 use app\models\Rolesimport;
 use app\components\AttributewalkBehavior;
 use app\components\NotificateBehavior;
+use Httpful\Request;
 
 /**
  * This is the model class for table "{{%message}}".
@@ -261,6 +262,7 @@ class Message extends \yii\db\ActiveRecord
             [['file'], 'safe'],
             [['file'], 'file', 'maxFiles' => $fileCount, 'maxSize' => Yii::$app->params['message.file.maxsize'], 'extensions' => Yii::$app->params['message.file.ext']],
 //            [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}')), 'allowArray' => true],
+            [['ekis_id'], 'setupEkisData', 'on'=>'person',],
             [['msg_id', 'msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject', 'ekis_id'], 'integer'],
             [['msg_pers_text'], 'string', 'max' => self::MAX_PERSON_TEXT_LENGTH, 'on' => 'person'],
             [['msg_answer', 'msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_pers_org'], 'string'],
@@ -273,6 +275,26 @@ class Message extends \yii\db\ActiveRecord
                 'whenClient' => "function (attribute, value) { return [".implode(',', $aFlagsToAnswer)."].indexOf(parseInt($('#".Html::getInputId($this, 'msg_flag') ."').val())) != -1 ;}"
             ]
         ];
+    }
+
+    public function setupEkisData($attribute, $params) {
+        $id = $this->ekis_id;
+        if( $id > 0 ) {
+            $data = [
+                'filters' => [
+                    'eo_id' => $id,
+                ],
+                'maskarade' => [
+                    'eo_id' => "id",
+                    'eo_short_name' => "text",
+                ],
+                'fields' => implode(";", ["eo_id", "eo_short_name", "eo_district_name_id"]),
+            ];
+            Request::post('http://hastur.temocenter.ru/task/eo.search/')
+                ->body(json_encode($data))
+                ->send();
+
+        }
     }
 
     /**

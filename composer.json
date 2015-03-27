@@ -39,7 +39,8 @@
         "kartik-v/yii2-widget-fileinput": "*",
         "vova07/yii2-fileapi-widget": "*",
         "creativedream/jqueryfiler": "1.0",
-        "kartik-v/yii2-export": "*"
+        "kartik-v/yii2-export": "*",
+        "nategood/httpful": "*"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",
