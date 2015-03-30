@@ -271,7 +271,7 @@ class SiteController extends Controller
             }
             return /* $id . */ str_replace("\n", "<br />", htmlspecialchars($sOut));
         }
-
+/*
         $oldConnection = Yii::$app->dbold;
         $sql = 'Select m.ID As MSGID, m.*, p.*, a.*, a.VALUE As dopuser '
             . 'From b_iblock_element_prop_s52 p, b_iblock_element m '
@@ -284,7 +284,7 @@ class SiteController extends Controller
         foreach($aMsg As $ad) {
             echo $ad['PROPERTY_194'] . ' ' . $ad['PROPERTY_195'] . ' ' . (($ad['PROPERTY_196'] === null) ? '' : $ad['PROPERTY_196']) . "<br />\n";
         }
-
+*/
 
 
     }
