@@ -284,12 +284,14 @@ CREATE TABLE `b_user` (
         $nPrint = 3;
         $n = 0;
         $nNewUser = 0;
+        $nUserPrint = 5;
         foreach($aMsg As $ad) {
 /*
             if( empty($ad['PREVIEW_TEXT']) ) {
                 continue;
             }
  */
+            $nUserPrint--;
             if( $nPrint-- > 0 ) {
                 \Yii::info('Migrate up to ' . Message::tableName() . ' data ' . print_r($ad, true));
             }
@@ -335,6 +337,9 @@ CREATE TABLE `b_user` (
                     }
 //                    elseif() {}
                 }
+
+                $sOutUser = $ad['PROPERTY_194'] . ' -> ' . $oMsg->msg_pers_lastname;
+
                 if( !$oMsg->save() ) {
                     \Yii::info("Error insert into message " . print_r($oMsg->getErrors(), true) . ' ' . print_r($ad, true) );
                     echo 'Error insert into message : ' . print_r($oMsg->getErrors(), true) . "\n";
@@ -356,6 +361,11 @@ CREATE TABLE `b_user` (
                         }
                     }
                 }
+                
+                if( $nUserPrint > 0 ) {
+                    echo $sOutUser . ' -> ' . $oMsg->msg_pers_lastname . "\n";
+                }
+
             }
             else {
                 if( !empty($ad['dopuser']) ) {
