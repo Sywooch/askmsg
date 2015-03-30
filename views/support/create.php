@@ -6,9 +6,9 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\Support */
 
-$this->title = 'Create Support';
-$this->params['breadcrumbs'][] = ['label' => 'Supports', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = 'Сообщение команде поддержки';
+// $this->params['breadcrumbs'][] = ['label' => 'Supports', 'url' => ['index']];
+// $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="support-create">
 

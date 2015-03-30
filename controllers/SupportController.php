@@ -3,11 +3,14 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\Support;
-use app\models\SupportSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
+
+use app\models\Support;
+use app\models\SupportSearch;
+use app\models\Rolesimport;
 
 /**
  * SupportController implements the CRUD actions for Support model.
@@ -17,6 +20,21 @@ class SupportController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['create'],
+                        'roles' => ['@'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['index', 'admin', 'view', 'update'],
+                        'roles' => [Rolesimport::ROLE_ADMIN],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [

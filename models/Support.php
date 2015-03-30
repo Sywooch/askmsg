@@ -15,6 +15,7 @@ use Yii;
  */
 class Support extends \yii\db\ActiveRecord
 {
+
     /**
      * @inheritdoc
      */
@@ -30,9 +31,11 @@ class Support extends \yii\db\ActiveRecord
     {
         return [
             [['sup_createtime'], 'safe'],
-            [['sup_message', 'sup_empl_id'], 'required'],
+            [['sup_message'], 'required'], // , 'sup_empl_id'
             [['sup_message'], 'string'],
-            [['sup_empl_id', 'sup_active'], 'integer']
+            [['sup_empl_id', 'sup_active'], 'integer'],
+            [['sup_createtime'], 'filter', 'filter' => function($v){ return empty($v) ? new Expression('NOW()') : $v; }],
+            [['sup_empl_id'], 'filter', 'filter' => function($v){ return empty($v) ? Yii::$app->user->id : $v; }],
         ];
     }
 
@@ -42,11 +45,11 @@ class Support extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'sup_id' => 'Sup ID',
-            'sup_createtime' => 'Sup Createtime',
-            'sup_message' => 'Sup Message',
-            'sup_empl_id' => 'Sup Empl ID',
-            'sup_active' => 'Sup Active',
+            'sup_id' => 'id',
+            'sup_createtime' => 'Создано',
+            'sup_message' => 'Текст',
+            'sup_empl_id' => 'Пользователь',
+            'sup_active' => 'Актуально',
         ];
     }
 }

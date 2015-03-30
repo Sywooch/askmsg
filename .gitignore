@@ -32,3 +32,9 @@ phpunit.phar
 
 *local.php
 /web/bitrix
+
+.bash_logout
+.bashrc
+.cache
+.profile
+.ssh
