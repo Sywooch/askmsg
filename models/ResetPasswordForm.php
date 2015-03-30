@@ -68,6 +68,7 @@ class ResetPasswordForm extends Model
     public function resetPassword()
     {
         $user = $this->_user;
+        $user->scenario = 'passwordop';
         $user->setPassword($this->password);
         $user->removePasswordResetToken();
 

@@ -1,8 +1,9 @@
 <?php
 namespace app\models;
 
-use app\models\User;
+use yii;
 use yii\base\Model;
+use app\models\User;
 
 /**
  * Password reset request form
@@ -46,14 +47,31 @@ class PasswordResetRequestForm extends Model
             if (!User::isPasswordResetTokenValid($user->password_reset_token)) {
                 $user->generatePasswordResetToken();
             }
+            $user->scenario = 'passwordop';
 
-            if ($user->save()) {
+            if( $user->save() ) {
 //                return \Yii::$app->mailer->compose(['html' => 'passwordResetToken-html', 'text' => 'passwordResetToken-text'], ['user' => $user])
-                return \Yii::$app->mailer->compose('passwordResetToken-html', ['user' => $user])
-                    ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name . ' robot'])
+                $aMessages = [];
+                $oMsg = Yii::$app->mailer->compose('passResetToken', ['user' => $user])
+                    ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
                     ->setTo($this->email)
-                    ->setSubject('Password reset for ' . \Yii::$app->name)
-                    ->send();
+                    ->setSubject('Восстановление пароля на сайте ' . \Yii::$app->name);
+                $bRet = $oMsg->send();
+/*                $oMsg = \Yii::$app->mailer->compose('passwordResetToken-html', ['user' => $user])
+                    ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
+                    ->setTo($this->email)
+                    ->setSubject('Восстановление пароля на сайте ' . \Yii::$app->name);
+                $bRet = $oMsg->send();
+                $aMessages = [$oMsg];
+*/
+//                $bRet = Yii::$app->mailer->sendMultiple($aMessages);
+                if( !$bRet ) {
+                    \Yii::error("Error send email to [PasswordResetRequestForm::sendEmail()] " . $this->email);
+                }
+                return $bRet;
+            }
+            else {
+                \Yii::error(print_r($user->getErrors(), true));
             }
         }
 

@@ -130,6 +130,11 @@ class User extends ActiveRecord  implements IdentityInterface
             'us_chekword_hash',
             'us_password_hash',
         ];
+        $scenarios['passwordop'] = [
+            'password_reset_token',
+            'email_confirm_token',
+            'us_password_hash',
+        ];
         return $scenarios;
     }
 
