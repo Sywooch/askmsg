@@ -366,7 +366,7 @@ EOT;
 
     <?=
     $this->render(
-        '_view',
+        '_view01',
         [
             'model' => $model,
         ]
