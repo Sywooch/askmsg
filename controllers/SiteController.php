@@ -18,6 +18,7 @@ use app\models\Message;
 use app\models\Regions;
 use app\models\Rolesimport;
 use Httpful\Request;
+use Httpful\Response;
 
 class SiteController extends Controller
 {
@@ -236,11 +237,7 @@ class SiteController extends Controller
     }
 
     /*
-     * Вставка фейковых записей
-     * сначала генерим фикстуры php yii fixture/generate-all --count=10
-     * потом выполняем этот экшен, чтобы получить тестовые данные
-     * https://github.com/fzaninotto/Faker - полный список вариантов
-     * https://github.com/yiisoft/yii2/tree/master/extensions/faker - как в yii запускать
+     * Тест получения данных с api
      */
     public function actionTesthttp()
     {
@@ -251,22 +248,27 @@ class SiteController extends Controller
                 'filters' => [
                     'eo_id' => $id,
                 ],
-/*                'maskarade' => [
+                'maskarade' => [
                     'eo_id' => "id",
                     'eo_short_name' => "text",
-                ],*/
-//                'fields' => implode(";", ["eo_id", "eo_short_name", "eo_district_name_id"]),
+                ],
+                'fields' => implode(";", ["eo_id", "eo_short_name", "eo_district_name_id"]),
             ];
-            $request = Request::get('http://hastur.temocenter.ru/task/eo.search/', http_build_query($data), 'application/x-www-form-urlencoded')
-                ->addHeader('Accept', 'application/json; charset=UTF-8');
-//                ->body(http_build_query($data))
-//                ->contentType('application/x-www-form-urlencoded');
+            $request = Request::post('http://hastur.temocenter.ru/task/eo.search/') // , http_build_query($data), 'application/x-www-form-urlencoded'
+                ->addHeader('Accept', 'application/json; charset=UTF-8')
+                ->body(http_build_query($data))
+                ->contentType('application/x-www-form-urlencoded');
 
+            /** @var Response $response */
             $response = $request->send();
-
-            $sOut = "\n" . http_build_query($data) . "\n" . print_r($response, true);
+            $aData = json_decode($response->body, true);
+            $ob = null;
+            if( $aData['total'] > 0 ) {
+                $ob = array_pop($aData['list']);
+            }
+            $sOut = /*"\n" . http_build_query($data) . "\n" . */ print_r($ob, true);
         }
-        return $id . str_replace("\n", "<br />", htmlspecialchars($sOut));
+        return /* $id . */ str_replace("\n", "<br />", htmlspecialchars($sOut));
     }
 
 }

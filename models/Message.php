@@ -23,6 +23,7 @@ use app\models\Rolesimport;
 use app\components\AttributewalkBehavior;
 use app\components\NotificateBehavior;
 use Httpful\Request;
+use Httpful\Response;
 
 /**
  * This is the model class for table "{{%message}}".
@@ -278,22 +279,18 @@ class Message extends \yii\db\ActiveRecord
     }
 
     public function setupEkisData($attribute, $params) {
-        $id = $this->ekis_id;
-        if( $id > 0 ) {
-            $data = [
-                'filters' => [
-                    'eo_id' => $id,
-                ],
-                'maskarade' => [
-                    'eo_id' => "id",
-                    'eo_short_name' => "text",
-                ],
-                'fields' => implode(";", ["eo_id", "eo_short_name", "eo_district_name_id"]),
-            ];
-            Request::post('http://hastur.temocenter.ru/task/eo.search/')
-                ->body(json_encode($data))
-                ->send();
-
+        $ob = $this->getEkisOrgData($this->ekis_id);
+        if( $ob !== null ) {
+            $sOld = "{$this->msg_pers_org} + {$this->msg_pers_region}";
+            $this->msg_pers_org = $ob['text'];
+            $this->msg_pers_region = $ob['eo_district_name_id'];
+            Yii::info("setupEkisData({$this->ekis_id}): {$sOld} -> {$this->msg_pers_org} + {$this->msg_pers_region}");
+/*
+[eo_district_name] => Восточный
+[eo_district_name_id] => 1
+[id] => 12241
+[text] => ГБОУ гимназия № 1404 "Гамма"
+*/
         }
     }
 
@@ -922,5 +919,34 @@ class Message extends \yii\db\ActiveRecord
         if( count($aMessages) > 0 ) {
             Yii::$app->mailer->sendMultiple($aMessages);
         }
+    }
+
+    public function getEkisOrgData($id) {
+        $ob = null;
+        if( $id > 0 ) {
+            $data = [
+                'filters' => [
+                    'eo_id' => $id,
+                ],
+                'maskarade' => [
+                    'eo_id' => "id",
+                    'eo_short_name' => "text",
+                ],
+                'fields' => implode(";", ["eo_id", "eo_short_name", "eo_district_name_id"]),
+            ];
+            $request = Request::post('http://hastur.temocenter.ru/task/eo.search/') // , http_build_query($data), 'application/x-www-form-urlencoded'
+                ->addHeader('Accept', 'application/json; charset=UTF-8')
+                ->body(http_build_query($data))
+                ->contentType('application/x-www-form-urlencoded');
+
+            /** @var Response $response */
+            $response = $request->send();
+            $aData = json_decode($response->body, true);
+            if( isset($aData['total']) && ($aData['total'] > 0) ) {
+                $ob = array_pop($aData['list']);
+            }
+        }
+        return $ob;
+
     }
 }

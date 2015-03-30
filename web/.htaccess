@@ -1,5 +1,47 @@
 RewriteEngine on
- 
+
+#################################################################################
+#                                                                               #
+#             Begin rewrite rules for "Under construction" page                 #
+#                                                                               #
+#################################################################################
+# RewriteCond %{REQUEST_URI} !/construct.html$ [NC]
+# RewriteCond %{REQUEST_URI} !\.(jpe?g?|png|gif) [NC]
+# RewriteRule .* /construct.html? [R=302,L]
+#################################################################################
+#                                                                               #
+#             Finish rewrite rules for "Under construction" page                #
+#                                                                               #
+#################################################################################
+
+
+#################################################################################
+#                                                                               #
+#   Begin rewrite rules for old URLs ( search engines, user links and others )  #
+#                                                                               #
+#################################################################################
+rewriteCond %{QUERY_STRING} ^date=([0-9.]+)$
+rewriteRule ^list.php$ /message/index?MessageSearch[msg_createtime]=%1 [R=301,L]
+
+rewriteCond %{QUERY_STRING} ^PAGEN_1=([0-9]+)$
+rewriteRule ^list.php$ /message/index?page=%1 [R=301,L]
+
+rewriteRule ^list.php$ /message/index? [R=301,L]
+
+rewriteCond %{QUERY_STRING} ^ID=([0-9]+)$
+rewriteRule ^detail.php$ /message/%1? [R=301,L]
+#################################################################################
+#                                                                               #
+#                    Finish rewrite rules for old URLs                          #
+#                                                                               #
+#################################################################################
+#
+
+#################################################################################
+#                                                                               #
+#                    Rewrite rules for Yii start script                         #
+#                                                                               #
+#################################################################################
 # If a directory or a file exists, use it directly
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

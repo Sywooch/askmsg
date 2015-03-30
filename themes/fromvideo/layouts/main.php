@@ -84,10 +84,10 @@ $aMenuItems[] = Yii::$app->user->isGuest ?
                                 <span class="logo-box" href="/">
                                     <div class="text">
                                         <div class="line1">
-                                            Обращения
+                                            Обращения граждан
                                         </div>
                                         <div class="line2">
-                                            Департамента образования города Москвы
+                                            Департамент образования города Москвы
                                         </div>
                                     </div>
                                 </span>

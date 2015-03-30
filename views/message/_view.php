@@ -49,7 +49,7 @@ $oSubj = $model->subject;
     ?>
 
     <div class="listtext">
-        <?= str_replace("\n", "<br />\n", Html::encode($model->msg_pers_text)) ?>
+        <?= str_replace("\n", "&nbsp;<br />\n", Html::encode($model->msg_pers_text)) ?>
     </div>
 
     <?php
@@ -100,7 +100,7 @@ $oSubj = $model->subject;
     <?php endif; ?>
 
     <?php if( !empty($model->msg_answer)
-           && (($model->msg_flag == Msgflags::MFLG_SHOW_ANSWER) || Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM))  ): ?>
+           && (($model->msg_flag == Msgflags::MFLG_SHOW_ANSWER) || Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM))  ):?>
         <div class="listemploee">
             <strong>Ответ: </strong>
             <?= $model->msg_answer ?>

@@ -31,3 +31,4 @@ phpunit.phar
 /models/*.old
 
 *local.php
+/web/bitrix
