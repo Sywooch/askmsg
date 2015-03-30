@@ -241,34 +241,52 @@ class SiteController extends Controller
      */
     public function actionTesthttp()
     {
-        $id = 12241;
-        $sOut = 'No result';
-        if( $id > 0 ) {
-            $data = [
-                'filters' => [
-                    'eo_id' => $id,
-                ],
-                'maskarade' => [
-                    'eo_id' => "id",
-                    'eo_short_name' => "text",
-                ],
-                'fields' => implode(";", ["eo_id", "eo_short_name", "eo_district_name_id"]),
-            ];
-            $request = Request::post('http://hastur.temocenter.ru/task/eo.search/') // , http_build_query($data), 'application/x-www-form-urlencoded'
+        if( false ) {
+            $id = 12241;
+            $sOut = 'No result';
+            if ($id > 0) {
+                $data = [
+                    'filters' => [
+                        'eo_id' => $id,
+                    ],
+                    'maskarade' => [
+                        'eo_id' => "id",
+                        'eo_short_name' => "text",
+                    ],
+                    'fields' => implode(";", ["eo_id", "eo_short_name", "eo_district_name_id"]),
+                ];
+                $request = Request::post('http://hastur.temocenter.ru/task/eo.search/')// , http_build_query($data), 'application/x-www-form-urlencoded'
                 ->addHeader('Accept', 'application/json; charset=UTF-8')
-                ->body(http_build_query($data))
-                ->contentType('application/x-www-form-urlencoded');
+                    ->body(http_build_query($data))
+                    ->contentType('application/x-www-form-urlencoded');
 
-            /** @var Response $response */
-            $response = $request->send();
-            $aData = json_decode($response->body, true);
-            $ob = null;
-            if( $aData['total'] > 0 ) {
-                $ob = array_pop($aData['list']);
+                /** @var Response $response */
+                $response = $request->send();
+                $aData = json_decode($response->body, true);
+                $ob = null;
+                if ($aData['total'] > 0) {
+                    $ob = array_pop($aData['list']);
+                }
+                $sOut = print_r($ob, true);
             }
-            $sOut = /*"\n" . http_build_query($data) . "\n" . */ print_r($ob, true);
+            return /* $id . */ str_replace("\n", "<br />", htmlspecialchars($sOut));
         }
-        return /* $id . */ str_replace("\n", "<br />", htmlspecialchars($sOut));
+
+        $oldConnection = Yii::$app->dbold;
+        $sql = 'Select m.ID As MSGID, m.*, p.*, a.*, a.VALUE As dopuser '
+            . 'From b_iblock_element_prop_s52 p, b_iblock_element m '
+            . 'Left Outer Join b_iblock_element_prop_m52 a On a.IBLOCK_ELEMENT_ID = m.ID '
+            . 'Where m.IBLOCK_ID = 52 And p.IBLOCK_ELEMENT_ID = m.ID And LENGTH(m.PREVIEW_TEXT) > 0 Limit 20'; //  And m.ID > 82510 Order By m.ID Limit 20
+
+        $aMsg = $oldConnection->createCommand($sql)->query();
+        $nCount = $aMsg->count();
+        echo '<p>message get ' . $nCount . " records</p>\n";
+        foreach($aMsg As $ad) {
+            echo $ad['PROPERTY_194'] . ' ' . $ad['PROPERTY_195'] . ' ' . (($ad['PROPERTY_196'] === null) ? '' : $ad['PROPERTY_196']) . "<br />\n";
+        }
+
+
+
     }
 
 }
