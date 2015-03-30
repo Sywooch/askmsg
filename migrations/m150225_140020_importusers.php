@@ -361,7 +361,7 @@ CREATE TABLE `b_user` (
                         }
                     }
                 }
-                
+
                 if( $nUserPrint > 0 ) {
                     echo $sOutUser . ' -> ' . $oMsg->msg_pers_lastname . "\n";
                 }
