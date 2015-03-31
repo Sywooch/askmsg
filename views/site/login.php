@@ -46,8 +46,10 @@ $this->params['breadcrumbs'][] = $this->title;
     <strong><?php echo Html::a("Регистрация", ['site/signup']); ?></strong>
      */
     ?>
-    <div class="col-lg-offset-1" style="color:#999;">
-        <strong><?php echo Html::a("Забыли пароль", ['site/requestpasswordreset']); ?></strong>
+    <div class="col-lg-offset-1" style="color:#999; margin-bottom: 3em;">
+        <strong><?php echo Html::a("Установить новый пароль", ['site/requestpasswordreset']); ?></strong>
     </div>
+
+    <div class="clearfix"></div>
 
 </div>
