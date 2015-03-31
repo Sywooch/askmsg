@@ -300,20 +300,22 @@ class User extends ActiveRecord  implements IdentityInterface
      */
     public function validatePassword($password)
     {
-        $bRet = $this->validateOldPassword($password);
-        Yii::warning("validateOldPassword({$password}): " . ($bRet ? 'yes' : 'no'));
-        if( !$bRet ) {
+        $bRet =false;
+        if( preg_match('/^\$2[axy]\$(\d\d)\$[\.\/0-9A-Za-z]{22}/', $this->us_password_hash, $matches) && $matches[1] >= 4 && $matches[1] <= 30) {
             $bRet = Yii::$app->security->validatePassword($password, $this->us_password_hash);
-            Yii::warning("validatePassword({$password}): " . ($bRet ? 'yes' : 'no'));
         }
-        else {
-            // Перекодируем пароль новым алгоритмом
-            $this->setPassword($password);
-            $this->generateAuthKey();
-            if( !$this->save() ) {
-                Yii::error("Can't save new password " . print_r($this->getErrors(), true));
+        Yii::warning("validatePassword({$password}): " . ($bRet ? 'yes' : 'no'));
+        if( !$bRet ) {
+            $bRet = $this->validateOldPassword($password);
+            Yii::warning("validateOldPassword({$password}): " . ($bRet ? 'yes' : 'no'));
+            if( $bRet ) {
+                // Перекодируем пароль новым алгоритмом
+                $this->setPassword($password);
+                $this->generateAuthKey();
+                if( !$this->save() ) {
+                    Yii::error("Can't save new password " . print_r($this->getErrors(), true));
+                }
             }
-
         }
         return $bRet;
     }
