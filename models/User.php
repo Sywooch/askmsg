@@ -300,19 +300,20 @@ class User extends ActiveRecord  implements IdentityInterface
      */
     public function validatePassword($password)
     {
-        $bRet = Yii::$app->security->validatePassword($password, $this->us_password_hash);
-        Yii::warning("validatePassword({$password}): " . ($bRet ? 'yes' : 'no'));
+        $bRet = $this->validateOldPassword($password);
+        Yii::warning("validateOldPassword({$password}): " . ($bRet ? 'yes' : 'no'));
         if( !$bRet ) {
-            $bRet = $this->validateOldPassword($password);
-            Yii::warning("validateOldPassword({$password}): " . ($bRet ? 'yes' : 'no'));
-            if( $bRet ) {
-                // Перекодируем пароль новым алгоритмом
-                $this->setPassword($password);
-                $this->generateAuthKey();
-                if( !$this->save() ) {
-                    Yii::error("Can't save new password " . print_r($this->getErrors(), true));
-                }
+            $bRet = Yii::$app->security->validatePassword($password, $this->us_password_hash);
+            Yii::warning("validatePassword({$password}): " . ($bRet ? 'yes' : 'no'));
+        }
+        else {
+            // Перекодируем пароль новым алгоритмом
+            $this->setPassword($password);
+            $this->generateAuthKey();
+            if( !$this->save() ) {
+                Yii::error("Can't save new password " . print_r($this->getErrors(), true));
             }
+
         }
         return $bRet;
     }
