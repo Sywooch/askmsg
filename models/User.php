@@ -301,8 +301,10 @@ class User extends ActiveRecord  implements IdentityInterface
     public function validatePassword($password)
     {
         $bRet = Yii::$app->security->validatePassword($password, $this->us_password_hash);
+        Yii::warning("validatePassword({$password}): " . ($bRet ? 'yes' : 'no'));
         if( !$bRet ) {
             $bRet = $this->validateOldPassword($password);
+            Yii::warning("validateOldPassword({$password}): " . ($bRet ? 'yes' : 'no'));
             if( $bRet ) {
                 // Перекодируем пароль новым алгоритмом
                 $this->setPassword($password);
@@ -327,6 +329,7 @@ class User extends ActiveRecord  implements IdentityInterface
         $hash = $this->us_password_hash;
         $salt = substr($hash, 0, 8);
         $checkToken = $salt . md5($salt . $password);
+        Yii::warning("validateOldPassword({$password}): salt = {$salt} checkToken = {$checkToken} hash = {$hash} " . (($checkToken==$hash) ? 'yes' : 'no'));
         return ($checkToken==$hash);
     }
 
