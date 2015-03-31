@@ -3,17 +3,15 @@
 namespace app\api\modules\v1\controllers;
 
 use yii;
-use yii\filters\auth\HttpBasicAuth;
-use app\models\User;
-use app\api\modules\v1\models\MessageSearch;
-use app\api\modules\v1\models\Message;
+use app\api\modules\v1\models\UserSearch;
+use app\api\modules\v1\models\User;
 
 
-class MessageController extends \yii\rest\ActiveController
+class UserController extends \yii\rest\ActiveController
 {
 
     public function init() {
-        $this->modelClass = Message::className();
+        $this->modelClass = User::className();
         parent::init();
     }
 
@@ -23,23 +21,23 @@ class MessageController extends \yii\rest\ActiveController
         unset($actions['delete']); // $actions['create']
         $actions['index'] = [
             'class' => 'yii\rest\IndexAction',
-            'modelClass' => Message::className(),
+            'modelClass' => User::className(),
             'checkAccess' => [$this, 'checkAccess'],
             'prepareDataProvider' =>
             function($action) {
-                /** @var MessageSearch $model */
-                $model = new MessageSearch();
+                /** @var UserSearch $model */
+                $model = new UserSearch();
                 // TODO: тут поставить входные параметры
-                return $model->searchindex([]) ;
+                return $model->search([]) ;
             },
         ];
         $actions['field'] = [
             'class' => 'app\components\FieldAction',
-            'modelClass' => \app\models\Message::className(),
+            'modelClass' => \app\models\User::className(),
             'checkAccess' => [$this, 'checkAccess'],
-            'defaultfield' => 'msg_id',
+            'defaultfield' => 'us_id',
         ];
-        $actions['create']['scenario'] = 'person';
+//        $actions['create']['scenario'] = 'person';
         return $actions;
     }
 
@@ -50,7 +48,7 @@ class MessageController extends \yii\rest\ActiveController
     public function actionTitle() {
         $aLabels = (new $this->modelClass())->attributeLabels();
         foreach($aLabels As $k=>$v) {
-            if( (substr($k, 0, 4) !== 'msg_') && (strpos($k, '_id') === false) ) {
+            if( (substr($k, 0, 3) !== 'us_') && (strpos($k, '_id') === false) ) {
                 unset($aLabels[$k]);
             }
         }
@@ -63,7 +61,7 @@ class MessageController extends \yii\rest\ActiveController
         $request = Yii::$app->request;
         $username = $request->getAuthUser();
         if( $username !== null ) {
-            $user = User::findIdentityByAccessToken($username);
+            $user = \app\models\User::findIdentityByAccessToken($username);
             if( $user ) {
                 Yii::$app->user->login($user);
             }
