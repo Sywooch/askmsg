@@ -29,6 +29,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= $form->field($model, 'rememberMe', [
         'template' => "<div class=\"col-lg-offset-1 col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
+        'checkboxTemplate' => "<div class=\"checkbox col-lg-offset-1 col-lg-3\">\n{beginLabel}\n{input}\n{labelTitle}\n{endLabel}\n<div class=\"col-lg-8\">{error}</div>\n{hint}\n</div>",
+
     ])->checkbox() ?>
 
     <div class="form-group">
