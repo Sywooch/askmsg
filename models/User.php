@@ -312,6 +312,7 @@ class User extends ActiveRecord  implements IdentityInterface
                 // Перекодируем пароль новым алгоритмом
                 $this->setPassword($password);
                 $this->generateAuthKey();
+                $this->scenario = 'passwordop';
                 if( !$this->save() ) {
                     Yii::error("Can't save new password " . print_r($this->getErrors(), true));
                 }
