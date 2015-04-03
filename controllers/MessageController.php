@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\Msgflags;
 use Yii;
 use yii\db\ActiveRecord;
+use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
@@ -36,7 +37,7 @@ class MessageController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['update', 'delete', 'moderatelist', 'upload', 'instruction'],
+                        'actions' => ['update', 'delete', 'moderatelist', 'upload', 'instruction', 'testmail'],
                         'roles' => [Rolesimport::ROLE_MODERATE_DOGM],
                     ],
                     [
@@ -298,6 +299,31 @@ class MessageController extends Controller
         $model->save();
 
         return $this->redirect(Yii::$app->request->getReferrer());
+    }
+
+    /**
+     * Test email sending
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionTestmail($id)
+    {
+        // $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+
+        $from = Yii::$app->request->getQueryParam('from', Msgflags::MFLG_NEW);
+        $to = Yii::$app->request->getQueryParam('to', Msgflags::MFLG_SHOW_INSTR);
+
+        $model->_oldAttributes['msg_flag'] = $from;
+        $model->msg_flag = $to;
+        if( $model->save(false, ['msg_id']) ) {
+            $s = 'OK';
+        }
+        else {
+            $s = print_r($model->getErrors(), true);
+        }
+
+        return str_replace("\n", "<br />\n", Html::encode($s));
     }
 
     /**

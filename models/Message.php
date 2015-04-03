@@ -224,6 +224,7 @@ class Message extends \yii\db\ActiveRecord
                         ],
                         'value' => function ($event) {
                             /** @var Message $model */
+                            Yii::info('mail on EVENT_AFTER_UPDATE');
                             $model = $event->sender;
                             $model->sendUserNotification([
                                 Message::USERTYPE_PERSON,

@@ -152,6 +152,19 @@ class Msgflags extends \yii\db\ActiveRecord
         return isset($aTrans[$nState]) ? $aTrans[$nState] : [];
     }
 
+/*    const MFLG_THANK = 11;           //	[110] Благодарности                      ** видимо посетителям
+    const MFLG_INT_FIN_INSTR = 12;   //	[111] Выполненные внутренние поручения
+    const MFLG_INT_NEWANSWER = 9;    //	[108] Внутренние ответы
+    const MFLG_INT_REVIS_INSTR = 10; //	[109] На доработку в.п.
+    const MFLG_INT_INSTR = 8;        //	[107] Внутренние поручения
+    const MFLG_NOSHOW = 7;           //	[106] Неопубликованные
+    const MFLG_SHOW_REVIS = 5;       //	[104] На доработку                        ** видимо посетителям
+    const MFLG_SHOW_NO_ANSWER = 6;   //	[105] Опубликованные без ответов          ** видимо посетителям
+    const MFLG_SHOW_ANSWER = 4;      //	[103] Опубликованные ответы               ** видимо посетителям
+    const MFLG_NEW = 1;              //	[100] Новые
+    const MFLG_SHOW_INSTR = 2;       //	[101] Поручения                           ** видимо посетителям
+    const MFLG_SHOW_NEWANSWER = 3;  //	[102] Ответ дан, но не виден              ** видимо посетителям
+*/
     /**
      * Выдача возможных переходов из текущего состояния для ответчика
      *

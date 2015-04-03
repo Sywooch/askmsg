@@ -17,19 +17,23 @@ use yii\helpers\Url;
 
 $aLink = ['message/view', 'id'=>$model->msg_id];
 
+include dirname(__FILE__) . DIRECTORY_SEPARATOR . 'mail_styles_data.php';
+
 ?>
 
 <p>Здравствуйте, <?= Html::encode($model->getShortName()) ?>!</p>
 
 <p>Ваше обращение №<?= Html::encode($model->msg_id) ?> было рассмотрено Департаментом образования города Москвы.</p>
 
-<p><strong>Ответ:</strong></p>
+<p<?= $aMailTextStyles['large_text_01'] ?>>Ответ:</p>
 <?= $model->msg_answer ?>
 
-<p><strong>Ответчик:</strong></p>
+<p<?= $aMailTextStyles['large_text_01'] ?>>Ответчик:</p>
 <p><?= $model->employee->getFullName() ?></p>
 <p><?= $model->employee->us_workposition ?></p>
 
+<p>&nbsp;</p>
+<p>&nbsp;</p>
 <p>С уважением, Департамент образования города Москвы</p>
 
 <p>Сообщение сгенерировано автоматически, отвечать на него не нужно</p>
