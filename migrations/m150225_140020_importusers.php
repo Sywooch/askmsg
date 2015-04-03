@@ -15,6 +15,7 @@ class m150225_140020_importusers extends Migration
 {
     public function up()
     {
+//        return true;
         Yii::setAlias('@webroot', dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'web');
 //        return true;
 //        $sf = \Yii::getAlias('@app') . DIRECTORY_SEPARATOR . 'runtime' . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . 'migration.log';
@@ -115,6 +116,40 @@ CREATE TABLE `b_user` (
         $nPrint = 3;
         $aUserMap = [];
 
+        $aDel = [
+            'szouo' => 0,
+            'EvdokimovEO' => 0,
+            'krutova' => 0,
+            'svouo' => 0,
+            'chinga@mosedu.ru' => 0,
+            'uzouo' => 0,
+            'stretovich' => 0,
+        ];
+
+        $sChange = <<<EOT
+Биржаков;Александр;Валентинович;Заместитель Начальника Управления организации обучения и социализации в профессиональном и дополнительном образовании;BirzhakovAV;KudryavtsevaNV@edu.mos.ru;
+Бондаренко;Елена;Николаевна;Инспектор Троицкого и Новомосковского административных округов ;BondarenkoEN;tinouo@edu.mos.ru;
+Гаврилов;Александр;Владимирович;Заместитель руководителя Департамента;GavrilovAV;gavrilovav@mos.ru;
+Жданова;Марина;Аркадьевна;Директор ГБОУ СОШ № 554;ZhdanovaM;zhdanovama@edu.mos.ru;
+Муратов;Александр;Владимирович;Начальник Управления экономического анализа, бюджетного процесса и правового обеспечения;MuratovAV;muratovav@mos.ru;
+Олтаржевская;Любовь;Евгеньевна;Начальник Управления комплексного сопровождения госпрограмм и инновационных технологий в образовании;uvouo;dogm-sekretar-uvuo@mos.ru;
+Рытов;Алексей;Иванович;Ректор Московского Института Открытого Образования ;ritov;ritov@mcko.ru;
+Тарасенко;Юрий;Владимирович;Начальник Административного Управления;uouo;skr@sinergi.ru;
+Фертман;Виктор;Александрович;Заместитель руководителя Департамента;couo;couo@edu.mos.ru;
+Шашков;Андрей ;Анатольевич;Директор Московского Городского Дворца Детского (Юношеского) Творчества;shashkov_АА;shashkov-64@mail.ru;
+Яковлев;Олег;Иванович;Первый заместитель и.о. руководителя Дирекции;yakovlev;ShumilovaON@mos.ru;
+EOT;
+
+        $aTmpCh = explode("\n", $sChange);
+        $aChange = [];
+        foreach($aTmpCh As $v) {
+            $v = trim($v);
+            if( $v === '' ) {
+                continue;
+            }
+            $a___ = explode(';', $v);
+            $aChange[$a___[4]] = $a___;
+        }
         foreach($aOldUsers As $ad) {
             if( $nPrint-- > 0 ) {
                 \Yii::info('Migrate up to ' . User::tableName() . ' data ' . print_r($ad, true));
@@ -142,6 +177,28 @@ CREATE TABLE `b_user` (
                 ];
                 $oUser->generateAuthKey();
 
+                if( isset($aDel[$oUser->us_login]) ) {
+                    $oUser->us_active = 0;
+                    unset($aDel[$oUser->us_login]);
+                    $s = "IMPORT USERS: set active to 0 [{$oUser->us_login}]\n";
+                    echo $s;
+                    \Yii::info($s);
+                }
+                if( $oUser->us_login == 'direct' ) {
+                    $oUser->us_email = 'StretovichYF@edu.mos.ru';
+                    $s = "IMPORT USERS: change email on [{$oUser->us_login}] to  StretovichYF@edu.mos.ru \n";
+                    echo $s;
+                    \Yii::info($s);
+                }
+                if( isset($aChange[$oUser->us_login]) ) {
+                    $oUser->us_name = $aChange[$oUser->us_login][1];
+                    $oUser->us_secondname = $aChange[$oUser->us_login][2];
+                    $oUser->us_lastname = $aChange[$oUser->us_login][0];
+                    $oUser->us_workposition = $aChange[$oUser->us_login][3];
+                    $oUser->us_email = $aChange[$oUser->us_login][5];
+                    unset($aChange[$oUser->us_login]);
+                }
+
                 if( !$oUser->save() ) {
                     \Yii::info("Error insert into user " . print_r($oUser->getErrors(), true) . ' ' . print_r($ad, true) );
                     echo 'Error insert into user : ' . print_r($oUser->getErrors(), true) . "\n";
@@ -163,27 +220,26 @@ CREATE TABLE `b_user` (
                 \Yii::info("Error insert into user->group " . print_r($oUserGr->getErrors(), true) . ' ' . print_r($ad, true) );
                 echo 'Error insert into user->group : ' . print_r($oUserGr->getErrors(), true) . "\n";
             }
-            /*
-
-            Error insert into user->group : Array
-    (
-        [usgr_uid] => Array
-            (
-                [0] => Usgr Uid cannot be blank.
-            )
-
-    )
-
-    Error insert into user : Array
-    (
-        [selectedGroups] => Array
-            (
-                [0] => Группы cannot be blank.
-            )
-
-    )
-
-            */
+        }
+        foreach($aDel As $k) {
+            $s = "IMPORT USERS: not set active 0 [{$k}]\n";
+            echo $s;
+            \Yii::info($s);
+        }
+        if( count($aDel) == 0 ) {
+            $s = "IMPORT USERS: All users set active 0\n";
+            echo $s;
+            \Yii::info($s);
+        }
+        foreach($aChange As $k=>$v) {
+            $s = "IMPORT USERS: not changed [{$k}] : ".implode(', ', $v)."\n";
+            echo $s;
+            \Yii::info($s);
+        }
+        if( count($aChange) == 0 ) {
+            $s = "IMPORT USERS: All users changed\n";
+            echo $s;
+            \Yii::info($s);
         }
 
         echo 'import users finished' . "\n";
@@ -384,7 +440,7 @@ CREATE TABLE `b_user` (
 
     public function down()
     {
-//        return true;
+        return true;
         Yii::setAlias('@webroot', dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'web');
 //        echo "m150225_140020_importusers cannot be reverted.\n";
         $a = [
