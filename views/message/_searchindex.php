@@ -26,6 +26,18 @@ if( !isset($action) ) {
     $action = ['index'];
 }
 
+$sCss = <<<EOT
+.col-sm-1-dop {
+/*    width: 8.33333%;*/
+    width: 12.4999%;
+}
+.col-sm-11-dop {
+/*    width: 91.6667%;*/
+    width: 87.5%;
+}
+EOT;
+$this->registerCss($sCss);
+
 ?>
 
 <div class="message-search" id="<?= $idserchblock; ?>" style="<?= $model->isEmpty() ? 'display: none; ' : '' ?>clear: both; border: 1px solid #777777; border-radius: 4px; background-color: #eeeeee; padding-top: 2em; padding-bottom: 1em; margin-bottom: 2em;">
@@ -45,7 +57,20 @@ if( !isset($action) ) {
 //                    'hint' => '',
             ],
         ],
-    ]); ?>
+    ]);
+
+    $aSubjectParam = [
+        'horizontalCssClasses' => [
+            'label' => 'col-sm-1 col-sm-1-dop',
+            'offset' => 'col-sm-offset-1',
+            'wrapper' => 'col-sm-11 col-sm-11-dop',
+        ],
+        'inputOptions' => [
+            'disabled' => true,
+        ]
+    ];
+
+    ?>
 
     <div class="col-sm-4">
     <?= $form->field($model, 'msg_id') ?>
@@ -160,11 +185,12 @@ if( !isset($action) ) {
 
     </div>
 
-    <div class="col-sm-4">
+    <div class="col-sm-8">
     <?= $form
         ->field(
             $model,
-            'msg_subject')
+            'msg_subject',
+            $aSubjectParam)
         ->widget(Select2::classname(), [
             'data' => ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_SUBJECT), 'tag_id', 'tag_title'),
             'language' => 'ru',
