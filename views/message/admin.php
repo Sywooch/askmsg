@@ -252,6 +252,22 @@ EOT;
             <?= ExportMenu::widget([
                 'dataProvider' => $exportDataProvider,
                 'filename' => 'user-messages',
+                'exportConfig' => [
+                    ExportMenu::FORMAT_CSV => false,
+                    ExportMenu::FORMAT_TEXT => false,
+                    ExportMenu::FORMAT_PDF => false, /*[
+                        'label' => Yii::t('kvexport', 'PDF'),
+                        'icon' => $isFa ? 'file-pdf-o' : 'floppy-disk',
+                        'iconOptions' => ['class' => 'text-danger'],
+                        'linkOptions' => [],
+                        'options' => ['title' => Yii::t('kvexport', 'Portable Document Format')],
+                        'alertMsg' => Yii::t('kvexport', 'The PDF export file will be generated for download.'),
+                        'mime' => 'application/pdf',
+                        'extension' => 'pdf',
+                        'writer' => 'PDF'
+                    ],
+*/
+                ],
                 'columns' => [
                     'msg_id',
                     [
