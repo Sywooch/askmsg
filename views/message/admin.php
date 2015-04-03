@@ -253,6 +253,7 @@ EOT;
                 'dataProvider' => $exportDataProvider,
                 'filename' => 'user-messages',
                 'exportConfig' => [
+                    ExportMenu::FORMAT_HTML => false,
                     ExportMenu::FORMAT_CSV => false,
                     ExportMenu::FORMAT_TEXT => false,
                     ExportMenu::FORMAT_PDF => false, /*[
