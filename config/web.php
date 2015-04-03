@@ -9,7 +9,7 @@ $params = ArrayHelper::merge(
 
 $config = [
     'id' => 'basic',
-    'name' => 'Обращения в Департамент образования',
+    'name' => 'Обращения к руководителю Департамента образования города Москвы',
     'basePath' => dirname(__DIR__),
     'language' => 'ru',
     'bootstrap' => ['log'],

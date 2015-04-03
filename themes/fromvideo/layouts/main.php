@@ -35,6 +35,8 @@ $isModerate = \Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM);
 $isAnswer = \Yii::$app->user->can(Rolesimport::ROLE_ANSWER_DOGM);
 $isGuest = \Yii::$app->user->isGuest;
 
+$sLogoLink = 'http://dogm.mos.ru';
+
 $aMenuItems = [
     ['label' => 'Главная', 'url' => [Yii::$app->homeUrl], 'active' => Yii::$app->defaultRoute == Yii::$app->controller->getRoute()],
 ];
@@ -80,14 +82,14 @@ $aMenuItems[] = Yii::$app->user->isGuest ?
                             <div class="col-xs-12">
                                 <div id="head" class="row">
                                     <div class="col-xs-5">
-                                        <a href="<?= Yii::$app->homeUrl ?>" class="dogm-logo"></a>
+                                        <a href="<?= $sLogoLink /* Yii::$app->homeUrl */ ?>" class="dogm-logo" target="_blank"></a>
                                 <span class="logo-box" href="/">
                                     <div class="text">
                                         <div class="line1">
-                                            Обращения граждан
+                                            Обращения к руководителю
                                         </div>
                                         <div class="line2">
-                                            Департамент образования города Москвы
+                                            Департамента образования города Москвы
                                         </div>
                                     </div>
                                 </span>

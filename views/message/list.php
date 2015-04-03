@@ -9,7 +9,7 @@ use app\assets\ListdataAsset;
 /* @var $searchModel app\models\MessageSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Обращения граждан';
+$this->title = Yii::$app->name; // 'Обращения граждан';
 $this->params['breadcrumbs'][] = $this->title;
 
 ListdataAsset::register($this);
