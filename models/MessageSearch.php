@@ -59,8 +59,9 @@ class MessageSearch extends Message
     public function attributeLabels()
     {
         $a = parent::attributeLabels();
-        $a['msg_pers_lastname'] = 'Проситель';
+        $a['msg_pers_lastname'] = 'Автор';
         $a['msg_oldcomment'] = 'Школа';
+        $a['ekis_id'] = 'Школа';
         $a['_flagsstring'] = 'Состояние';
 
         return $a;

@@ -440,7 +440,7 @@ EOT;
 
     public function down()
     {
-        return true;
+//        return true;
         Yii::setAlias('@webroot', dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'web');
 //        echo "m150225_140020_importusers cannot be reverted.\n";
         $a = [
