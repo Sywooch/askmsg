@@ -86,7 +86,18 @@ $this->registerJs($sJs, View::POS_READY, 'toggleuserpart');
             </span>
         </div>
     <?php endif; ?>
+    <?php if( !empty($model->msg_curator_id)  ): ?>
+        <?php $bShowFooter = true; ?>
+        <div class="col-sm-3"><strong>Контроль <span style="font-size: 0.8em; /* color: #cccccc; */">исполнения</span></strong></div>
+        <div class="col-sm-9">
+            <?= Html::encode($model->curator->getFullName()) ?>
+            <span class="dopline">
+                <?= Html::encode($model->curator->us_workposition) ?>
+            </span>
+        </div>
+    <?php endif; ?>
     <?php if( $isDopFields && (count($model->answers) > 0) ): ?>
+        <div class="clearfix"></div>
         <div class="col-sm-3"><strong>Соответчик</strong></div>
         <div class="col-sm-9">
             <?php foreach( $model->answers As $k=>$ob ): ?>

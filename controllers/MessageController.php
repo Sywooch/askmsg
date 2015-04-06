@@ -113,7 +113,7 @@ class MessageController extends Controller
         $searchModel = new MessageSearch();
         $searchModel->msgflags = Message::getMessageFilters()[Rolesimport::ROLE_MODERATE_DOGM];
 //        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $dataProvider = $searchModel->maderateSearch(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->moderateSearch(Yii::$app->request->queryParams);
 
         return $this->render('admin', [
             'searchModel' => $searchModel,

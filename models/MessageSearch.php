@@ -108,7 +108,7 @@ class MessageSearch extends Message
      *
      * @return ActiveDataProvider
      */
-    public function maderateSearch($params)
+    public function moderateSearch($params)
     {
         $this->load($params);
 
@@ -153,6 +153,7 @@ class MessageSearch extends Message
 
         $query = Message::find()
             ->with('employee')
+            ->with('curator')
             ->with('answers')
             ->with('alltags')
 //            ->with('attachments')
@@ -272,6 +273,7 @@ class MessageSearch extends Message
         $query = Message::find()
             ->with('employee')
             ->with('answers')
+            ->with('curator')
             ->with('subject')
 //            ->with('alltags')
             ->with('attachments')

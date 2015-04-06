@@ -49,6 +49,7 @@ use Httpful\Response;
  * @property integer $msg_flag
  * @property integer $msg_subject
  * @property integer $ekis_id
+ * @property integer $msg_curator_id
  *
  *
  * @property string $employer
@@ -265,7 +266,7 @@ class Message extends \yii\db\ActiveRecord
             [['file'], 'file', 'maxFiles' => $fileCount, 'maxSize' => Yii::$app->params['message.file.maxsize'], 'extensions' => Yii::$app->params['message.file.ext']],
 //            [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}')), 'allowArray' => true],
             [['ekis_id'], 'setupEkisData', 'on'=>'person',],
-            [['msg_id', 'msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject', 'ekis_id'], 'integer'],
+            [['msg_id', 'msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject', 'ekis_id', 'msg_curator_id'], 'integer'],
             [['msg_pers_text'], 'string', 'max' => self::MAX_PERSON_TEXT_LENGTH, 'on' => 'person'],
             [['msg_answer', 'msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_pers_org'], 'string'],
             [['msg_answer'], 'filter', 'filter' => function($v){ return strip_tags($v, '<p><a><li><ol><ul><strong><b><em><i><u><h1><h2><h3><h4><h5><blockquote><pre><del><br>');  }],
@@ -328,6 +329,7 @@ class Message extends \yii\db\ActiveRecord
                 'msg_flag',
                 'msg_active',
                 'answers',
+                'msg_curator_id',
 //                'alltags',
                 'tagsstring',
                 'msg_answertime',
@@ -426,6 +428,7 @@ class Message extends \yii\db\ActiveRecord
             'msg_subject' => 'Тема',
             'ekis_id' => 'Учреждение',
             'tagsstring' => 'Теги',
+            'msg_curator_id' => 'Инспектор',
 
             'employer' => 'Ответчик',
             'asker' => 'Проситель',
@@ -463,6 +466,14 @@ class Message extends \yii\db\ActiveRecord
      */
     public function getEmployee() {
         return $this->hasOne(User::className(), ['us_id' => 'msg_empl_id']);
+    }
+
+    /*
+     * Отношения к Куратору
+     *
+     */
+    public function getCurator() {
+        return $this->hasOne(User::className(), ['us_id' => 'msg_curator_id']);
     }
 
     /*

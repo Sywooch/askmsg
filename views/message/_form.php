@@ -612,6 +612,14 @@ $aFieldParam = [
 
         <div class="col-sm-6">
             <?= $form
+                ->field($model, 'msg_curator_id')
+                ->widget(Select2::classname(), array_merge($aFieldParam['answer'], ['options' => ['placeholder' => 'Выберите инспектора ...'],]))
+            ?>
+        </div>
+        <div class="clearfix"></div>
+
+        <div class="col-sm-6">
+            <?= $form
                 ->field($model, 'tagsstring')
                 ->widget(Select2::classname(), $aFieldParam['tagsstring'])
             //    ->field($model, 'alltags')
