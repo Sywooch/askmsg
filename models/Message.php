@@ -430,7 +430,7 @@ class Message extends \yii\db\ActiveRecord
             'msg_subject' => 'Тема',
             'ekis_id' => 'Учреждение',
             'tagsstring' => 'Теги',
-            'msg_curator_id' => 'Инспектор',
+            'msg_curator_id' => 'Контролер',
 
             'employer' => 'Ответчик',
             'asker' => 'Проситель',
