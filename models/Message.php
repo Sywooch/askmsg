@@ -425,7 +425,7 @@ class Message extends \yii\db\ActiveRecord
             'msg_flag' => 'Состояние',
             'msg_subject' => 'Тема',
             'ekis_id' => 'Учреждение',
-//            'fl_hint' => 'Описание',
+            'tagsstring' => 'Теги',
 
             'employer' => 'Ответчик',
             'asker' => 'Проситель',
