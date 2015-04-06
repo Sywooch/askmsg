@@ -66,6 +66,7 @@ class Message extends \yii\db\ActiveRecord
     const USERTYPE_PERSON = 'user';
     const USERTYPE_ANSWER = 'answer';
     const USERTYPE_SOANSWER = 'soanswer';
+    const USERTYPE_CURATOR = 'curator';
 
     public $employer; // Ответчик
     public $asker; // Проситель
@@ -225,12 +226,13 @@ class Message extends \yii\db\ActiveRecord
                         ],
                         'value' => function ($event) {
                             /** @var Message $model */
-                            Yii::info('mail on EVENT_AFTER_UPDATE');
+//                            Yii::info('mail on EVENT_AFTER_UPDATE');
                             $model = $event->sender;
                             $model->sendUserNotification([
                                 Message::USERTYPE_PERSON,
                                 Message::USERTYPE_ANSWER,
                                 Message::USERTYPE_SOANSWER,
+                                Message::USERTYPE_CURATOR,
                             ]);
                             return $model->msg_flag;
                         },
@@ -816,6 +818,14 @@ class Message extends \yii\db\ActiveRecord
                     Msgflags::MFLG_SHOW_NEWANSWER,
                 ],
             ],
+            self::USERTYPE_CURATOR => [
+                Msgflags::MFLG_SHOW_INSTR => [],
+                Msgflags::MFLG_SHOW_REVIS => [],
+                Msgflags::MFLG_INT_INSTR => [],
+                Msgflags::MFLG_INT_REVIS_INSTR => [],
+                Msgflags::MFLG_INT_NEWANSWER => [],
+                Msgflags::MFLG_SHOW_NEWANSWER => [],
+            ],
             self::USERTYPE_SOANSWER => [
                 Msgflags::MFLG_SHOW_INSTR => [],
                 Msgflags::MFLG_INT_INSTR => [],
@@ -875,6 +885,14 @@ class Message extends \yii\db\ActiveRecord
                 Msgflags::MFLG_INT_REVIS_INSTR => 'ans_notif_revis',
                 Msgflags::MFLG_NEW => 'ans_notif_esc',
             ],
+            self::USERTYPE_CURATOR => [
+                Msgflags::MFLG_SHOW_INSTR => 'curator_notif_instr',
+                Msgflags::MFLG_INT_INSTR => 'curator_notif_instr',
+                Msgflags::MFLG_SHOW_REVIS => 'curator_notif_revis',
+                Msgflags::MFLG_INT_REVIS_INSTR => 'curator_notif_revis',
+                Msgflags::MFLG_INT_NEWANSWER => 'curator_notif_answer',
+                Msgflags::MFLG_SHOW_NEWANSWER => 'curator_notif_answer',
+            ],
             self::USERTYPE_SOANSWER => [
                 Msgflags::MFLG_SHOW_INSTR => 'soans_notif_instr',
                 Msgflags::MFLG_INT_INSTR => 'soans_notif_instr',
@@ -916,6 +934,25 @@ class Message extends \yii\db\ActiveRecord
                                 ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
                                 ->setTo($ob->us_email)
                                 ->setSubject('Обращение №' . $this->msg_id . ' от ' . date('d.m.Y', strtotime($this->msg_createtime)));
+                            if (count($aFiles) > 0) {
+                                foreach ($aFiles As $obFile) {
+                                    /** @var File $obFile */
+                                    $oMsg->attach($obFile->getFullpath(), ['fileName' => $obFile->file_orig_name]);
+                                }
+                            }
+                            $aMessages[] = $oMsg;
+                        }
+                        break;
+
+                    case self::USERTYPE_CURATOR:
+                        if( $this->curator !== null ) {
+                            $aFiles = array_merge($this->getUserFiles(true), $this->getUserFiles(false));
+                            $a = User::find()->where(['us_id' => array_slice($this->getAllanswers(), 1)])->all();
+                            $oMsg = Yii::$app->mailer->compose($sTemplate, ['model' => $this, 'allusers' => $a,])
+                                ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+                                ->setTo($this->curator->us_email)
+                                ->setSubject('Обращение №' . $this->msg_id . ' от ' . date('d.m.Y', strtotime($this->msg_createtime)));
+
                             if (count($aFiles) > 0) {
                                 foreach ($aFiles As $obFile) {
                                     /** @var File $obFile */

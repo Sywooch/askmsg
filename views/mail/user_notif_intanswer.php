@@ -25,7 +25,7 @@ include dirname(__FILE__) . DIRECTORY_SEPARATOR . 'mail_styles_data.php';
 
 <p>Ваше обращение №<?= Html::encode($model->msg_id) ?> было рассмотрено Департаментом образования города Москвы.</p>
 
-<p<?= $aMailTextStyles['large_text_01'] ?>>Ответ:</p>
+<p<?= $aMailTextStyles['large_text_01'] ?>>На него подготовлен следующий ответ:</p>
 <?= $model->msg_answer ?>
 
 <p<?= $aMailTextStyles['large_text_01'] ?>>Ответчик:</p>
