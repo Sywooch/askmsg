@@ -255,8 +255,9 @@ EOT;
                 'exportConfig' => [
                     ExportMenu::FORMAT_HTML => false,
                     ExportMenu::FORMAT_CSV => false,
-                    ExportMenu::FORMAT_TEXT => false,
-                    ExportMenu::FORMAT_PDF => false, /*[
+                    // ExportMenu::FORMAT_TEXT => false,
+                    //ExportMenu::FORMAT_PDF => false,
+                    /*[
                         'label' => Yii::t('kvexport', 'PDF'),
                         'icon' => $isFa ? 'file-pdf-o' : 'floppy-disk',
                         'iconOptions' => ['class' => 'text-danger'],

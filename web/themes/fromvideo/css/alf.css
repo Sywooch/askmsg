@@ -1239,3 +1239,40 @@ ul.video-blocks-blocks li:hover .show-title {
 .login form .control-group .control-label {
   text-align: left;
 }
+
+/* change logo and title position */
+#head .logo-box .text .box1 {
+  color: #333333;
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: bold;
+  height: 51px;
+  line-height: 17px;
+  float: left;
+  width: 145px;
+  border-right: 1px solid #333333;
+  padding: 0;
+  margin-left: 8px;
+/*  margin-top: 3px; */
+}
+
+#head .logo-box .text .box1 span {
+  color: #55aaff;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+#head .logo-box .text .box2 {
+  font-size: 19px;
+  font-weight: bold;
+  height: 52px;
+  line-height: 26px;
+  float: left;
+  width: 180px;
+  margin-left: 12px;
+  padding: 0;
+}
+
+#head .logo-box .text .box2 span {
+  white-space: nowrap;
+}
