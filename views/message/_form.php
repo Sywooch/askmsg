@@ -613,7 +613,7 @@ $aFieldParam = [
         <div class="col-sm-6">
             <?= $form
                 ->field($model, 'msg_curator_id')
-                ->widget(Select2::classname(), array_merge($aFieldParam['answer'], ['options' => ['placeholder' => 'Выберите инспектора ...'],]))
+                ->widget(Select2::classname(), array_merge($aFieldParam['answer'], ['options' => ['placeholder' => 'Выберите контролера ...'],]))
             ?>
         </div>
         <div class="clearfix"></div>
