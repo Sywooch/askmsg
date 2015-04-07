@@ -54,9 +54,9 @@ class HelloController extends Controller
 //            'password_reset_token' => '',
         ];
 
+        $model->setPassword($password);
 /*
         $model->newPassword = $password;
-        $model->setPassword($password);
         $model->generateAuthKey();
         $template = empty($template) ? 'user_create_info' : $template;
         $subject = empty($subject) ? ('Уведомление портала ' . Yii::$app->name) : $subject;
