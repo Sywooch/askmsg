@@ -173,6 +173,7 @@ $this->registerJs($sJs, View::POS_END , 'showselectpart');
 
 // https://github.com/CreativeDream/jquery.filer
 $sExt = '["' . implode('","', Yii::$app->params['message.file.ext']) . '"]';
+$sFileExt = implode(', ', Yii::$app->params['message.file.ext']);
 $nMaxSize = Yii::$app->params['message.file.maxsize'] / 1000000;
 $sJs = <<<EOT
 $('#message-file').filer({
@@ -258,7 +259,7 @@ $('#message-file').filer({
             removeConfirmation: "Удалить этот файл?",
             errors: {
                 filesLimit: "Можно загрузить не более {{fi-limit}} файлов.",
-                filesType: "Файлы только типов {{fi-extension}} разрешены к загрузке.",
+                filesType: "Файлы только типов {$sFileExt} разрешены к загрузке.",
                 filesSize: "{{fi-name}} слишком большой! Выберите файл до {{fi-maxSize}} MB.",
                 filesSizeAll: "Слишком большие файлы выбрали! Пожалуйста ограничьте их размер {{fi-maxSize}} MB."
             }
@@ -815,8 +816,8 @@ $aFieldParam = [
             ->field($model, 'file[]', $aFieldParam['filefield'])
             ->fileInput(['multiple' => true])
             ->hint('Максимальный размер файла: '
-                . Yii::$app->params['message.file.maxsize']
-                . ' байт, Допустимые типы файлов: '
+                . sprintf("%.1f Mb", Yii::$app->params['message.file.maxsize'] / 1000000)
+                . ', Допустимые типы файлов: '
                 . implode(',', Yii::$app->params['message.file.ext'])
             )
         ?>

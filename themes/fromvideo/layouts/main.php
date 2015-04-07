@@ -73,8 +73,8 @@ $aMenuItems[] = Yii::$app->user->isGuest ?
 */        ?>
 
 <div id="site" class="container-fluid">
-    <div class="row">
-        <div class="col-xs-12">
+    <div class="row minheight">
+        <div class="col-xs-12 minheight">
             <div id="alf" class="container-fluid shadow">
                 <div class="row underline">
                     <div class="col-xs-12">
@@ -158,28 +158,28 @@ $aMenuItems[] = Yii::$app->user->isGuest ?
 
             </div>
 
-            <div id="footer" class="container-fluid">
-                <div class="row">
-
-                    <div class="col-xs-6">
-                        <span class="text-url">&copy; 2015</span> <a class="text-url mr" href="http://dogm.mos.ru">Департамент образования города Москвы</a>
-                        <span class="text-url">&copy; 2015 Разработка и поддержка </span><a class="text-url" href="http://temocenter.ru">ТемоЦентр</a>
-                    </div>
-                    <div class="col-xs-6" style="text-align: right;"><span class="text-url"></span>
-                        <?=
-                            Html::a(
-                                Yii::$app->user->isGuest ? 'Вход' : 'Выход (' . Yii::$app->user->identity->us_login . ')',
-                                Yii::$app->user->isGuest ? ['/site/login'] : ['/site/logout'],
-                                Yii::$app->user->isGuest ? ['class' => 'text-url'] : ['class' => 'text-url', 'options' => ['data-method' => 'post']]
-                            )
-                        ?>
-
-                    </div>
-                </div>
-
-            </div>
 
         </div></div>
+    <div id="footer" class="container-fluid">
+        <div class="row">
+
+            <div class="col-xs-6">
+                <span class="text-url">&copy; 2015</span> <a class="text-url mr" href="http://dogm.mos.ru">Департамент образования города Москвы</a>
+                <span class="text-url">&copy; 2015 Разработка и поддержка </span><a class="text-url" href="http://temocenter.ru">ТемоЦентр</a>
+            </div>
+            <div class="col-xs-6" style="text-align: right;"><span class="text-url"></span>
+                <?=
+                Html::a(
+                    Yii::$app->user->isGuest ? 'Вход' : 'Выход (' . Yii::$app->user->identity->us_login . ')',
+                    Yii::$app->user->isGuest ? ['/site/login'] : ['/site/logout'],
+                    Yii::$app->user->isGuest ? ['class' => 'text-url'] : ['class' => 'text-url', 'options' => ['data-method' => 'post']]
+                )
+                ?>
+
+            </div>
+        </div>
+
+    </div>
 </div>
 
 <?php $this->endBody() ?>

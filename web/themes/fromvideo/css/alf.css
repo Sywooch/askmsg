@@ -1276,3 +1276,28 @@ ul.video-blocks-blocks li:hover .show-title {
 #head .logo-box .text .box2 span {
   white-space: nowrap;
 }
+
+html,body{
+  height:100%
+}
+
+#site {
+  min-height:100%;
+  padding-bottom: 68px;
+  position: relative;
+}
+
+#footer {
+  position: absolute;
+  bottom: 0;
+}
+
+#alf {
+  padding-bottom: 20px;
+}
+
+.minheight {
+  min-height: 100%;
+  height: 100%;
+}
+
