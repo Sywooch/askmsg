@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
+use yii\web\View;
 
 use app\models\Msgflags;
 use app\models\Message;
@@ -61,12 +62,24 @@ if( count($aData) > 0 ) {
         }
 //        $s = trim(preg_replace('|^\\[[^\\]]+\\]|', '', $ad['fl_name']));
         $s = trim($aData[$v]['fl_sname']);
-        echo Html::a($s . ' ' . $aData[$v]['cou'], '?' . Html::getInputName(new MessageSearch(), 'msg_flag') . '=' . $v, ['class'=>'btn btn-success', 'role'=>"button"]);
+        echo Html::a($s . ' ' . $aData[$v]['cou'], '?' . Html::getInputName(new MessageSearch(), 'msg_flag') . '=' . $v, ['class'=>'btn btn-success faststatlink', 'role'=>"button"]);
     }
     ?>
     </div>
     <?php
+
+$sJs = <<<EOT
+if( window.location.search.indexOf("&") == -1 ) {
+    jQuery(".faststatlink[href='"+window.location.search+"']")
+        .removeClass("btn-success")
+        .addClass("btn-primary");
 }
+
+EOT;
+
+    $this->registerJs($sJs, View::POS_READY, 'statlinktest');
+}
+
 
 ?>
 
