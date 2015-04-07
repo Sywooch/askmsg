@@ -32,7 +32,7 @@ class MessageController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'list', 'create', 'view'],
+                        'actions' => ['index', 'list', 'create', 'view', 'export'],
                         'roles' => ['?', '@'],
                     ],
                     [
@@ -74,6 +74,22 @@ class MessageController extends Controller
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'action' => ['admin'],
+        ]);
+    }
+
+    /**
+     * Export data to file
+     * @return mixed
+     */
+    public function actionExport()
+    {
+        $searchModel = new MessageSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('export', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'format' => Yii::$app->request->getQueryParam('format', 'xlsx'),
         ]);
     }
 

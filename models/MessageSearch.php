@@ -476,4 +476,25 @@ class MessageSearch extends Message
         return $aData;
     }
 
+    /**
+     * Получаем массив аттрибутов для создания ссылки
+     *
+     * @return array
+     */
+    public function getSearchParams() {
+        $aAttr = $this->safeAttributes();
+        $aRet = [];
+        $ref = new \ReflectionClass($this);
+        $sName = $ref->getShortName();
+
+        foreach($aAttr As $v) {
+            if( empty($this->$v) ) {
+                continue;
+            }
+            $aRet[$sName . '['.$v.']'] = $this->$v;
+        }
+
+        return $aRet;
+    }
+
 }

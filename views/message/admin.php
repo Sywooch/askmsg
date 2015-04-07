@@ -5,6 +5,7 @@ use yii\grid\GridView;
 use yii\bootstrap\Modal;
 use yii\web\View;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 
 use app\assets\GriddataAsset;
 use app\assets\ListdataAsset;
@@ -13,6 +14,7 @@ use app\models\Regions;
 use app\models\Message;
 use app\models\Msgflags;
 use app\models\Tags;
+use app\components\Urllocation;
 
 use kartik\export\ExportMenu;
 
@@ -247,9 +249,7 @@ EOT;
     ?>
     <div class="col-sm-12">
         <div class="form-group">
-            <label class="control-label">Экспорт данных </label>
-
-            <?= ExportMenu::widget([
+            <?= false ? ExportMenu::widget([
                 'dataProvider' => $exportDataProvider,
                 'filename' => 'user-messages',
                 'exportConfig' => [
@@ -336,7 +336,21 @@ EOT;
                     ],
                     'msg_empl_remark',
                 ]
-            ]);  ?>
+            ]) : '' ?>
+            <?php
+//            <label class="control-label">Экспорт данных </label>
+
+//                $sSearch = Urllocation::getSearchPart($searchModel);
+                if( $_SERVER['HTTP_HOST'] == 'host04.design' ) {
+                    $aFormats = [/*'doc', */
+                        'xls', 'xlsx', 'pdf'];
+
+                    foreach ($aFormats As $v) {
+                        echo Html::a($v, Url::to(array_merge(['export'], $searchModel->getSearchParams(), ['format' => $v])), ['class' => 'btn btn-default', 'target' => '_blank']);
+                    }
+                }
+            // http://host04.design/message/export?msg_id=&msg_createtime=&msg_pers_lastname=%D0%BB%D0%B0&msg_pers_email=&msg_pers_org=14&msg_empl_id=&msg_flag%5B0%5D=2&msg_flag%5B1%5D=3&msg_flag%5B2%5D=4&msg_flag%5B3%5D=5&msg_flag%5B4%5D=6&msg_flag%5B5%5D=7&msg_flag%5B6%5D=8&msg_flag%5B7%5D=9&msg_flag%5B8%5D=10&msg_flag%5B9%5D=12&msg_subject=
+            ?>
         </div>
     </div>
 
