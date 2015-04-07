@@ -12,7 +12,6 @@
 use yii\data\ActiveDataProvider;
 use app\models\Message;
 
-
 $dataProvider->prepare();
 $nMaxCount = 1000;
 
@@ -48,13 +47,68 @@ if( $dataProvider->pagination->totalCount > $nMaxCount ) {
     $nPageCount = floor($nMaxCount / $dataProvider->pagination->pageSize);
 }
 
-$cou = 0;
-$nRow = 4;
+$styleTitle = array(
+    'font' => array(
+        'bold' => true,
+        'size' => 18,
+    ),
+    'alignment' => array(
+        'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+    ),
+);
+
+$styleColTitle = array(
+    'font' => array(
+        'bold' => true,
+        'size' => 14,
+    ),
+    'alignment' => array(
+        'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+        'wrap' => true
+    ),
+);
+
+$styleSell = array(
+    'font' => array(
+        'bold' => false,
+        'size' => 10,
+    ),
+    'alignment' => array(
+        'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+        'vertical' => PHPExcel_Style_Alignment::VERTICAL_TOP,
+        'wrap' => true
+    ),
+);
+
+
+$oSheet->getColumnDimension('A')->setWidth(14);
+$oSheet->getColumnDimension('B')->setWidth(20);
+$oSheet->getColumnDimension('C')->setWidth(30);
+$oSheet->getColumnDimension('D')->setWidth(40);
+$oSheet->getColumnDimension('E')->setWidth(80);
+$oSheet->setCellValue('A1', Yii::$app->name)
+    ->setCellValue('A2', 'Выгрузка от ' . date('d.m.Y H:i'));
+$objPHPExcel->getActiveSheet()->mergeCells('A1:E1');
+$objPHPExcel->getActiveSheet()->mergeCells('A2:E2');
+$oSheet->getStyle('A1')->applyFromArray($styleTitle);
+$oSheet->getStyle('A2')->applyFromArray($styleTitle);
+
+$oSheet->fromArray(
+    [
+        '№',
+        'Обращение' . "\r\n" . 'Дата',
+        'Фамилия Имя Отчество',
+        'Тема' . "\r\n" . 'Учреждение',
+        'Обращение'
+    ],
+    null,
+    'A4'
+);
+$oSheet->getStyle('A4:E4')->applyFromArray($styleColTitle);
+
+$cou = 1;
+$nRow = 5;
 $oSheet->getPageSetup()->setRowsToRepeatAtTopByStartAndEnd(1, $nRow-1);
-$oSheet->getColumnDimension('A')->setWidth(20);
-$oSheet->getColumnDimension('B')->setWidth(30);
-$oSheet->getColumnDimension('C')->setWidth(40);
-$oSheet->getColumnDimension('D')->setWidth(80);
 
 for($page = 0; $page < $nPageCount; $page++) {
     $dataProvider->pagination->setPage($page);
@@ -62,14 +116,17 @@ for($page = 0; $page < $nPageCount; $page++) {
     foreach($dataProvider->getModels() As $model) {
         $oSheet->fromArray(
             [
-                $model->msg_id . "\n" . date("d.m.Y", strtotime($model->msg_createtime)) . "\n" . $model->flag->fl_sname,
-                $model->getFullName() . "\n" . $model->msg_pers_email . " " . $model->msg_pers_phone . "\n" . (($model->msg_empl_id !== null) ? $model->employee->getFullName() : ''),
-                ($model->subject ? ($model->subject->tag_title . "\n") : '') . $model->msg_pers_org,
+                $cou,
+                $model->msg_id . "\r\n" . date("d.m.Y", strtotime($model->msg_createtime)) . "\r\n" . $model->flag->fl_sname,
+                $model->getFullName() . "\r\n" . $model->msg_pers_email . "\r\n" . $model->msg_pers_phone . "\r\n\r\n" . (($model->msg_empl_id !== null) ? $model->employee->getFullName() : ''),
+                ($model->subject ? ($model->subject->tag_title . "\r\n") : '') . $model->msg_pers_org,
                 $model->msg_pers_text
             ],
             null,
             'A' . $nRow
         );
+        $oSheet->getStyle('A'.$nRow.':E' . ($nRow))->applyFromArray($styleSell);
+        $cou++;
 //            ->setCellValue('A' . $nRow, $model->msg_id . "\n" . date("d.m.Y", strtotime($model->msg_createtime)))
 //            ->setCellValue('B' . $nRow, $model->getFullName() . "\n" . $model->msg_pers_email . " " . $model->msg_pers_phone)
 //            ->setCellValue('C' . $nRow, ($model->subject ? ($model->subject->tag_title . "\n") : '') . $model->msg_pers_org)
@@ -78,10 +135,21 @@ for($page = 0; $page < $nPageCount; $page++) {
     }
 }
 
-$oSheet->getPageSetup()->setPrintArea('A1:D' . ($nRow - 1));
+$oSheet->getPageSetup()->setPrintArea('A1:E' . ($nRow - 1));
+
+$styleBorders = array(
+    'borders' => array(
+        'allborders' => array(
+            'style' => PHPExcel_Style_Border::BORDER_THIN,
+            'color' => array('argb' => 'FF000000'),
+        ),
+    ),
+);
+$oSheet->getStyle('A4:E' . ($nRow - 1))->applyFromArray($styleBorders);
 
 $sFilename = $_SERVER['HTTP_HOST'].'-export-'.date('YmdHis').'.'.$format;
-$sf = Yii::getAlias('@web/upload/export');
+$sf = Yii::getAlias('@webroot/upload/export');
+
 if( !is_dir($sf) ) {
     mkdir($sf);
 }
@@ -94,10 +162,10 @@ $sf .= DIRECTORY_SEPARATOR . $sFilename;
 //Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
 
 if( $format == 'xls' ) {
-    $objWriter = PHPExcel_Writer_Excel5($objPHPExcel);
+    $objWriter = new PHPExcel_Writer_Excel5($objPHPExcel);
 }
 else if( $format == 'xlsx' ) {
-    $objWriter = PHPExcel_Writer_Excel2007($objPHPExcel);
+    $objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
 }
 else if( $format == 'pdf' ) {
     $rendererName = PHPExcel_Settings::PDF_RENDERER_MPDF;
