@@ -7,6 +7,7 @@
 
 namespace app\commands;
 
+use app\models\Usergroup;
 use Yii;
 use yii\console\Controller;
 use app\models\User;
@@ -67,6 +68,14 @@ class HelloController extends Controller
             $s = 'Error save init admin: ' . print_r($model->getErrors());
             Yii::error($s);
             echo $s;
+        }
+        else {
+            $orole = new Usergroup();
+            $orole->usgr_gid = 1;
+            $orole->usgr_uid = $model->us_id;
+            if( !$orole->save() ) {
+                $s = 'Error save init admin: ' . print_r($model->getErrors());
+            }
         }
     }
 }

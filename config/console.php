@@ -12,6 +12,7 @@ $params = ArrayHelper::merge(
 
 return [
     'id' => 'basic-console',
+    'name' => 'Обращения к руководителю Департамента образования города Москвы',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log', 'gii'],
     'controllerNamespace' => 'app\commands',
