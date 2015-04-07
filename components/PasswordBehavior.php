@@ -71,6 +71,7 @@ class PasswordBehavior extends Behavior
             /** @var User $model */
             $model = $this->owner;
             $model->newPassword = $sPassword;
+            Yii::error('setNewPassword(): new password = ' . $sPassword);
 
             $model->setPassword($sPassword);
             $model->generateAuthKey();
