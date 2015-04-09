@@ -347,7 +347,7 @@ EOT;
 
 //                $sSearch = Urllocation::getSearchPart($searchModel);
 //                if( $_SERVER['HTTP_HOST'] == 'host04.design' ) {
-                    $aFormats = ['xls', 'xlsx', /*'pdf', 'html', */'docx'];
+                    $aFormats = ['xls', 'xlsx', /*'pdf', 'html', 'docx'*/];
                     $param = [
                         'xls' => [
                             'icon' => 'fa-file-excel-o',
