@@ -21,23 +21,23 @@ class RustextValidator extends Validator {
         $sNewVal = str_replace(["\r", "\n"], ['', ''], $sBaseVal);
         $sNewVal = preg_replace('|[\\s]|', '', $sNewVal);
         $nBaseLen = mb_strlen($sNewVal, 'UTF-8');
-        Yii::info("RustextValidator(): base: {$nBaseLen}: {$sNewVal}");
+//        Yii::info("RustextValidator(): base: {$nBaseLen}: {$sNewVal}");
         $sNewVal = preg_replace('|[A-za-z]|', '', $sNewVal);
         $nRusLen = mb_strlen($sNewVal, 'UTF-8');
-        Yii::info("RustextValidator(): rus: {$nRusLen}: {$sNewVal}");
+//        Yii::info("RustextValidator(): rus: {$nRusLen}: {$sNewVal}");
         $sNewVal = preg_replace('|[А-ЯЁ]|u', '', $sNewVal);
-        Yii::info("RustextValidator(): small: {$nRusLen}: {$sNewVal}");
+//        Yii::info("RustextValidator(): small: {$nRusLen}: {$sNewVal}");
         $nCapitalLen = $nRusLen - mb_strlen($sNewVal, 'UTF-8');
-        Yii::info("RustextValidator(): {$sBaseVal} -> {$sNewVal}");
-        Yii::info("RustextValidator(): nBaseLen = {$nBaseLen}, nRusLen = {$nRusLen}, nCapitalLen = {$nCapitalLen}");
+//        Yii::info("RustextValidator(): {$sBaseVal} -> {$sNewVal}");
+//        Yii::info("RustextValidator(): nBaseLen = {$nBaseLen}, nRusLen = {$nRusLen}, nCapitalLen = {$nCapitalLen}");
         if( $this->usecapital ) {
             if( ($nCapitalLen / $nRusLen) > $this->capital ) {
-                Yii::info("RustextValidator(): capital = " . sprintf("%.3", $nCapitalLen / $nRusLen));
+//                Yii::info("RustextValidator(): capital = " . sprintf("%.3f", $nCapitalLen / $nRusLen));
                 $model->addError($attribute, 'Слишком много заглавных букв.');
             }
         }
         if( ($nRusLen / $nBaseLen) < $this->russian ) {
-            Yii::info("RustextValidator(): russian = " . sprintf("%.3", ($nRusLen / $nBaseLen)));
+//            Yii::info("RustextValidator(): russian = " . sprintf("%.3f", ($nRusLen / $nBaseLen)));
             $model->addError($attribute, 'Необходимо написать побольше слов на русском языке.');
         }
 

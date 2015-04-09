@@ -272,7 +272,7 @@ class Message extends \yii\db\ActiveRecord
             [['msg_id', 'msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject', 'ekis_id', 'msg_curator_id'], 'integer'],
 
             [['msg_pers_text'], 'string', 'max' => self::MAX_PERSON_TEXT_LENGTH, 'min' => 32, 'on' => 'person', 'tooShort' => 'Напишите более подробное сообщение'],
-            [['msg_pers_text'], 'app\components\RustextValidator', 'on' => 'person', 'capital' => 0.15, 'russian' => 0.8, ],
+            [['msg_pers_text'], 'app\components\RustextValidator', 'on' => 'person', 'capital' => 0.2, 'russian' => 0.8, ],
 
             [['msg_answer', 'msg_empl_command', 'msg_empl_remark', 'msg_comment', 'msg_pers_org'], 'string'],
             [['msg_answer'], 'filter', 'filter' => function($v){ return strip_tags($v, '<p><a><li><ol><ul><strong><b><em><i><u><h1><h2><h3><h4><h5><blockquote><pre><del><br>');  }],
