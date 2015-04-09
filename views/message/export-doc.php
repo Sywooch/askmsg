@@ -106,10 +106,10 @@ $phpWord->addTableStyle('Msg Table', $styleTable, $styleFirstRow);
 $table = $section->addTable('Msg Table');
 
 $table->addRow($n2sm);
-insertText($table->addCell(1200, $styleHeaderCell), '№' . "\r\n" . 'Дата', $fontHeaderStyle);
-insertText($table->addCell(4000, $styleHeaderCell), 'Фамилия Имя Отчество' . "\r\n" . 'Контакты', $fontHeaderStyle);
-insertText($table->addCell(3000, $styleHeaderCell), 'Тема' . "\r\n" . 'Учреждение', $fontHeaderStyle);
-insertText($table->addCell(9000, $styleHeaderCell), 'Обращение', $fontHeaderStyle);
+insertText($table->addCell(2, $styleHeaderCell), '№' . "\r\n" . 'Дата', $fontHeaderStyle);
+insertText($table->addCell(4, $styleHeaderCell), 'Фамилия Имя Отчество' . "\r\n" . 'Контакты', $fontHeaderStyle);
+insertText($table->addCell(3, $styleHeaderCell), 'Тема' . "\r\n" . 'Учреждение', $fontHeaderStyle);
+insertText($table->addCell(9, $styleHeaderCell), 'Обращение', $fontHeaderStyle);
 // $table->addCell($n2sm, $styleCell)->addText(prepare('№' . "\r\n" . 'Дата'), $fontStyle);
 //$table->addCell($n5_2sm, $styleCell)->addText(prepare('Фамилия Имя Отчество' . "\r\n" . 'Контакты'), $fontStyle);
 //$table->addCell($n5_2sm, $styleCell)->addText(prepare('Тема' . "\r\n" . 'Учреждение'), $fontStyle);
@@ -121,10 +121,10 @@ for($page = 0; $page < $nPageCount; $page++) {
     $dataProvider->refresh();
     foreach($dataProvider->getModels() As $model) {
         $table->addRow();
-        insertText($table->addCell(1200, $styleCell), $model->msg_id . "\r\n" . date("d.m.Y", strtotime($model->msg_createtime)) . "\r\n" . $model->flag->fl_sname, $fontStyle);
-        insertText($table->addCell(4000, $styleCell), $model->getFullName() . "\r\n" . $model->msg_pers_email . "\r\n" . $model->msg_pers_phone . "\r\n\r\n" . (($model->msg_empl_id !== null) ? $model->employee->getFullName() : ''), $fontStyle);
-        insertText($table->addCell(3000, $styleCell), ($model->subject ? ($model->subject->tag_title . "\r\n") : '') . $model->msg_pers_org, $fontStyle);
-        insertText($table->addCell(9000, $styleCell), $model->msg_pers_text, $fontStyle);
+        insertText($table->addCell(2, $styleCell), $model->msg_id . "\r\n" . date("d.m.Y", strtotime($model->msg_createtime)) . "\r\n" . $model->flag->fl_sname, $fontStyle);
+        insertText($table->addCell(4, $styleCell), $model->getFullName() . "\r\n" . $model->msg_pers_email . "\r\n" . $model->msg_pers_phone . "\r\n\r\n" . (($model->msg_empl_id !== null) ? $model->employee->getFullName() : ''), $fontStyle);
+        insertText($table->addCell(3, $styleCell), ($model->subject ? ($model->subject->tag_title . "\r\n") : '') . $model->msg_pers_org, $fontStyle);
+        insertText($table->addCell(9, $styleCell), $model->msg_pers_text, $fontStyle);
 /*
         $table->addCell($n2sm)->addText(prepare($model->msg_id . "\r\n" . date("d.m.Y", strtotime($model->msg_createtime)) . "\r\n" . $model->flag->fl_sname));
         $table->addCell($n5_2sm)->addText(prepare($model->getFullName() . "\r\n" . $model->msg_pers_email . "\r\n" . $model->msg_pers_phone . "\r\n\r\n" . (($model->msg_empl_id !== null) ? $model->employee->getFullName() : '')));
