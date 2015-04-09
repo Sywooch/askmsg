@@ -125,7 +125,7 @@ $aWidth1 = [
 insertText($table->addCell($aWidth[0], $styleHeaderCell), '№' . "\r\n" . 'Дата', $fontHeaderStyle);
 insertText($table->addCell($aWidth[1], $styleHeaderCell), 'Фамилия Имя Отчество' . "\r\n" . 'Контакты', $fontHeaderStyle);
 insertText($table->addCell($aWidth[2], $styleHeaderCell), 'Тема' . "\r\n" . 'Учреждение', $fontHeaderStyle);
-insertText($table->addCell($aWidth[3], $styleHeaderCell), 'Обращение', $fontHeaderStyle);
+insertText($table->addCell($bLocal ? $aWidth[3] : $aWidth[3] / 3, $styleHeaderCell), 'Обращение', $fontHeaderStyle);
 // $table->addCell($n2sm, $styleCell)->addText(prepare('№' . "\r\n" . 'Дата'), $fontStyle);
 //$table->addCell($n5_2sm, $styleCell)->addText(prepare('Фамилия Имя Отчество' . "\r\n" . 'Контакты'), $fontStyle);
 //$table->addCell($n5_2sm, $styleCell)->addText(prepare('Тема' . "\r\n" . 'Учреждение'), $fontStyle);
@@ -140,7 +140,7 @@ for($page = 0; $page < $nPageCount; $page++) {
         insertText($table->addCell($aWidth[0], $styleCell), $model->msg_id . "\r\n" . date("d.m.Y", strtotime($model->msg_createtime)) . "\r\n" . $model->flag->fl_sname, $fontStyle);
         insertText($table->addCell($aWidth[1], $styleCell), $model->getFullName() . "\r\n" . $model->msg_pers_email . "\r\n" . $model->msg_pers_phone . "\r\n\r\n" . (($model->msg_empl_id !== null) ? $model->employee->getFullName() : ''), $fontStyle);
         insertText($table->addCell($aWidth[2], $styleCell), ($model->subject ? ($model->subject->tag_title . "\r\n") : '') . $model->msg_pers_org, $fontStyle);
-        insertText($table->addCell($aWidth[3], $styleCell), $model->msg_pers_text, $fontStyle);
+        insertText($table->addCell($bLocal ? $aWidth[3] : $aWidth[3] / 3, $styleCell), $model->msg_pers_text, $fontStyle);
 /*
         $table->addCell($n2sm)->addText(prepare($model->msg_id . "\r\n" . date("d.m.Y", strtotime($model->msg_createtime)) . "\r\n" . $model->flag->fl_sname));
         $table->addCell($n5_2sm)->addText(prepare($model->getFullName() . "\r\n" . $model->msg_pers_email . "\r\n" . $model->msg_pers_phone . "\r\n\r\n" . (($model->msg_empl_id !== null) ? $model->employee->getFullName() : '')));
