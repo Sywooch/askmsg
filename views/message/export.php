@@ -117,8 +117,8 @@ $styleSell = array(
 $oSheet->getColumnDimension('A')->setWidth(14);
 $oSheet->getColumnDimension('B')->setWidth(40);
 $oSheet->getColumnDimension('C')->setWidth(30);
-//$oSheet->getColumnDimension('D')->setWidth(130);
-$oSheet->getColumnDimension('D')->setAutoSize(true);
+$oSheet->getColumnDimension('D')->setWidth(130);
+//$oSheet->getColumnDimension('D')->setAutoSize(true);
 //$oSheet->getColumnDimension('E')->setWidth(80);
 $oSheet->setCellValue('A1', Yii::$app->name)
     ->setCellValue('A2', 'Выгрузка от ' . date('d.m.Y H:i'));
