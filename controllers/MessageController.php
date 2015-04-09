@@ -93,7 +93,7 @@ class MessageController extends Controller
         $format = Yii::$app->request->getQueryParam('format', 'xlsx');
 
         return $this->render(
-            (substr($format, 0, 3) == 'doc') ? 'export-doc' : 'export',
+            (substr($format, 0, 3) == 'doc') ? 'export-doc' : 'export-wt',
             [
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,

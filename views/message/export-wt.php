@@ -19,7 +19,7 @@ $mime = [
     'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 ];
 $dataProvider->prepare();
-$nMaxCount = 500;
+$nMaxCount = 1500;
 
 echo $format;
 echo ' ' . $dataProvider->pagination->pageCount;
@@ -57,7 +57,7 @@ $objPHPExcel->getProperties()
 */
 
 $oSheet->getPageSetup()
-    ->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE)
+    ->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_PORTRAIT) // ORIENTATION_LANDSCAPE
     ->setPaperSize(PHPExcel_Worksheet_PageSetup::PAPERSIZE_A4)
     ->setFitToPage(true)
     ->setFitToWidth(1)
@@ -114,10 +114,10 @@ $styleSell = array(
 );
 
 
-$oSheet->getColumnDimension('A')->setWidth(14);
-$oSheet->getColumnDimension('B')->setWidth(40);
-$oSheet->getColumnDimension('C')->setWidth(30);
-$oSheet->getColumnDimension('D')->setWidth(130);
+$oSheet->getColumnDimension('A')->setWidth(16);
+$oSheet->getColumnDimension('B')->setWidth(50);
+$oSheet->getColumnDimension('C')->setWidth(50);
+$oSheet->getColumnDimension('D')->setWidth(40);
 //$oSheet->getColumnDimension('D')->setAutoSize(true);
 //$oSheet->getColumnDimension('E')->setWidth(80);
 $oSheet->setCellValue('A1', Yii::$app->name)
@@ -131,9 +131,9 @@ $oSheet->fromArray(
     [
 //        '№',
         '№' . "\r\n" . 'Дата',
-        'Фамилия Имя Отчество' . "\r\n" . 'Контакты',
-        'Тема' . "\r\n" . 'Учреждение',
-        'Обращение'
+        'Состояние',
+        'Проситель' . "\r\n" . 'Исполнитель',
+        'Контакты',
     ],
     null,
     'A4'
@@ -145,36 +145,23 @@ $nStartRow = 5;
 $nRow = $nStartRow;
 $oSheet->getPageSetup()->setRowsToRepeatAtTopByStartAndEnd(1, $nRow-1);
 
+$nPageCount = 1;
+
 for($page = 0; $page < $nPageCount; $page++) {
-    Yii::info(str_repeat('-', 30) . ' Page: ' . $page . ' ['.$cou.']');
     $dataProvider->pagination->setPage($page);
     $dataProvider->refresh();
+
     foreach($dataProvider->getModels() As $model) {
-        $aText = explode("\n", trim(str_replace("\r", "", $model->msg_pers_text)));
-        foreach($aText As $k=>$v) {
-            $v = trim($v);
-            if( $v == '' ) {
-                unset($aText[$k]);
-                continue;
-            }
-            $aText[$k] = wordwrap($v, 200);
-        }
-        $sText = implode("\r\n", $aText);
         $oSheet->fromArray(
             [
-//                $cou,
-                $model->msg_id . "\r\n" . date("d.m.Y", strtotime($model->msg_createtime)) . "\r\n" . $model->flag->fl_sname,
-                $model->getFullName() . "\r\n" . $model->msg_pers_email . "\r\n" . $model->msg_pers_phone . "\r\n\r\n" . (($model->msg_empl_id !== null) ? $model->employee->getFullName() : ''),
-                ($model->subject ? ($model->subject->tag_title . "\r\n") : '') . $model->msg_pers_org,
-                $sText
+                $model->msg_id . "\r\n" . date("d.m.Y", strtotime($model->msg_createtime)),
+                preg_replace('|^\\[[^\\]]+\\]\\s+|', '', $model->flag->fl_name),
+                $model->getFullName() . (($model->msg_empl_id !== null) ?  ("\r\n" . $model->employee->getFullName()) : ''),
+                $model->msg_pers_email . "\r\n" . $model->msg_pers_phone,
             ],
             null,
             'A' . $nRow
         );
-//            ->setCellValue('A' . $nRow, $model->msg_id . "\n" . date("d.m.Y", strtotime($model->msg_createtime)))
-//            ->setCellValue('B' . $nRow, $model->getFullName() . "\n" . $model->msg_pers_email . " " . $model->msg_pers_phone)
-//            ->setCellValue('C' . $nRow, ($model->subject ? ($model->subject->tag_title . "\n") : '') . $model->msg_pers_org)
-//            ->setCellValue('D' . $nRow, $model->msg_pers_text);
         $cou++;
         $nRow++;
     }
@@ -185,17 +172,23 @@ $oStyle->applyFromArray($styleSell);
 $oStyle->getAlignment()->setWrapText(true);
 $oStyle->getAlignment()->setIndent(1);
 
-$oSheet->getPageSetup()->setPrintArea('A1:D' . ($nRow - 1));
-
-$styleBorders = array(
-    'borders' => array(
-        'allborders' => array(
+$styleBorders = [
+    'borders' => [
+        'allborders' => [
             'style' => PHPExcel_Style_Border::BORDER_THIN,
             'color' => array('argb' => 'FF000000'),
-        ),
-    ),
-);
+        ],
+        'outline' => [
+            'style' => PHPExcel_Style_Border::BORDER_THIN,
+            'color' => array('argb' => 'FF000000'),
+        ],
+    ],
+];
+
 $oSheet->getStyle('A4:D' . ($nRow - 1))->applyFromArray($styleBorders);
+
+$oSheet->getPageSetup()->setPrintArea('A1:D' . ($nRow - 1));
+
 
 $oUtil = new Exportutil();
 $sFilename = $_SERVER['HTTP_HOST'].'-export-'.date('YmdHis').'.'.$format;
