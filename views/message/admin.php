@@ -187,7 +187,7 @@ EOT;
             [
                 'class' => 'yii\grid\ActionColumn',
                 'contentOptions' => ['class' => 'commandcell'],
-                'template'=>'{view} {update} {answer} {delete} {toword}',
+                'template'=>'{view} {update} {answer} {toword} {delete}',
                 'buttons'=>[
                     'view'=>function ($url, $model) {
                         return Html::a( '<span class="glyphicon glyphicon-eye-open"></span>', $url,
@@ -346,7 +346,7 @@ EOT;
                 echo '<label class="control-label">Экспорт данных: &nbsp; </label>';
 
 //                $sSearch = Urllocation::getSearchPart($searchModel);
-                if( $_SERVER['HTTP_HOST'] == 'host04.design' ) {
+//                if( $_SERVER['HTTP_HOST'] == 'host04.design' ) {
                     $aFormats = ['xls', 'xlsx', /*'pdf', 'html', */'docx'];
                     $param = [
                         'xls' => [
@@ -378,7 +378,7 @@ EOT;
                             ['class' => 'btn btn-default', 'target' => '_blank']
                         );
                     }
-                }
+//                }
             // http://host04.design/message/export?msg_id=&msg_createtime=&msg_pers_lastname=%D0%BB%D0%B0&msg_pers_email=&msg_pers_org=14&msg_empl_id=&msg_flag%5B0%5D=2&msg_flag%5B1%5D=3&msg_flag%5B2%5D=4&msg_flag%5B3%5D=5&msg_flag%5B4%5D=6&msg_flag%5B5%5D=7&msg_flag%5B6%5D=8&msg_flag%5B7%5D=9&msg_flag%5B8%5D=10&msg_flag%5B9%5D=12&msg_subject=
             ?>
         </div>
