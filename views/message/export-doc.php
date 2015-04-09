@@ -106,8 +106,8 @@ $phpWord->addTableStyle('Msg Table', $styleTable, $styleFirstRow);
 $table = $section->addTable('Msg Table');
 
 $table->addRow($n2sm);
-insertText($table->addCell($n2sm, $styleHeaderCell), '№' . "\r\n" . 'Дата', $fontHeaderStyle);
-insertText($table->addCell(3000, $styleHeaderCell), 'Фамилия Имя Отчество' . "\r\n" . 'Контакты', $fontHeaderStyle);
+insertText($table->addCell(1200, $styleHeaderCell), '№' . "\r\n" . 'Дата', $fontHeaderStyle);
+insertText($table->addCell(4000, $styleHeaderCell), 'Фамилия Имя Отчество' . "\r\n" . 'Контакты', $fontHeaderStyle);
 insertText($table->addCell(3000, $styleHeaderCell), 'Тема' . "\r\n" . 'Учреждение', $fontHeaderStyle);
 insertText($table->addCell(9000, $styleHeaderCell), 'Обращение', $fontHeaderStyle);
 // $table->addCell($n2sm, $styleCell)->addText(prepare('№' . "\r\n" . 'Дата'), $fontStyle);
@@ -116,13 +116,13 @@ insertText($table->addCell(9000, $styleHeaderCell), 'Обращение', $fontH
 //$table->addCell($n15sm, $styleCell)->addText(prepare('Обращение'), $fontStyle);
 
 for($page = 0; $page < $nPageCount; $page++) {
-    Yii::info(str_repeat('-', 30) . ' Page: ' . $page . ' ['.$cou.']');
+//    Yii::info(str_repeat('-', 30) . ' Page: ' . $page . ' ['.$cou.']');
     $dataProvider->pagination->setPage($page);
     $dataProvider->refresh();
     foreach($dataProvider->getModels() As $model) {
         $table->addRow();
-        insertText($table->addCell($n2sm, $styleCell), $model->msg_id . "\r\n" . date("d.m.Y", strtotime($model->msg_createtime)) . "\r\n" . $model->flag->fl_sname, $fontStyle);
-        insertText($table->addCell(3000, $styleCell), $model->getFullName() . "\r\n" . $model->msg_pers_email . "\r\n" . $model->msg_pers_phone . "\r\n\r\n" . (($model->msg_empl_id !== null) ? $model->employee->getFullName() : ''), $fontStyle);
+        insertText($table->addCell(1200, $styleCell), $model->msg_id . "\r\n" . date("d.m.Y", strtotime($model->msg_createtime)) . "\r\n" . $model->flag->fl_sname, $fontStyle);
+        insertText($table->addCell(4000, $styleCell), $model->getFullName() . "\r\n" . $model->msg_pers_email . "\r\n" . $model->msg_pers_phone . "\r\n\r\n" . (($model->msg_empl_id !== null) ? $model->employee->getFullName() : ''), $fontStyle);
         insertText($table->addCell(3000, $styleCell), ($model->subject ? ($model->subject->tag_title . "\r\n") : '') . $model->msg_pers_org, $fontStyle);
         insertText($table->addCell(9000, $styleCell), $model->msg_pers_text, $fontStyle);
 /*
