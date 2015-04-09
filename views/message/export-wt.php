@@ -19,7 +19,7 @@ $mime = [
     'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 ];
 $dataProvider->prepare();
-$nMaxCount = 1500;
+$nMaxCount = 2500;
 
 echo $format;
 echo ' ' . $dataProvider->pagination->pageCount;
@@ -144,8 +144,6 @@ $cou = 1;
 $nStartRow = 5;
 $nRow = $nStartRow;
 $oSheet->getPageSetup()->setRowsToRepeatAtTopByStartAndEnd(1, $nRow-1);
-
-$nPageCount = 1;
 
 for($page = 0; $page < $nPageCount; $page++) {
     $dataProvider->pagination->setPage($page);
