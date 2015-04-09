@@ -106,11 +106,25 @@ $phpWord->addTableStyle('Msg Table', $styleTable, $styleFirstRow);
 $table = $section->addTable('Msg Table');
 
 $table->addRow($n2sm);
-$kMult = ($_SERVER['HTTP_HOST'] == 'host04.design') ? 1 : 2;
-insertText($table->addCell(1150 * $kMult, $styleHeaderCell), '№' . "\r\n" . 'Дата', $fontHeaderStyle);
-insertText($table->addCell(3700 * $kMult, $styleHeaderCell), 'Фамилия Имя Отчество' . "\r\n" . 'Контакты', $fontHeaderStyle);
-insertText($table->addCell(3700 * $kMult, $styleHeaderCell), 'Тема' . "\r\n" . 'Учреждение', $fontHeaderStyle);
-insertText($table->addCell(7300 / $kMult, $styleHeaderCell), 'Обращение', $fontHeaderStyle);
+$bLocal = ($_SERVER['HTTP_HOST'] == 'host04.design');
+$aWidth = [
+    1150,
+    3700,
+    3700,
+    7300
+];
+
+$aWidth1 = [
+    $aWidth[0],
+    $bLocal ? $aWidth[1] : array_reduce(array_slice($aWidth, 0, 2), function($carry, $item) { return $carry + $item;}, 0),
+    $bLocal ? $aWidth[2] : array_reduce(array_slice($aWidth, 0, 3), function($carry, $item) { return $carry + $item;}, 0),
+    $bLocal ? $aWidth[3] : array_reduce(array_slice($aWidth, 0, 4), function($carry, $item) { return $carry + $item;}, 0),
+];
+
+insertText($table->addCell($aWidth1[0], $styleHeaderCell), '№' . "\r\n" . 'Дата', $fontHeaderStyle);
+insertText($table->addCell($aWidth1[1], $styleHeaderCell), 'Фамилия Имя Отчество' . "\r\n" . 'Контакты', $fontHeaderStyle);
+insertText($table->addCell($aWidth1[2], $styleHeaderCell), 'Тема' . "\r\n" . 'Учреждение', $fontHeaderStyle);
+insertText($table->addCell($aWidth1[3], $styleHeaderCell), 'Обращение', $fontHeaderStyle);
 // $table->addCell($n2sm, $styleCell)->addText(prepare('№' . "\r\n" . 'Дата'), $fontStyle);
 //$table->addCell($n5_2sm, $styleCell)->addText(prepare('Фамилия Имя Отчество' . "\r\n" . 'Контакты'), $fontStyle);
 //$table->addCell($n5_2sm, $styleCell)->addText(prepare('Тема' . "\r\n" . 'Учреждение'), $fontStyle);
@@ -122,10 +136,10 @@ for($page = 0; $page < $nPageCount; $page++) {
     $dataProvider->refresh();
     foreach($dataProvider->getModels() As $model) {
         $table->addRow();
-        insertText($table->addCell(1150 * $kMult, $styleCell), $model->msg_id . "\r\n" . date("d.m.Y", strtotime($model->msg_createtime)) . "\r\n" . $model->flag->fl_sname, $fontStyle);
-        insertText($table->addCell(3700 * $kMult, $styleCell), $model->getFullName() . "\r\n" . $model->msg_pers_email . "\r\n" . $model->msg_pers_phone . "\r\n\r\n" . (($model->msg_empl_id !== null) ? $model->employee->getFullName() : ''), $fontStyle);
-        insertText($table->addCell(3700 * $kMult, $styleCell), ($model->subject ? ($model->subject->tag_title . "\r\n") : '') . $model->msg_pers_org, $fontStyle);
-        insertText($table->addCell(7300 / $kMult, $styleCell), $model->msg_pers_text, $fontStyle);
+        insertText($table->addCell($aWidth1[0], $styleCell), $model->msg_id . "\r\n" . date("d.m.Y", strtotime($model->msg_createtime)) . "\r\n" . $model->flag->fl_sname, $fontStyle);
+        insertText($table->addCell($aWidth1[1], $styleCell), $model->getFullName() . "\r\n" . $model->msg_pers_email . "\r\n" . $model->msg_pers_phone . "\r\n\r\n" . (($model->msg_empl_id !== null) ? $model->employee->getFullName() : ''), $fontStyle);
+        insertText($table->addCell($aWidth1[2], $styleCell), ($model->subject ? ($model->subject->tag_title . "\r\n") : '') . $model->msg_pers_org, $fontStyle);
+        insertText($table->addCell($aWidth1[3], $styleCell), $model->msg_pers_text, $fontStyle);
 /*
         $table->addCell($n2sm)->addText(prepare($model->msg_id . "\r\n" . date("d.m.Y", strtotime($model->msg_createtime)) . "\r\n" . $model->flag->fl_sname));
         $table->addCell($n5_2sm)->addText(prepare($model->getFullName() . "\r\n" . $model->msg_pers_email . "\r\n" . $model->msg_pers_phone . "\r\n\r\n" . (($model->msg_empl_id !== null) ? $model->employee->getFullName() : '')));
