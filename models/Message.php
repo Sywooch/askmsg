@@ -25,6 +25,7 @@ use app\components\NotificateBehavior;
 use Httpful\Request;
 use Httpful\Response;
 
+
 /**
  * This is the model class for table "{{%message}}".
  *
@@ -971,6 +972,11 @@ class Message extends \yii\db\ActiveRecord
         }
     }
 
+    /**
+     * @param $id
+     * @return mixed|null
+     * @throws \Httpful\Exception\ConnectionErrorException
+     */
     public function getEkisOrgData($id) {
         $ob = null;
         if( $id > 0 ) {
@@ -999,4 +1005,5 @@ class Message extends \yii\db\ActiveRecord
         return $ob;
 
     }
+
 }

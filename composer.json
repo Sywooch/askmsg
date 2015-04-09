@@ -41,7 +41,10 @@
         "creativedream/jqueryfiler": "1.0",
         "kartik-v/yii2-export": "*",
         "nategood/httpful": "*",
-        "kartik-v/yii2-mpdf": "dev-master"
+        "kartik-v/yii2-mpdf": "dev-master",
+        "tecnick.com/tcpdf": "dev-master",
+        "dompdf/dompdf": "dev-master",
+        "phpoffice/phpword": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",

@@ -28,6 +28,8 @@ $this->params['breadcrumbs'][] = $this->title;
 GriddataAsset::register($this);
 ListdataAsset::register($this);
 
+$this->registerCssFile('/themes/font-awesome-4.3.0/css/font-awesome.min.css', ['rel'=>"stylesheet"], 'font-awesome');
+
 /*
      <h1><?= Html::encode($this->title) ?></h1>
 */
@@ -185,7 +187,7 @@ EOT;
             [
                 'class' => 'yii\grid\ActionColumn',
                 'contentOptions' => ['class' => 'commandcell'],
-                'template'=>'{view} {update} {answer} {delete}',
+                'template'=>'{view} {update} {answer} {delete} {toword}',
                 'buttons'=>[
                     'view'=>function ($url, $model) {
                         return Html::a( '<span class="glyphicon glyphicon-eye-open"></span>', $url,
@@ -201,6 +203,9 @@ EOT;
                         return $model->isAnswerble ?
                             Html::a( '<span class="glyphicon glyphicon-refresh"></span>', $url, ['title' => 'Изменить Обращение ' . $model->msg_id]) :
                             '';
+                    },
+                    'toword'=>function ($url, $model) {
+                        return Html::a( '<span class="glyphicon glyphicon-floppy-disk"></span>', $url, ['title' => 'Экспорт в Word', 'target' => '_blank']);
                     },
                     'delete' => function ($url, $model, $key) {
                         return Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM) ?
@@ -338,15 +343,40 @@ EOT;
                 ]
             ]) : '' ?>
             <?php
-//            <label class="control-label">Экспорт данных </label>
+                echo '<label class="control-label">Экспорт данных: &nbsp; </label>';
 
 //                $sSearch = Urllocation::getSearchPart($searchModel);
                 if( $_SERVER['HTTP_HOST'] == 'host04.design' ) {
-                    $aFormats = [/*'doc', */
-                        'xls', 'xlsx', 'pdf'];
+                    $aFormats = ['xls', 'xlsx', /*'pdf', 'html', */'docx'];
+                    $param = [
+                        'xls' => [
+                            'icon' => 'fa-file-excel-o',
+                            'text' => 'Excel',
+                        ],
+                        'xlsx' => [
+                            'icon' => 'fa-file-excel-o',
+                            'text' => 'Excel 2007',
+                        ],
+                        'pdf' => [
+                            'icon' => 'fa-file-pdf-o',
+                            'text' => 'Pdf',
+                        ],
+                        'html' => [
+                            'icon' => 'fa-code',
+                            'text' => 'Html',
+                        ],
+                        'docx' => [
+                            'icon' => 'fa-file-word-o',
+                            'text' => 'Word 2007',
+                        ],
+                    ];
 
                     foreach ($aFormats As $v) {
-                        echo Html::a($v, Url::to(array_merge(['export'], $searchModel->getSearchParams(), ['format' => $v])), ['class' => 'btn btn-default', 'target' => '_blank']);
+                        echo Html::a(
+                            '<i class="fa '.$param[$v]['icon'].' fa-fw"></i> ' . $param[$v]['text'],
+                            Url::to(array_merge(['export'], $searchModel->getSearchParams(), ['format' => $v])),
+                            ['class' => 'btn btn-default', 'target' => '_blank']
+                        );
                     }
                 }
             // http://host04.design/message/export?msg_id=&msg_createtime=&msg_pers_lastname=%D0%BB%D0%B0&msg_pers_email=&msg_pers_org=14&msg_empl_id=&msg_flag%5B0%5D=2&msg_flag%5B1%5D=3&msg_flag%5B2%5D=4&msg_flag%5B3%5D=5&msg_flag%5B4%5D=6&msg_flag%5B5%5D=7&msg_flag%5B6%5D=8&msg_flag%5B7%5D=9&msg_flag%5B8%5D=10&msg_flag%5B9%5D=12&msg_subject=

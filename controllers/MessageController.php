@@ -37,6 +37,11 @@ class MessageController extends Controller
                     ],
                     [
                         'allow' => true,
+                        'actions' => ['toword'],
+                        'roles' => ['@'],
+                    ],
+                    [
+                        'allow' => true,
                         'actions' => ['update', 'delete', 'moderatelist', 'upload', 'instruction', 'testmail'],
                         'roles' => [Rolesimport::ROLE_MODERATE_DOGM],
                     ],
@@ -85,12 +90,16 @@ class MessageController extends Controller
     {
         $searchModel = new MessageSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $format = Yii::$app->request->getQueryParam('format', 'xlsx');
 
-        return $this->render('export', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'format' => Yii::$app->request->getQueryParam('format', 'xlsx'),
-        ]);
+        return $this->render(
+            (substr($format, 0, 3) == 'doc') ? 'export-doc' : 'export',
+            [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+                'format' => $format,
+            ]
+        );
     }
 
     /**
@@ -205,6 +214,20 @@ class MessageController extends Controller
         return $this->render('view', [
             'model' => $model,
         ]);
+    }
+
+    /**
+     * Displays a single Message model.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionToword($id)
+    {
+        $model = $this->findModel($id);
+        return $this->render('msgtoword', [
+            'model' => $model,
+        ]);
+
     }
 
     /**
