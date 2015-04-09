@@ -421,9 +421,9 @@ class Message extends \yii\db\ActiveRecord
             'msg_pers_region' => 'Район',
             'msg_pers_text' => 'Обращение',
             'msg_comment' => 'Комментарий',
-            'msg_empl_id' => 'Ответчик',
-            'msg_empl_command' => 'Поручение ответчику',
-            'msg_empl_remark' => 'Замечание ответчику',
+            'msg_empl_id' => 'Исполнитель',
+            'msg_empl_command' => 'Поручение исполнителю',
+            'msg_empl_remark' => 'Замечание исполнителю',
             'msg_answer' => 'Ответ',
             'msg_answertime' => 'Дата ответа',
             'msg_oldcomment' => 'Старые теги',
@@ -433,9 +433,9 @@ class Message extends \yii\db\ActiveRecord
             'tagsstring' => 'Теги',
             'msg_curator_id' => 'Контролер',
 
-            'employer' => 'Ответчик',
+            'employer' => 'Исполнитель',
             'asker' => 'Проситель',
-            'answers' => 'Соответчики',
+            'answers' => 'Соисполнители',
             'askid' => 'Номер и дата',
             'askcontacts' => 'Контакты',
             'tags' => 'Теги',
@@ -464,7 +464,7 @@ class Message extends \yii\db\ActiveRecord
     }
 
     /*
-     * Отношения к Ответчику
+     * Отношения к Исполнителю
      *
      */
     public function getEmployee() {
@@ -496,7 +496,7 @@ class Message extends \yii\db\ActiveRecord
     }
 
     /**
-     *  Связь с табличкой, соединяющей сообщения и его соответчиков
+     *  Связь с табличкой, соединяющей сообщения и его соисполнителей
      */
     public function getUsers() {
         return $this->hasMany(
@@ -506,7 +506,7 @@ class Message extends \yii\db\ActiveRecord
     }
 
     /**
-     *  Связь сообщения и его ответчиков
+     *  Связь сообщения и его соисполнителей
      */
     public function getAnswers() {
         return $this
@@ -517,7 +517,7 @@ class Message extends \yii\db\ActiveRecord
     }
 
     /**
-     *  Установка соответчиков
+     *  Установка соисполнителей
      * @param array $answers id soanswers for message
      */
     public function setAnswers($answers)
@@ -578,7 +578,7 @@ class Message extends \yii\db\ActiveRecord
     }
 
     /**
-     *  Получение всех ответчиков
+     *  Получение всех исполнителей
      * @return array
      */
     public function getAllanswers()
@@ -638,7 +638,7 @@ class Message extends \yii\db\ActiveRecord
     }
 
     /**
-     *  Сохраняем соответчиков
+     *  Сохраняем соисполнителей
      * @param Event $event
      */
     public function saveCoanswers($event) {
@@ -792,7 +792,7 @@ class Message extends \yii\db\ActiveRecord
 
     /**
      *
-     * @param string $sType тип данных для возврата: флаги для отправки уведомлений по пользователям, ответчикам и соответчикам
+     * @param string $sType тип данных для возврата: флаги для отправки уведомлений по пользователям, исполнителям и соисполнителям
      * @return array массив переходов флагов: ключ - текущий флаг, значение - массив флагов, при переходе из которых будет присходить отправка писем
      *
      */
@@ -838,7 +838,7 @@ class Message extends \yii\db\ActiveRecord
 
     /**
      *
-     * @param string $sType тип данных для возврата: флаги для отправки уведомлений по пользователям, ответчикам и соответчикам
+     * @param string $sType тип данных для возврата: флаги для отправки уведомлений по пользователям, исполнителям и соисполнителям
      * @return boolean надо ли отправлять уведомление
      *
      */

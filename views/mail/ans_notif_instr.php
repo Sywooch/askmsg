@@ -29,6 +29,14 @@ include dirname(__FILE__) . DIRECTORY_SEPARATOR . 'mail_styles_data.php';
 <p<?= $aMailTextStyles['large_text_01'] ?>>Текст поручения:</p>
 <p><?= Html::encode($model->msg_empl_command) ?></p>
 
+<p<?= $aMailTextStyles['large_text_01'] ?>><b>Автор обращения: </b></p>
+<p><?= Html::encode($model->getFullName()) . ', ' . Html::encode($model->msg_pers_email) . ', ' . Html::encode($model->msg_pers_phone) ?></p>
+
+<p<?= $aMailTextStyles['large_text_01'] ?>><b>Сообщение: </b></p>
+<p><?= Html::encode($model->msg_oldcomment) ?></p>
+<p><?= ($model->subject ? Html::encode($model->subject->tag_title) : '') ?></p>
+<p><?= Html::encode($model->msg_pers_text) ?></p>
+
 <?php
 
 if( !empty($model->answers) ) {

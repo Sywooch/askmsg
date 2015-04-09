@@ -78,7 +78,7 @@ $this->registerJs($sJs, View::POS_READY, 'toggleuserpart');
 <div class="col-sm-6 no-horisontal-padding">
     <?php if( !empty($model->msg_empl_id)  ): ?>
         <?php $bShowFooter = true; ?>
-        <div class="col-sm-3"><strong>Ответчик</strong></div>
+        <div class="col-sm-3"><strong>Исполнитель</strong></div>
         <div class="col-sm-9">
             <?= Html::encode($model->employee->getFullName()) ?>
             <span class="dopline">
@@ -98,7 +98,7 @@ $this->registerJs($sJs, View::POS_READY, 'toggleuserpart');
     <?php endif; ?>
     <?php if( $isDopFields && (count($model->answers) > 0) ): ?>
         <div class="clearfix"></div>
-        <div class="col-sm-3"><strong>Соответчик</strong></div>
+        <div class="col-sm-3"><strong>Соисполнитель</strong></div>
         <div class="col-sm-9">
             <?php foreach( $model->answers As $k=>$ob ): ?>
                 <?= $ob->getFullName() ?>

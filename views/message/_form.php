@@ -274,7 +274,7 @@ $aFieldParam = [
     'answer' => [
         'data' => $aAnsw,
         'language' => 'ru',
-        'options' => ['placeholder' => 'Выберите ответчика ...'],
+        'options' => ['placeholder' => 'Выберите из списка ...'],
         'pluginOptions' => [
             'allowClear' => true,
 //                        'formatResult' => new JsExpression('function(object, container, query){ console.log("format: ", object, container, query); container.append(object.text);  }'),
@@ -289,7 +289,7 @@ $aFieldParam = [
         'language' => 'ru',
         'options' => [
             'multiple' => true,
-            'placeholder' => 'Выберите соответчика ...',
+            'placeholder' => 'Выберите из списка ...',
         ],
         'pluginOptions' => [
             'allowClear' => true,
@@ -663,7 +663,7 @@ $aFieldParam = [
             <?= $form
                 ->field($model, 'msg_comment')
                 ->textarea()
-                ->hint('Текст комментария будет виден только ответчику и модератору');
+                ->hint('Текст комментария будет виден только исполнителям и модератору');
             ?>
         </div>
 
@@ -680,7 +680,7 @@ $aFieldParam = [
             <?= $form
                 ->field($model, 'msg_empl_remark')
                 ->textarea()
-                ->hint('Текст замечания будет виден только ответчику и модератору');
+                ->hint('Текст замечания будет виден только исполнителям и модератору');
             ?>
         </div>
         <?php

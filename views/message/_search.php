@@ -129,7 +129,7 @@ if( !isset($action) ) {
         ->widget(Select2::classname(), [
             'data' => $aAnsw,
             'language' => 'ru',
-            'options' => ['placeholder' => 'Выберите ответчика ...'],
+            'options' => ['placeholder' => 'Выберите из списка ...'],
             'pluginOptions' => [
                 'allowClear' => true,
             ],
