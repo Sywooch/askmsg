@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\Msgflags;
+use app\models\SendmsgForm;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\Html;
@@ -12,6 +13,7 @@ use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+use yii\widgets\ActiveForm;
 
 use app\models\Rolesimport;
 use app\models\Message;
@@ -37,7 +39,7 @@ class MessageController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['toword'],
+                        'actions' => ['toword', 'send'],
                         'roles' => ['@'],
                     ],
                     [
@@ -224,9 +226,10 @@ class MessageController extends Controller
     public function actionToword($id)
     {
         $model = $this->findModel($id);
-        return $this->render('msgtoword', [
+        $sf = $this->renderPartial('msgtoword', [
             'model' => $model,
         ]);
+        return Yii::$app->response->sendFile($sf);
 
     }
 
@@ -271,6 +274,50 @@ class MessageController extends Controller
         return $this->render('create', [
             'model' => $model,
         ]);
+    }
+
+    /**
+     * Answer
+     * @return mixed
+     */
+    public function actionSend($id)
+    {
+        $model = $this->findModel($id);
+        $form = new SendmsgForm();
+
+        Yii::info('actionSend('.$id.'): ' . (Yii::$app->request->isAjax ? 'ajax' : 'noajax'));
+        Yii::info('actionSend('.$id.'): ' . ($model->load(Yii::$app->request->post()) ? 'load' : 'noload') . ' POST: ' . print_r(Yii::$app->request->post(), true));
+        Yii::info('actionSend('.$id.'): ' . ($model->load(Yii::$app->request->post()) ? 'load' : 'noload') . ' POST: ' . print_r(Yii::$app->request->post(), true));
+        if( Yii::$app->request->isAjax && $form->load(Yii::$app->request->post()) ) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::info('actionSend('.$id.'): return json ' . print_r(ActiveForm::validate($model), true));
+            return ActiveForm::validate($form);
+/*            $sf = $this->renderPartial('msgtoword', [
+                'model' => $model,
+            ]);
+            return Yii::$app->response->sendFile($sf);
+*/
+        }
+        Yii::info('actionSend('.$id.'): return render form');
+
+
+/*
+        if ( $form->load(Yii::$app->request->post()) ) {
+            return $this->redirect(['answerlist']);
+        }
+*/
+        if( Yii::$app->request->isAjax ) {
+            return $this->renderAjax('send', [
+                'model' => $form,
+                'message' => $model,
+            ]);
+        }
+        else {
+            return $this->render('send', [
+                'model' => $form,
+                'message' => $model,
+            ]);
+        }
     }
 
     /**

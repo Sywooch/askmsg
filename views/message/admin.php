@@ -187,7 +187,7 @@ EOT;
             [
                 'class' => 'yii\grid\ActionColumn',
                 'contentOptions' => ['class' => 'commandcell'],
-                'template'=>'{view} {update} {answer} {toword} {delete}',
+                'template'=>'{view} {update} {answer} {toword} {send} {delete}',
                 'buttons'=>[
                     'view'=>function ($url, $model) {
                         return Html::a( '<span class="glyphicon glyphicon-eye-open"></span>', $url,
@@ -206,6 +206,9 @@ EOT;
                     },
                     'toword'=>function ($url, $model) {
                         return Html::a( '<span class="glyphicon glyphicon-floppy-disk"></span>', $url, ['title' => 'Экспорт в Word', 'target' => '_blank']);
+                    },
+                    'send'=>function ($url, $model) {
+                        return Html::a( '<span class="glyphicon glyphicon-envelope"></span>', $url, ['title' => 'Отправить по почте', 'target' => '_blank', 'class'=>'showinmodal']);
                     },
                     'delete' => function ($url, $model, $key) {
                         return Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM) ?
@@ -241,6 +244,7 @@ jQuery('.showinmodal').on("click", function (event){
         oBody = ob.find('.modal-body'),
         oLink = $(this);
 
+    oBody.text("");
     oBody.load(oLink.attr('href'), params);
     ob.find('.modal-header span').text(oLink.attr('title'));
     ob.modal('show');

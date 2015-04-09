@@ -219,6 +219,8 @@ use PhpOffice\PhpWord\PhpWord;
     $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
     $objWriter->save($sf);
 
-    Yii::$app->response->sendFile($sf);
+    echo $sf;
+
+//    Yii::$app->response->sendFile($sf);
 
 
