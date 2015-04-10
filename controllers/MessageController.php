@@ -285,12 +285,12 @@ class MessageController extends Controller
         $model = $this->findModel($id);
         $form = new SendmsgForm();
 
-        Yii::info('actionSend('.$id.'): ' . (Yii::$app->request->isAjax ? 'ajax' : 'noajax'));
-        Yii::info('actionSend('.$id.'): ' . ($model->load(Yii::$app->request->post()) ? 'load' : 'noload') . ' POST: ' . print_r(Yii::$app->request->post(), true));
-        Yii::info('actionSend('.$id.'): ' . ($model->load(Yii::$app->request->post()) ? 'load' : 'noload') . ' POST: ' . print_r(Yii::$app->request->post(), true));
+//        Yii::info('actionSend('.$id.'): ' . (Yii::$app->request->isAjax ? 'ajax' : 'noajax'));
+//        Yii::info('actionSend('.$id.'): ' . ($model->load(Yii::$app->request->post()) ? 'load' : 'noload') . ' POST: ' . print_r(Yii::$app->request->post(), true));
+//        Yii::info('actionSend('.$id.'): ' . ($model->load(Yii::$app->request->post()) ? 'load' : 'noload') . ' POST: ' . print_r(Yii::$app->request->post(), true));
         if( Yii::$app->request->isAjax && $form->load(Yii::$app->request->post()) ) {
             Yii::$app->response->format = Response::FORMAT_JSON;
-            Yii::info('actionSend('.$id.'): return json ' . print_r(ActiveForm::validate($model), true));
+//            Yii::info('actionSend('.$id.'): return json ' . print_r(ActiveForm::validate($model), true));
             return ActiveForm::validate($form);
 /*            $sf = $this->renderPartial('msgtoword', [
                 'model' => $model,
@@ -298,7 +298,7 @@ class MessageController extends Controller
             return Yii::$app->response->sendFile($sf);
 */
         }
-        Yii::info('actionSend('.$id.'): return render form');
+//        Yii::info('actionSend('.$id.'): return render form');
 
 
 /*

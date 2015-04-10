@@ -15,8 +15,11 @@ use app\models\Message;
 use app\models\Msgflags;
 use app\models\Tags;
 use app\components\Urllocation;
+use app\models\SendmsgForm;
 
 use kartik\export\ExportMenu;
+
+// use kartik\select2\Select2Asset;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\MessageSearch */
@@ -27,6 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 GriddataAsset::register($this);
 ListdataAsset::register($this);
+// Select2Asset::register($this);
 
 $this->registerCssFile('/themes/font-awesome-4.3.0/css/font-awesome.min.css', ['rel'=>"stylesheet"], 'font-awesome');
 
@@ -187,7 +191,7 @@ EOT;
             [
                 'class' => 'yii\grid\ActionColumn',
                 'contentOptions' => ['class' => 'commandcell'],
-                'template'=>'{view} {update} {answer} {toword} {send} {delete}',
+                'template'=>'{view} {update} {answer} {toword} {delete}', //  {send}
                 'buttons'=>[
                     'view'=>function ($url, $model) {
                         return Html::a( '<span class="glyphicon glyphicon-eye-open"></span>', $url,
@@ -208,7 +212,7 @@ EOT;
                         return Html::a( '<span class="glyphicon glyphicon-floppy-disk"></span>', $url, ['title' => 'Экспорт в Word', 'target' => '_blank']);
                     },
                     'send'=>function ($url, $model) {
-                        return Html::a( '<span class="glyphicon glyphicon-envelope"></span>', $url, ['title' => 'Отправить по почте', 'target' => '_blank', 'class'=>'showinmodal']);
+                        return Html::a( '<span class="glyphicon glyphicon-envelope"></span>', $url, ['title' => 'Отправить по почте', 'target' => '_blank', 'class'=>'showmail']);
                     },
                     'delete' => function ($url, $model, $key) {
                         return Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM) ?
@@ -233,7 +237,16 @@ EOT;
     ]);
     Modal::end();
 
-        $sJs =  <<<EOT
+/*
+    Modal::begin([
+        'header' => '<span></span>',
+        'id' => 'maildata',
+        'size' => Modal::SIZE_LARGE,
+    ]);
+    $this->renderAjax('send', ['model' => new SendmsgForm(), ]);
+    Modal::end();
+*/
+    $sJs =  <<<EOT
 var params = {};
 params[$('meta[name=csrf-param]').prop('content')] = $('meta[name=csrf-token]').prop('content');
 
@@ -241,6 +254,21 @@ jQuery('.showinmodal').on("click", function (event){
     event.preventDefault();
 
     var ob = jQuery('#messagedata'),
+        oBody = ob.find('.modal-body'),
+        oLink = $(this);
+
+    oBody.text("");
+    oBody.load(oLink.attr('href'), params);
+    ob.find('.modal-header span').text(oLink.attr('title'));
+    ob.modal('show');
+//    jQuery(".modal-content").css({'max-height': jQuery('window').height() * 0.7 + 'px'})
+    return false;
+});
+
+jQuery('.showmail').on("click", function (event){
+    event.preventDefault();
+
+    var ob = jQuery('#maildata'),
         oBody = ob.find('.modal-body'),
         oLink = $(this);
 

@@ -14,7 +14,7 @@ use app\models\UserSearch;
 use app\models\Group;
 use app\models\Rolesimport;
 use app\models\Usergroup;
-
+use yii\db\Query;
 /**
  * UserController implements the CRUD actions for User model.
  */
@@ -29,7 +29,12 @@ class UserController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['answerlist'],
+                        'actions' => ['find', ],
+                        'roles' => ['@'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['answerlist', ],
                         'roles' => [Rolesimport::ROLE_MODERATE_DOGM],
                     ],
                     [
@@ -84,6 +89,91 @@ class UserController extends Controller
 
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         return $aData;
+    }
+
+    /**
+     * Lists all users.
+     * @return mixed
+     */
+    public function actionFind($search = null, $id = null)
+    {
+        $out = ['more' => false];
+        if (!is_null($search)) {
+            $sQuery = $search;
+//            $query = new Query;
+            $query = User::find();
+            $query->select('us_id, us_lastname AS text')
+//                ->from('city')
+                ->where(['or',
+                        ['like', 'us_lastname', $sQuery],
+                        ['like', 'us_name', $sQuery],
+                        ['like', 'us_secondname', $sQuery],
+                        ['like', 'us_workposition', $sQuery],
+                    ]
+                );
+            $query1 = clone $query;
+            $out['more'] = $query1->count();
+//                ->limit(20);
+            $command = $query->createCommand();
+            $data = $command->queryAll();
+            $out['results'] = array_values($data);
+        }
+        elseif ($id > 0) {
+            $out['results'] = ['id' => $id, 'text' => City::find($id)->name];
+        }
+        else {
+            $out['results'] = ['id' => 0, 'text' => 'No matching records found'];
+        }
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+//        echo Json::encode($out);
+        return $out;
+
+        $sQuery = Yii::$app->request->get('query', '');
+        $nLimit = Yii::$app->request->get('limit', 10);
+        $nStart = Yii::$app->request->get('start', 0);
+        $a = explode(' ', $sQuery);
+        if( count($a) > 1 ) {
+            $sQuery = $a[0];
+        }
+
+        $oQuery = User::find()
+            ->select(User::tableName() . '.* ')
+            ->where(//[
+//                    'and',
+                ['or',
+                    ['like', 'us_lastname', $sQuery],
+                    ['like', 'us_name', $sQuery],
+                    ['like', 'us_secondname', $sQuery],
+                    ['like', 'us_workposition', $sQuery],
+                ]
+//                    ['like', 'us_lastname', $sQuery],
+            //]
+            )
+            ->orderBy(['us_lastname' => SORT_ASC, 'us_name' => SORT_ASC, 'us_secondname' => SORT_ASC]);
+
+        $oQuery2 = clone $oQuery;
+        $nAll = $oQuery2->count();
+        $aData = ArrayHelper::map(
+            $oQuery
+                ->limit($nLimit)
+                ->offset($nStart)
+                ->all(),
+            'us_id',
+            function($ob) {
+                return $ob->getFullName();
+                return [
+                    'id' => $ob->us_id,
+                    'val' => $ob->getFullName(),
+                    'pos' => $ob->us_workposition,
+                ];
+            }
+        );
+
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        return [
+            'total' => $nAll,
+            'list' => $aData,
+        ];
     }
 
     /**
