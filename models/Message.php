@@ -282,7 +282,10 @@ class Message extends \yii\db\ActiveRecord
 
             [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', ], 'filter', 'filter' => 'trim'],
             [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_oldcomment'], 'string', 'max' => 255],
-            [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', ], 'match', 'pattern' => '|^[А-Яа-яЁё]{2}[-А-Яа-яЁё\\s]*$|u', 'message' => 'Допустимы символы русского алфавита'],
+            [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', ], 'match',
+                'pattern' => '|^[А-Яа-яЁё]{2}[-А-Яа-яЁё\\s]*$|u', 'message' => 'Допустимы символы русского алфавита',
+                'when' => function($model) { return ($this->scenario != 'importdata'); },
+            ],
 
             ['verifyCode', 'captcha'],
 
