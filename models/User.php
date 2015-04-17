@@ -69,12 +69,6 @@ class User extends ActiveRecord  implements IdentityInterface
                 ],
                 'value' => new Expression('NOW()'),
             ],
-            'passwordBehavior' => [
-                'class' => PasswordBehavior::className(),
-                'attributes' => [
-                    ActiveRecord::EVENT_BEFORE_INSERT => true,
-                ]
-            ],
         ];
     }
 
@@ -226,7 +220,7 @@ class User extends ActiveRecord  implements IdentityInterface
      * Finds user by username
      *
      * @param string $username
-     * @return static|null
+     * @return User|null
      */
     public static function findByUsername($username)
     {
