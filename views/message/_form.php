@@ -326,7 +326,7 @@ $aFieldParam = [
 //                'disabled' => $isModerate,
 //                'readonly' => $isModerate,
         'options' => [
-            'placeholder' => 'Выберите тему сообщения ...',
+            'placeholder' => 'Выберите тему обращения ...',
         ],
         'pluginOptions' => [
             'allowClear' => true,
