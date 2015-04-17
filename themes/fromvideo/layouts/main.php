@@ -83,10 +83,12 @@ $aMenuItems[] = Yii::$app->user->isGuest ?
                                 <div id="head" class="row">
                                     <div class="col-xs-5">
                                         <a href="<?= $sLogoLink /* Yii::$app->homeUrl */ ?>" class="dogm-logo" target="_blank"></a>
-                                <span class="logo-box" href="/">
+                                <span class="logo-box">
                                     <div class="text">
                                         <div class="box1">
+                                            <a href="<?= $sLogoLink ?>" target="_blank" class="dogmlink">
                                             ДЕПАРТАМЕНТ ОБРАЗОВАНИЯ <span>ГОРОДА МОСКВЫ</span>
+                                            </a>
                                         </div>
                                         <div class="box2">
                                             ОБРАЩЕНИЯ <span>К РУКОВОДИТЕЛЮ</span>

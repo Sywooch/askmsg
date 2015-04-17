@@ -157,3 +157,13 @@ span.description {
 .panel {
     margin-bottom: 34px;
 }
+
+.dogmlink {
+    color: #333333;
+    text-decoration: none;
+}
+
+.dogmlink:hover, .dogmlink:active, .dogmlink:focus, .dogmlink:visited {
+    color: #333333;
+    text-decoration: none;
+}
