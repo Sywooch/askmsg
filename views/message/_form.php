@@ -830,6 +830,7 @@ $aFieldParam = [
     ?>
         <div class="col-sm-12">
             <?= $form->field($model, 'verifyCode', $aFieldParam['filefield'])->widget(Captcha::className(), [
+                'captchaAction' => 'message/captcha',
                 'template' => '<div class="row"><div class="col-lg-2">{image}</div><div class="col-lg-3">{input}</div><div class="clearfix"></div><div class="col-lg-5">Введите код с картинки в текстовое поле</div></div>',
             ]) ?>
         </div>

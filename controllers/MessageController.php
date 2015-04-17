@@ -37,7 +37,7 @@ class MessageController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'list', 'create', 'view', 'export'],
+                        'actions' => ['index', 'list', 'create', 'view', 'export', 'captcha', ],
                         'roles' => ['?', '@'],
                     ],
                     [
@@ -77,6 +77,8 @@ class MessageController extends Controller
             'captcha' => [
                 'class' => 'yii\captcha\CaptchaAction',
                 'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
+                'minLength' => 2,
+                'maxLength' => 3,
             ],
         ];
     }
