@@ -75,6 +75,9 @@ class Message extends \yii\db\ActiveRecord
     public $askcontacts; // Email и телефон
     public $tags; //
     public $_tagsstring; // теги строкой
+
+    public $verifyCode;
+
     /**
      * @var mixed file аттрибут для генерации поля добавления файла
      */
@@ -281,6 +284,8 @@ class Message extends \yii\db\ActiveRecord
             [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_oldcomment'], 'string', 'max' => 255],
             [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', ], 'match', 'pattern' => '|^[А-Яа-яЁё]{2}[-А-Яа-яЁё\\s]*$|u', 'message' => 'Допустимы символы русского алфавита'],
 
+            ['verifyCode', 'captcha'],
+
             [['msg_pers_email'], 'email', 'except' => ['importdata']],
             [['employer', 'asker', 'askid', 'askcontacts', 'tags'], 'string', 'max' => 255],
             [['tagsstring'], 'string', 'max' => 1024],
@@ -297,7 +302,7 @@ class Message extends \yii\db\ActiveRecord
             $sOld = "{$this->msg_pers_org} + {$this->msg_pers_region}";
             $this->msg_pers_org = $ob['text'];
             $this->msg_pers_region = $ob['eo_district_name_id'];
-            Yii::info("setupEkisData({$this->ekis_id}): {$sOld} -> {$this->msg_pers_org} + {$this->msg_pers_region}");
+//            Yii::info("setupEkisData({$this->ekis_id}): {$sOld} -> {$this->msg_pers_org} + {$this->msg_pers_region}");
 /*
 [eo_district_name] => Восточный
 [eo_district_name_id] => 1
@@ -366,6 +371,10 @@ class Message extends \yii\db\ActiveRecord
             'msg_empl_command',
             'msg_empl_remark',
         ];
+
+        if( $this->isUseCaptcha() ) {
+            $scenarios['person'][] = 'verifyCode';
+        }
 
         // у старых сообщений нет темы, ekis_id
         /*
@@ -439,6 +448,7 @@ class Message extends \yii\db\ActiveRecord
             'ekis_id' => 'Учреждение',
             'tagsstring' => 'Теги',
             'msg_curator_id' => 'Контролер',
+            'verifyCode' => 'Код',
 
             'employer' => 'Исполнитель',
             'asker' => 'Проситель',
@@ -1011,6 +1021,17 @@ class Message extends \yii\db\ActiveRecord
         }
         return $ob;
 
+    }
+
+    /**
+     * Нужно ли использовать капчу
+     *
+     * @return bool
+     */
+    public function isUseCaptcha()
+    {
+        return isset(Yii::$app->params['msgform.use.captcha'])
+            && Yii::$app->params['msgform.use.captcha'];
     }
 
 }

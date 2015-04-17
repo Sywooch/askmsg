@@ -9,6 +9,7 @@ use yii\widgets\MaskedInput;
 use yii\web\JsExpression;
 use yii\web\View;
 use yii\bootstrap\Modal;
+use yii\captcha\Captcha;
 
 use kartik\select2\Select2;
 
@@ -823,6 +824,18 @@ $aFieldParam = [
         ?>
 
     </div>
+
+    <?php
+        if( $model->isUseCaptcha() ) {
+    ?>
+        <div class="col-sm-12">
+            <?= $form->field($model, 'verifyCode', $aFieldParam['filefield'])->widget(Captcha::className(), [
+                'template' => '<div class="row"><div class="col-lg-2">{image}</div><div class="col-lg-3">{input}</div><div class="clearfix"></div><div class="col-lg-5">Введите код с картинки в текстовое поле</div></div>',
+            ]) ?>
+        </div>
+    <?php
+        }
+    ?>
 
     <?php
     else:

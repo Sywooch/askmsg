@@ -114,7 +114,7 @@ $aFieldParam = [
         }
 
         // Фокус на редактор помещаем
-        $sJs = 'setTimeout(function() {var oEditor = jQuery(".redactor-editor").first(); oEditor.focus(); console.log("Click: ", oEditor);}, 500);';
+        $sJs = 'setTimeout(function() {var oEditor = jQuery(".redactor-editor").first(); oEditor.focus(); /* console.log("Click: ", oEditor); */ }, 500);';
         $this->registerJs($sJs, View::POS_READY, 'focusonimperavi');
 
     ?>
@@ -333,6 +333,7 @@ EOT;
     $sJs =  <<<EOT
 var oButtons = jQuery('.changeflag'),
     oFlag = jQuery("#{$sFlagId}");
+//    console.log("flag field {{$sFlagId}} : ", oFlag);
 
 oButtons.on("click", function(event){
     event.preventDefault();
@@ -346,7 +347,7 @@ oButtons.on("click", function(event){
 
 EOT;
 
-    $this->registerJs($sJs, View::POS_READY, 'toggleuserpart');
+    $this->registerJs($sJs, View::POS_READY, 'changemshflag');
 
     ?>
 
@@ -356,6 +357,7 @@ EOT;
         Modal::begin([
             'header' => 'Обращение № ' . $model->msg_id,
             'id' => 'messagedata',
+            'size' => Modal::SIZE_LARGE,
         ]);
     /*        'toggleButton' => [
                 'label' => 'Текст обращения',

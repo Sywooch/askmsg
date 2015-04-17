@@ -19,9 +19,12 @@ use app\models\Regions;
 use app\models\Rolesimport;
 use Httpful\Request;
 use Httpful\Response;
+use app\components\WaitTrait;
 
 class SiteController extends Controller
 {
+    use WaitTrait;
+
     public function behaviors()
     {
         return [
@@ -72,22 +75,27 @@ class SiteController extends Controller
         }
 
         $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            if( Yii::$app->user->can(Rolesimport::ROLE_ADMIN) ) {
-                return $this->redirect(['message/admin']);
-            } elseif( Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM) ) {
-                return $this->redirect(['message/moderatelist']);
-            } elseif( Yii::$app->user->can(Rolesimport::ROLE_ANSWER_DOGM) ) {
-                return $this->redirect(['message/answerlist']);
-            } else {
-                return $this->redirect(['message/list']);
+        if ($model->load(Yii::$app->request->post()) ) {
+
+            $this->DoDelay('loginform.delay.time');
+
+            if( $model->login() ) {
+                if (Yii::$app->user->can(Rolesimport::ROLE_ADMIN)) {
+                    return $this->redirect(['message/admin']);
+                } elseif (Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM)) {
+                    return $this->redirect(['message/moderatelist']);
+                } elseif (Yii::$app->user->can(Rolesimport::ROLE_ANSWER_DOGM)) {
+                    return $this->redirect(['message/answerlist']);
+                } else {
+                    return $this->redirect(['message/list']);
+                }
+                return $this->goBack();
             }
-            return $this->goBack();
-        } else {
+        } // else {
             return $this->render('login', [
                 'model' => $model,
             ]);
-        }
+//        }
     }
 
     public function actionLogout()
@@ -144,12 +152,16 @@ class SiteController extends Controller
     public function actionRequestpasswordreset()
     {
         $model = new PasswordResetRequestForm();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            if ($model->sendEmail()) {
-                Yii::$app->getSession()->setFlash('success', 'Спасибо! На ваш Email было отправлено письмо со ссылкой на восстановление пароля.');
-                return $this->goHome();
-            } else {
-                Yii::$app->getSession()->setFlash('error', 'Извините. У нас возникли проблемы с отправкой письма восстановления пароля.');
+        if ( $model->load(Yii::$app->request->post()) ) {
+            $this->DoDelay('restoreform.delay.time');
+
+            if( $model->validate() ) {
+                if ($model->sendEmail()) {
+                    Yii::$app->getSession()->setFlash('success', 'Спасибо! На ваш Email было отправлено письмо со ссылкой на восстановление пароля.');
+                    return $this->goHome();
+                } else {
+                    Yii::$app->getSession()->setFlash('error', 'Извините. У нас возникли проблемы с отправкой письма восстановления пароля.');
+                }
             }
         }
 

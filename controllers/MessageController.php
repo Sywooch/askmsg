@@ -18,12 +18,15 @@ use yii\widgets\ActiveForm;
 use app\models\Rolesimport;
 use app\models\Message;
 use app\models\MessageSearch;
+use app\components\WaitTrait;
 
 /**
  * MessageController implements the CRUD actions for Message model.
  */
 class MessageController extends Controller
 {
+    use WaitTrait;
+
     public $defaultAction = 'create';
 
     public function behaviors()
@@ -67,6 +70,17 @@ class MessageController extends Controller
             ],
         ];
     }
+
+    public function actions()
+    {
+        return [
+            'captcha' => [
+                'class' => 'yii\captcha\CaptchaAction',
+                'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
+            ],
+        ];
+    }
+
 
     /**
      * Lists all Message models.
@@ -334,8 +348,6 @@ class MessageController extends Controller
         if( $id == 0 ) {
             $model = new Message();
             $model->scenario = 'person';
-            // поправим после сохранения сообщения всех соответчиков
-            // $model->on(ActiveRecord::EVENT_AFTER_INSERT, [$model, 'saveCoanswers'] );
         }
         else {
             $model = $this->findModel($id);
@@ -348,26 +360,32 @@ class MessageController extends Controller
             $model->on(ActiveRecord::EVENT_AFTER_UPDATE, [$model, 'saveAlltags'] );
         }
 
+        if ( $model->load(Yii::$app->request->post()) ) {
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            $model->uploadFiles();
-            if( $model->scenario == 'person' ) {
-                return $this->render(
+            $this->DoDelay('msgform.delay.time');
+
+            if( $model->save() ) {
+                $model->uploadFiles();
+                if( $model->scenario == 'person' ) {
+                    return $this->render(
                         'thankyou',
                         [
                             'model' => $model,
                         ]
                     );
+                }
+                else {
+                    return $this->redirect(['moderatelist']);
+                }
             }
-            else {
-                return $this->redirect(['moderatelist']);
-            }
-        } else {
-            Yii::info('MESSAGE ERROR: ' . print_r($model->getErrors(), true));
+
+        }
+//        else {
+//            Yii::info('MESSAGE ERROR: ' . print_r($model->getErrors(), true));
             return $this->render('create', [
                 'model' => $model,
             ]);
-        }
+//        }
     }
 
     /**

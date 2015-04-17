@@ -31,7 +31,7 @@ class RustextValidator extends Validator {
 //        Yii::info("RustextValidator(): {$sBaseVal} -> {$sNewVal}");
 //        Yii::info("RustextValidator(): nBaseLen = {$nBaseLen}, nRusLen = {$nRusLen}, nCapitalLen = {$nCapitalLen}");
         if( $this->usecapital ) {
-            if( ($nCapitalLen / $nRusLen) > $this->capital ) {
+            if( ($nRusLen > 0) && (($nCapitalLen / $nRusLen) > $this->capital) ) {
 //                Yii::info("RustextValidator(): capital = " . sprintf("%.3f", $nCapitalLen / $nRusLen));
                 $model->addError($attribute, 'Слишком много заглавных букв.');
             }
