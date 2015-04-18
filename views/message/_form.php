@@ -776,6 +776,8 @@ $aFieldParam = [
         <?= $form->field($model, 'msg_pers_secname')->textInput(['maxlength' => 255]) ?>
     </div>
 
+    <div class="clearfix"></div>
+
     <div class="col-sm-4">
         <?= $form->field($model, 'msg_pers_email')->textInput(['maxlength' => 255]) ?>
     </div>
