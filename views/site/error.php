@@ -20,9 +20,9 @@ Yii::error("ERROR PAGE: {$exception->statusCode} :\n{$name}\n{$message}\n" . pri
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <div class="alert alert-danger">
+    <!-- div class="alert alert-danger">
         <?= '' //nl2br(Html::encode($message)) ?>
-    </div>
+    </div -->
 
     <p>
         Произошла непредвиденная ошибка. Мы уже работаем над ее устранением.
