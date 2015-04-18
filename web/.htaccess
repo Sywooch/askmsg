@@ -28,7 +28,8 @@ rewriteRule ^list.php$ /message/index?page=%1 [R=301,L]
 
 rewriteRule ^list.php$ /message/index? [R=301,L]
 
-rewriteRule ^list.php/$ /message/index? [R=301,L]
+rewriteCond %{QUERY_STRING} .*PAGEN_1=([0-9]+).*
+rewriteRule ^list.php/$ /message/index?page=%1 [R=301,L]
 
 rewriteRule public_session.php$ / [R=301,L]
 
