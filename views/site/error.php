@@ -8,20 +8,27 @@ use yii\helpers\Html;
 /* @var $exception Exception */
 
 $this->title = $name;
+
+$this->title = ($exception->statusCode == 403 || $exception->statusCode == 404) ? 'Страница не найдена' : 'Ошибка на сайте';
+
+Yii::error("ERROR PAGE: {$exception->statusCode} :\n{$name}\n{$message}\n" . print_r($exception, true));
+
+// The above error occurred while the Web server was processing your request.
+// Please contact us if you think this is a server error. Thank you.
 ?>
 <div class="site-error">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
     <div class="alert alert-danger">
-        <?= nl2br(Html::encode($message)) ?>
+        <?= '' //nl2br(Html::encode($message)) ?>
     </div>
 
     <p>
-        The above error occurred while the Web server was processing your request.
+        Произошла непредвиденная ошибка. Мы уже работаем над ее устранением.
     </p>
     <p>
-        Please contact us if you think this is a server error. Thank you.
+        Для продолжения работы перейдите <a href="/">на главную страницу</a>.
     </p>
 
 </div>
