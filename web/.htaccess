@@ -28,6 +28,8 @@ rewriteRule ^list.php$ /message/index?page=%1 [R=301,L]
 
 rewriteRule ^list.php$ /message/index? [R=301,L]
 
+rewriteRule ^list.php/$ /message/index? [R=301,L]
+
 rewriteRule ^Archive.+ /message/index? [R=301,L]
 
 rewriteCond %{QUERY_STRING} ^ID=([0-9]+)$
