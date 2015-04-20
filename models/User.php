@@ -89,11 +89,12 @@ class User extends ActiveRecord  implements IdentityInterface
 //        \Yii::info("rules: " . print_r(array_keys(Group::getActiveGroups()), true));
         return [
             [['us_xtime', 'us_logintime', 'us_regtime', 'us_checkwordtime'], 'safe'],
-            [['us_login', 'us_password_hash', 'us_name', 'us_email', 'us_password_hash', 'selectedGroups'], 'required'],
+            [['us_login', ], 'filter', 'filter' => function($v) { return empty($v) ? $this->getLoginFromEmail() : $v; }],
+            [['us_password_hash', 'us_name', 'us_email', 'us_password_hash', 'selectedGroups'], 'required'], // 'us_login',
             [['us_workposition'], 'required', 'on' => ['create', 'update']],
             [['us_secondname', 'us_lastname'], 'required', 'on' => ['create', 'update']],
             [['us_active'], 'integer'],
-            [['us_login', 'us_email'], 'unique', 'on' => 'create'],
+            [['us_login', 'us_email'], 'unique', 'on' => ['create', 'update']],
             [['selectedGroups'], 'in', 'range' => array_keys(Group::getActiveGroups()), 'allowArray' => true ],
             [['us_login', 'us_password_hash', 'us_chekword_hash', 'us_name', 'us_secondname', 'us_lastname', 'us_email', 'us_workposition', 'email_confirm_token', 'password_reset_token'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32]
@@ -487,4 +488,31 @@ class User extends ActiveRecord  implements IdentityInterface
             ->send();
     }
 
+
+    /**
+     * Создание login из email
+     * @param string $sEmail
+     * @return string
+     */
+    public function getLoginFromEmail($sEmail = '') {
+        if( $sEmail == '' ) {
+            list($sEmail) = explode('@', $this->us_email);
+        }
+        if( $sEmail == '' ) {
+            $sEmail = 'user';
+        }
+        $n = 1;
+        $login = $sEmail;
+        while( true ) {
+            $sSql = 'Select COUNT(*) From ' . self::tableName() . ' Where us_login = :login';
+            if( Yii::$app->db->createCommand($sSql, [':login' => $login])->queryScalar() > 0 ) {
+                $login = $sEmail . '-' . sprintf("%d", $n);
+                $n++;
+            }
+            else {
+                break;
+            }
+        }
+        return $login;
+    }
 }

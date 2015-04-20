@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\helpers\ArrayHelper;
+use app\models\Rolesimport;
 
 /**
  * This is the model class for table "{{%group}}".
@@ -54,8 +55,12 @@ class Group extends \yii\db\ActiveRecord
      */
     public static function setActiveGroups() {
         if( self::$_activeGroups === null ) {
+            $aGroups = [Rolesimport::ROLE_ANSWER_DOGM, Rolesimport::ROLE_MODERATE_DOGM];
+            if( Yii::$app->user->can(Rolesimport::ROLE_ADMIN) ) {
+                $aGroups[] = Rolesimport::ROLE_ADMIN;
+            }
             self::$_activeGroups = Group::find()
-                 ->where(['group_active'=>1])
+                 ->where(['group_active'=>1, 'group_id' => $aGroups])
                  ->orderBy(['group_name' => SORT_ASC])
                  ->all();
         }

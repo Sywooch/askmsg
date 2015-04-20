@@ -39,7 +39,12 @@ class UserController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['index', 'create', 'update', 'delete', 'view'],
+                        'actions' => ['index', 'create', 'update', 'view'],
+                        'roles' => [Rolesimport::ROLE_MODERATE_DOGM],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['delete', ],
                         'roles' => [Rolesimport::ROLE_ADMIN],
                     ],
                 ],

@@ -40,17 +40,17 @@ use app\models\Group;
 
     <?= $form->field($model, 'us_active')->checkbox() ?>
 
-    <?= $form->field($model, 'us_login')->textInput(['maxlength' => 255]) ?>
+    <?= $form->field($model, 'us_lastname')->textInput(['maxlength' => 255]) ?>
 
     <?= $form->field($model, 'us_name')->textInput(['maxlength' => 255]) ?>
 
     <?= $form->field($model, 'us_secondname')->textInput(['maxlength' => 255]) ?>
 
-    <?= $form->field($model, 'us_lastname')->textInput(['maxlength' => 255]) ?>
-
     <?= $form->field($model, 'us_email')->textInput(['maxlength' => 255]) ?>
 
     <?= $form->field($model, 'us_workposition')->textInput(['maxlength' => 255]) ?>
+
+    <?= $form->field($model, 'us_login')->textInput(['maxlength' => 255])->hint("необязательное поле, будет создан из email") ?>
 
     <?= $form->field($model, 'selectedGroups')->checkboxList(Group::getActiveGroups()) ?>
 
