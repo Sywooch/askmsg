@@ -11,7 +11,8 @@ $this->title = $name;
 
 $this->title = ($exception->statusCode == 403 || $exception->statusCode == 404) ? 'Страница не найдена' : 'Ошибка на сайте';
 
-Yii::error("ERROR PAGE: {$exception->statusCode} :\n{$name}\n{$message}\n" . print_r($exception, true));
+Yii::error("ERROR PAGE: {$exception->statusCode} {$_SERVER['REQUEST_URI']}:\n{$name}\n{$message}\n"/* . print_r($exception, true)*/);
+// /bitrix/tools/public_session.php
 
 // The above error occurred while the Web server was processing your request.
 // Please contact us if you think this is a server error. Thank you.

@@ -21,17 +21,28 @@ RewriteEngine on
 #                                                                               #
 #################################################################################
 rewriteCond %{QUERY_STRING} ^date=([0-9.]+)$
-rewriteRule ^list.php$ /message/index?MessageSearch[msg_createtime]=%1 [R=301,L]
+rewriteRule list.php$ /message/index?MessageSearch[msg_createtime]=%1 [R=301,L]
+
+rewriteCond %{QUERY_STRING} ^dayt=([0-9.]+)$
+rewriteRule ^suggestion/messages/index.php$ /message/index?MessageSearch[msg_createtime]=%1 [R=301,L]
 
 rewriteCond %{QUERY_STRING} ^PAGEN_1=([0-9]+)$
 rewriteRule ^list.php$ /message/index?page=%1 [R=301,L]
 
 rewriteRule ^list.php$ /message/index? [R=301,L]
 
+rewriteCond %{QUERY_STRING} .*PAGEN_1=([0-9]+).*
+rewriteRule ^list.php/$ /message/index?page=%1 [R=301,L]
+
+rewriteRule public_session.php$ / [R=301,L]
+
 rewriteRule ^Archive.+ /message/index? [R=301,L]
 
+rewriteRule Archive/$ /message/index? [R=301,L]
+
 rewriteCond %{QUERY_STRING} ^ID=([0-9]+)$
-rewriteRule ^detail.php$ /message/%1? [R=301,L]
+rewriteRule detail.php$ /message/%1? [R=301,L]
+
 #################################################################################
 #                                                                               #
 #                    Finish rewrite rules for old URLs                          #
