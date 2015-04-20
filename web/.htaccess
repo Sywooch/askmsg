@@ -42,6 +42,8 @@ rewriteRule Archive/$ /message/index? [R=301,L]
 
 rewriteRule ^respondent/.* /message/answerlist? [R=301,L]
 
+rewriteRule ^moderator/.* /message/moderatelist? [R=301,L]
+
 rewriteCond %{QUERY_STRING} ^ID=([0-9]+)$
 rewriteRule detail.php$ /message/%1? [R=301,L]
 
