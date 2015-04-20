@@ -205,7 +205,7 @@ EOT;
                    },
                     'answer'=>function ($url, $model) {
                         return $model->isAnswerble ?
-                            Html::a( '<span class="glyphicon glyphicon-refresh"></span>', $url, ['title' => 'Изменить Обращение ' . $model->msg_id]) :
+                            Html::a( '<span class="glyphicon glyphicon-refresh"></span>', $url, ['title' => 'Ответить на Обращение ' . $model->msg_id]) :
                             '';
                     },
                     'toword'=>function ($url, $model) {
