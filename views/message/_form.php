@@ -56,6 +56,7 @@ echo '-->' . "\n";
 $isModerate = $model->scenario == 'moderator';
 
 $sFlagId = Html::getInputId($model, 'msg_flag');
+$sEmploeeId = Html::getInputId($model, 'msg_empl_id');
 $sCommandId = Html::getInputId($model, 'msg_empl_command');
 $sRemarkId = Html::getInputId($model, 'msg_empl_remark');
 $sMsgTextId = Html::getInputId($model, 'msg_pers_text');
@@ -132,7 +133,7 @@ $nFlagInstrInt = Msgflags::MFLG_INT_INSTR;
 $sJs .=  <<<EOT
 var filterButtons = function() {
     if( {$nFlagNewMsg} == parseInt(oFlag.val()) ) {
-        if( oCommand.val().length > 0 ) {
+        if( (jQuery("#{$sEmploeeId}").val() != "") ) { // (oCommand.val().length > 0) ||
             oButtons.each(function(index, ob){
                 var ob = jQuery(this),
                     nId = parseInt(ob.attr("id").split("_")[1]),
@@ -150,7 +151,13 @@ var filterButtons = function() {
                 var ob = jQuery(this),
                     nId = parseInt(ob.attr("id").split("_")[1]),
                     oGroup = jQuery("#buttongroup_" + nId);
-                oGroup.show();
+                if( (nId != {$nFlagInstrInt}) && nId != {$nFlagInstr} ) {
+                    oGroup.show();
+                }
+                else {
+                    oGroup.hide();
+                }
+//                oGroup.show();
             });
         }
     }
@@ -281,7 +288,12 @@ $aFieldParam = [
 //                        'formatResult' => new JsExpression('function(object, container, query){ console.log("format: ", object, container, query); container.append(object.text);  }'),
         ],
         'pluginEvents' => [
-//                        'change' => 'function(event) { jQuery("#'.Html::getInputId($model, 'msg_empl_id').'").val(event.val); console.log("change", event); }',
+                        'change' => 'function(event) {
+                            // jQuery("#'.$sEmploeeId.'").val(event.val);
+                            console.log("change", event);
+                            console.log("New val = " + jQuery("#'.$sEmploeeId.'").val());
+                            filterButtons();
+                        }',
 //                        'select2-selecting' => 'function(event) { console.log("select2-selecting", event); }',
         ],
     ],
@@ -649,7 +661,7 @@ $aFieldParam = [
                 'id' => 'messagedata',
                 'footer' => '<button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button><button type="button" class="btn btn-primary" id="setinstruct">Вставить поручение</button>',
             ]);
-            $this->registerJs('jQuery("#setinstruct").on("click", function(event) { var s = jQuery("#idinstructionlist").val(); event.preventDefault(); if( s.length > 0 ) { jQuery("#'.Html::getInputId($model, 'msg_empl_command').'").val(s); } $("#messagedata").modal("hide"); return false; });', View::POS_READY, 'selectinstruct');
+            $this->registerJs('jQuery("#setinstruct").on("click", function(event) { var s = jQuery("#idinstructionlist").val(); event.preventDefault(); if( s.length > 0 ) { jQuery("#'.Html::getInputId($model, 'msg_empl_command').'").val(s); } $("#messagedata").modal("hide"); filterButtons(); return false; });', View::POS_READY, 'selectinstruct');
             ?>
 
             <?= Select2::widget($aFieldParam['instrlist']) ?>
