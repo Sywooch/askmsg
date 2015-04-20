@@ -286,6 +286,9 @@ class Message extends \yii\db\ActiveRecord
                 'pattern' => '|^[А-Яа-яЁё]{2}[-А-Яа-яЁё\\s]*$|u', 'message' => 'Допустимы символы русского алфавита',
                 'when' => function($model) { return ($this->scenario != 'importdata'); },
             ],
+            [['msg_pers_phone', ], 'match',
+                'pattern' => '|^\\+7\\([\\d]{3}\\)\s+[\\d]{3}-[\\d]{2}-[\\d]{2}$|', 'message' => 'Нужно указать правильный телефон',
+            ],
 
             ['verifyCode', 'captcha'],
 
