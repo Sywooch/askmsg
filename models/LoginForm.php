@@ -55,6 +55,7 @@ class LoginForm extends Model
     {
         if (!$this->hasErrors()) {
             $user = $this->getUser();
+//            Yii::warning('validatePassword(): ' . print_r($user->attributes, true));
 
             if (!$user || !$user->validatePassword($this->password) ) {
                 $this->addError($attribute, 'Неправильное имя или пароль');

@@ -303,7 +303,7 @@ class User extends ActiveRecord  implements IdentityInterface
         if( preg_match('/^\$2[axy]\$(\d\d)\$[\.\/0-9A-Za-z]{22}/', $this->us_password_hash, $matches) && $matches[1] >= 4 && $matches[1] <= 30) {
             $bRet = Yii::$app->security->validatePassword($password, $this->us_password_hash);
         }
-        Yii::warning("validatePassword({$password}): " . ($bRet ? 'yes' : 'no'));
+        Yii::warning("validatePassword({$password}): us_id = {$this->us_id} " . ($bRet ? 'yes' : 'no'));
         if( !$bRet ) {
             $bRet = $this->validateOldPassword($password);
             Yii::warning("validateOldPassword({$password}): " . ($bRet ? 'yes' : 'no'));
