@@ -933,11 +933,11 @@ $aFieldParam = [
                     <a href="#" class="btn btn-default btn-block togglepart" id="toggle_answer">Показать Ответ</a>
                 </div>
                 <div class="col-sm-3" style="text-align: right;">
-                    <?= $model->flag->getTagName() ?>
+                    Статус: <?= $model->flag->getTagName() ?>
                 </div>
             <?php else: ?>
                 <div class="col-sm-6" style="text-align: right;">
-                    <?= $model->flag->getTagName() ?>
+                    Статус: <?= $model->flag->getTagName() ?>
                 </div>
             <?php endif; ?>
 
