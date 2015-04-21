@@ -223,4 +223,14 @@ class Msgflags extends \yii\db\ActiveRecord
             'fl_hint' => 'Подсказка',
         ];
     }
+
+    /**
+     * Получение названия флага без цифрового кода
+     * @return string
+     */
+    public function getTagName()
+    {
+        return trim(mb_substr($this->fl_name, 5, mb_strlen($this->fl_name, 'UTF-8'), 'UTF-8'));
+    }
+
 }
