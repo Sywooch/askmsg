@@ -22,6 +22,8 @@ use app\models\File;
 use app\assets\HelperscriptAsset;
 use app\assets\JqueryfilerAsset;
 
+use vova07\imperavi\Widget;
+
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Message */
@@ -702,9 +704,29 @@ $aFieldParam = [
 
         <?php if( !empty($model->msg_answer)  ): ?>
         <div class="col-sm-12 thumbnail " id="id_answer" style="display: none;">
-            <label for="message-msg_pers_text" class="control-label col-sm-1">Ответ</label>
-            <div style="clear: both;">
-            <?= $model->msg_answer ?>
+            <?php if( in_array($model->msg_flag, [Msgflags::MFLG_SHOW_NEWANSWER, Msgflags::MFLG_INT_NEWANSWER,]) ): ?>
+                <div style="clear: both;">
+                <?= $form
+                    ->field(
+                        $model,
+                        'msg_answer',
+                        $aFieldParam['orgfield'])
+                    ->widget(Widget::className(), [
+                        'settings' => [
+                            'lang' => 'ru',
+                            'minHeight' => 200,
+                            'buttons' => ['formatting', 'bold', 'italic', 'deleted', 'unorderedlist', 'orderedlist', 'link', 'alignment'], // 'outdent', 'indent', 'image',
+                            'plugins' => [
+//                       'clips',
+                                'fullscreen',
+                            ]
+                        ]
+                    ]) ?>
+            <?php else: ?>
+                <label for="message-msg_pers_text" class="control-label col-sm-1">Ответ</label>
+                <div style="clear: both;">
+                <?= $model->msg_answer ?>
+            <?php endif; ?>
 
             <?php
             $aFiles = $model->getUserFiles(false);

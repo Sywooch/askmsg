@@ -354,7 +354,15 @@ class Message extends \yii\db\ActiveRecord
 //                'alltags',
                 'tagsstring',
                 'msg_answertime',
-            ]
+            ],
+            // добавляем модератору возможность подправить ответ
+            in_array(
+                $this->msg_flag,
+                [
+                    Msgflags::MFLG_SHOW_NEWANSWER,
+                    Msgflags::MFLG_INT_NEWANSWER,
+                ]
+            ) ? ['msg_answer'] : []
         );
 
         $scenarios['importdata'] = [
@@ -654,6 +662,7 @@ class Message extends \yii\db\ActiveRecord
             Msgflags::MFLG_INT_REVIS_INSTR,
         ];
 
+/*
         if( $bModerate ) {
             $aFlagAns = array_merge(
                 $aFlagAns,
@@ -663,7 +672,7 @@ class Message extends \yii\db\ActiveRecord
                 ]
             );
         }
-
+*/
         $bRet = ((Yii::$app->user->can(Rolesimport::ROLE_ANSWER_DOGM)
              && $this->msg_empl_id == Yii::$app->user->identity->getId())
              || $bModerate)
