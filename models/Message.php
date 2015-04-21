@@ -646,15 +646,27 @@ class Message extends \yii\db\ActiveRecord
      *  Возможность ответа
      */
     public function getIsAnswerble() {
+        $bModerate = Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM);
         $aFlagAns = [
             Msgflags::MFLG_SHOW_INSTR,
             Msgflags::MFLG_INT_INSTR,
             Msgflags::MFLG_SHOW_REVIS,
             Msgflags::MFLG_INT_REVIS_INSTR,
         ];
+
+        if( $bModerate ) {
+            $aFlagAns = array_merge(
+                $aFlagAns,
+                [
+                    Msgflags::MFLG_SHOW_NEWANSWER,
+                    Msgflags::MFLG_INT_NEWANSWER,
+                ]
+            );
+        }
+
         $bRet = ((Yii::$app->user->can(Rolesimport::ROLE_ANSWER_DOGM)
              && $this->msg_empl_id == Yii::$app->user->identity->getId())
-             || Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM))
+             || $bModerate)
              && in_array($this->msg_flag, $aFlagAns)
              ;
         return $bRet;
