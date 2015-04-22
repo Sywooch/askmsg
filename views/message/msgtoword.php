@@ -127,13 +127,13 @@ use PhpOffice\PhpWord\PhpWord;
         $aStyleHead['font'],
         $aStyleHead['paragraph']
     );
-
+/*
     $section->addText(
         htmlspecialchars($model->region->reg_name),
         $aStyleHead['font'],
         $aStyleHead['paragraph']
     );
-
+*/
     $section->addText(
         htmlspecialchars($model->msg_pers_org),
         $aStyleHead['font'],
