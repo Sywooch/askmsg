@@ -305,7 +305,7 @@ class Message extends \yii\db\ActiveRecord
     public function setupEkisData($attribute, $params) {
         $ob = $this->getEkisOrgData($this->ekis_id);
         if( $ob !== null ) {
-            $sOld = "{$this->msg_pers_org} + {$this->msg_pers_region}";
+//            $sOld = "{$this->msg_pers_org} + {$this->msg_pers_region}";
             $this->msg_pers_org = $ob['text'];
             $this->msg_pers_region = $ob['eo_district_name_id'];
 //            Yii::info("setupEkisData({$this->ekis_id}): {$sOld} -> {$this->msg_pers_org} + {$this->msg_pers_region}");
