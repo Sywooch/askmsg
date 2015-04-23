@@ -178,7 +178,7 @@ use PhpOffice\PhpWord\PhpWord;
         );
     }
 
-    if( $model->msg_empl_command !== '' ) {
+    if( $model->msg_empl_command != '' ) {
         $section->addText(
             htmlspecialchars('Поручение'),
             $aStyleTitle2['font'],
