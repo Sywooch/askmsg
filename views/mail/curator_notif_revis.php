@@ -21,7 +21,7 @@ include dirname(__FILE__) . DIRECTORY_SEPARATOR . 'mail_styles_data.php';
 $aLink = ['message/answer', 'id'=>$model->msg_id];
 ?>
 
-<p>Здравствуйте, <?= Html::encode($model->curator->getShortName()) ?>!</p>
+<p>Здравствуйте, <?= Html::encode($model->curator->getShortName()) ?>.</p>
 
 <p>На ответ к обращению №<?= Html::encode($model->msg_id) ?> поступило замечание.</p>
 

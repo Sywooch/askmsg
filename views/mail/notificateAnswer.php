@@ -16,7 +16,7 @@ $aListLink = ['message/answerlist'];
 
 ?>
 
-<p>Здравствуйте, <?= Html::encode($user['shortname']) ?>!</p>
+<p>Здравствуйте, <?= Html::encode($user['shortname']) ?>.</p>
 
 <p>Это извещение проекта <?= Html::encode(Yii::$app->name) ?> о сообщении №<?= Html::encode($model->msg_id) ?>.</p>
 

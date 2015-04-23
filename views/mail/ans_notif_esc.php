@@ -20,7 +20,7 @@ $aLink = ['message/answer', 'id'=>$model->msg_id];
 
 ?>
 
-<p>Здравствуйте, <?= Html::encode($model->employee->getShortName()) ?>!</p>
+<p>Здравствуйте, <?= Html::encode($model->employee->getShortName()) ?>.</p>
 
 <p>Обращение №<?= Html::encode($model->msg_id) ?>, назначенное Вам, снято.</p>
 

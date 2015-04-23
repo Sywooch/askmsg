@@ -21,7 +21,7 @@ $aLink = ['site/login'];
 
 ?>
 
-<p>Здравствуйте, <?= Html::encode($model->getShortName()) ?>!</p>
+<p>Здравствуйте, <?= Html::encode($model->getShortName()) ?>.</p>
 
 <p>На сайте <?= Html::encode(Yii::$app->name) ?> изменен Ваш пароль.</p>
 

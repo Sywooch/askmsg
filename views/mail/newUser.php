@@ -14,7 +14,7 @@ use yii\helpers\Html;
 $loginLink = \Yii::$app->urlManager->createAbsoluteUrl(['site/login']);
 ?>
 
-<p>Здравствуйте, <?= Html::encode($user->us_name) ?>!</p>
+<p>Здравствуйте, <?= Html::encode($user->us_name) ?>.</p>
 
 <p>Вы зарегистрированы в проекте <?= Html::encode(Yii::$app->name) ?></p>
 

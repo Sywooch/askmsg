@@ -21,7 +21,7 @@ include dirname(__FILE__) . DIRECTORY_SEPARATOR . 'mail_styles_data.php';
 
 ?>
 
-<p>Здравствуйте, <?= Html::encode($model->getShortName()) ?>!</p>
+<p>Здравствуйте, <?= Html::encode($model->getShortName()) ?>.</p>
 
 <p>Ваше обращение №<?= Html::encode($model->msg_id) ?> было рассмотрено Департаментом образования города Москвы.</p>
 

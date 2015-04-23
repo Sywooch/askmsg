@@ -15,7 +15,7 @@ $aLink = ['message/view', 'id'=>$model->msg_id];
 
 ?>
 
-<p>Здравствуйте, <?= Html::encode($model->getShortName()) ?>!</p>
+<p>Здравствуйте, <?= Html::encode($model->getShortName()) ?>.</p>
 
 <p>Ваше обращение в проекте <?= Html::encode(Yii::$app->name) ?> №<?= Html::encode($model->msg_id) ?> прошло обработку.</p>
 

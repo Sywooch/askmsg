@@ -19,7 +19,7 @@ $aLink = ['message/view', 'id'=>$model->msg_id];
 
 ?>
 
-<p>Здравствуйте, <?= Html::encode($model->getShortName()) ?>!</p>
+<p>Здравствуйте, <?= Html::encode($model->getShortName()) ?>.</p>
 
 <p>Ваше обращение №<?= Html::encode($model->msg_id) ?> опубликовано на сайте Департамента образования города Москвы.</p>
 

@@ -22,7 +22,7 @@ include dirname(__FILE__) . DIRECTORY_SEPARATOR . 'mail_styles_data.php';
 
 ?>
 
-<p>Здравствуйте, <?= Html::encode($model->employee->getShortName()) ?>!</p>
+<p>Здравствуйте, <?= Html::encode($model->employee->getShortName()) ?>.</p>
 
 <p>Поступило новое поручение №<?= Html::encode($model->msg_id) ?>.</p>
 
