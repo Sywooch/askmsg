@@ -219,7 +219,6 @@ class Message extends \yii\db\ActiveRecord
                                 'answers' => $ob->allanswers,
                             ];
                         },
-
                     ],
 
                     // пробуем посмотреть нужна ли отправка

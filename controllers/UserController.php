@@ -262,6 +262,7 @@ class UserController extends Controller
 //                }
             }
 //            return $this->redirect(['view', 'id' => $model->us_id]);
+            return $this->redirect(['index']);
         }
 
         return $this->render(

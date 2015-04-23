@@ -5,6 +5,7 @@ namespace app\models;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
+use yii\behaviors\AttributeBehavior;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
@@ -44,7 +45,7 @@ class User extends ActiveRecord  implements IdentityInterface
     public static $_cache = [];
 
     public $selectedGroups = null;
-    public $newPassword = null;
+    public $newPassword = null; // используется в поведении passwordBehavior
 
     public function behaviors()
     {
@@ -61,6 +62,7 @@ class User extends ActiveRecord  implements IdentityInterface
                 'template' => 'user_create_info',
                 'subject' => 'Регистрация на портале ' . Yii::$app->name,
             ],
+
             'timestampBehavior' => [
                 'class' => TimestampBehavior::className(),
                 'attributes' => [
@@ -69,6 +71,30 @@ class User extends ActiveRecord  implements IdentityInterface
                 ],
                 'value' => new Expression('NOW()'),
             ],
+
+            // обработка нового пароля
+            [
+                'class' => AttributeBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_UPDATE => 'newPassword',
+                ],
+                'value' => function ($event) {
+                    /** @var User $model */
+                    $model = $event->sender;
+
+                    if( $model->newPassword != '' ) {
+                        Yii::error('setNewPassword(): new password = ' . $model->newPassword);
+
+                        $model->setPassword($model->newPassword);
+                        $model->generateAuthKey();
+
+                        $model->sendNotificate('user_update_pass', 'Изменение пароля на портале ' . Yii::$app->name, ['model' => $model]);
+                    }
+
+                    return $model->newPassword;
+                },
+            ],
+
         ];
     }
 
@@ -97,7 +123,8 @@ class User extends ActiveRecord  implements IdentityInterface
             [['us_login', 'us_email'], 'unique', 'on' => ['create', 'update']],
             [['selectedGroups'], 'in', 'range' => array_keys(Group::getActiveGroups()), 'allowArray' => true ],
             [['us_login', 'us_password_hash', 'us_chekword_hash', 'us_name', 'us_secondname', 'us_lastname', 'us_email', 'us_workposition', 'email_confirm_token', 'password_reset_token'], 'string', 'max' => 255],
-            [['auth_key'], 'string', 'max' => 32]
+            [['auth_key'], 'string', 'max' => 32],
+            [['newPassword'], 'string', 'max' => 32],
         ];
     }
 
@@ -110,7 +137,7 @@ class User extends ActiveRecord  implements IdentityInterface
         $scenarios = parent::scenarios();
         $scenarios['create'] = ['us_login', 'us_name', 'us_secondname', 'us_lastname', 'us_email', 'us_workposition',
                                 'us_active', 'selectedGroups'];
-        $scenarios['update'] = array_merge($scenarios['create'], []);
+        $scenarios['update'] = array_merge($scenarios['create'], ['newPassword']);
         $scenarios['importdata'] = [
             'us_login',
             'us_name',
@@ -125,6 +152,7 @@ class User extends ActiveRecord  implements IdentityInterface
             'us_chekword_hash',
             'us_password_hash',
         ];
+
         $scenarios['passwordop'] = [
             'password_reset_token',
             'email_confirm_token',
@@ -158,6 +186,7 @@ class User extends ActiveRecord  implements IdentityInterface
             'password_reset_token' => 'Password Reset Token',
 
             'selectedGroups' => 'Группы',
+            'newPassword' => 'Новый пароль',
         ];
     }
 
