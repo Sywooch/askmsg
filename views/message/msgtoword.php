@@ -127,13 +127,13 @@ use PhpOffice\PhpWord\PhpWord;
         $aStyleHead['font'],
         $aStyleHead['paragraph']
     );
-/*
+
     $section->addText(
         htmlspecialchars($model->region->reg_name),
         $aStyleHead['font'],
         $aStyleHead['paragraph']
     );
-*/
+
     $section->addText(
         htmlspecialchars($model->msg_pers_org),
         $aStyleHead['font'],
@@ -165,7 +165,7 @@ use PhpOffice\PhpWord\PhpWord;
         );
     }
 
-    if( $model->msg_empl_id !== null ) {
+    if( !empty($model->msg_empl_id) ) {
         $section->addText(
             htmlspecialchars('Исполнитель'),
             $aStyleTitle1['font'],
@@ -178,7 +178,7 @@ use PhpOffice\PhpWord\PhpWord;
         );
     }
 
-    if( $model->msg_empl_command != '' ) {
+    if( !empty($model->msg_empl_command) ) {
         $section->addText(
             htmlspecialchars('Поручение'),
             $aStyleTitle2['font'],
