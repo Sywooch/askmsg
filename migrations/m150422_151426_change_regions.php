@@ -81,6 +81,24 @@ class m150422_151426_change_regions extends Migration
         echo  iconv('UTF-8','CP866', $sOut);
         Yii::info($sOut);
 
+        foreach($aConvert As $k=>$v) {
+            $s = '';
+            foreach($aOldData As $ob) {
+                if( $ob['reg_id'] == $k ) {
+                    $s .= $ob['reg_name'];
+                }
+            }
+            foreach($aData['eo_district_name'] As $ob) {
+                if( $ob['eo_district_name_id'] == $v ) {
+                    $s .= ' -> ' . $ob['eo_district_name'] . "\n";
+                    break;
+                }
+            }
+            echo  iconv('UTF-8','CP866', $s);
+            Yii::info($s);
+            $s = '';
+        }
+
         $sSql = 'Update educom_regions Set reg_id = 100 + reg_id Where reg_id < 100';
         $nUpd = $db->createCommand($sSql)->execute();
 
