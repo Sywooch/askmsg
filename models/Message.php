@@ -307,6 +307,7 @@ class Message extends \yii\db\ActiveRecord
 //            $sOld = "{$this->msg_pers_org} + {$this->msg_pers_region}";
             $this->msg_pers_org = $ob['text'];
             $this->msg_pers_region = $ob['eo_district_name_id'];
+            Regions::testExistRegion($ob['eo_district_name_id'], $ob['eo_district_name']);
 //            Yii::info("setupEkisData({$this->ekis_id}): {$sOld} -> {$this->msg_pers_org} + {$this->msg_pers_region}");
 /*
 [eo_district_name] => Восточный
@@ -1031,7 +1032,7 @@ class Message extends \yii\db\ActiveRecord
                     'eo_id' => "id",
                     'eo_short_name' => "text",
                 ],
-                'fields' => implode(";", ["eo_id", "eo_short_name", "eo_district_name_id"]),
+                'fields' => implode(";", ["eo_id", "eo_short_name", "eo_district_name_id", "eo_district_name"]),
             ];
             $request = Request::post('http://hastur.temocenter.ru/task/eo.search/') // , http_build_query($data), 'application/x-www-form-urlencoded'
                 ->addHeader('Accept', 'application/json; charset=UTF-8')

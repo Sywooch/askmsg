@@ -18,7 +18,7 @@ class Regions extends \yii\db\ActiveRecord
     /**
      * @inheritdoc
      */
-    public static function tableName()
+    public static function tableNme()
     {
         return '{{%regions}}';
     }
@@ -63,6 +63,21 @@ class Regions extends \yii\db\ActiveRecord
             );
         }
         return self::$_aListData;
+    }
+
+    /**
+     * Проверяем наличие района в нашей базе
+     * @param integer $id
+     * @param string $name
+     */
+    public static function testExistRegion($id, $name)
+    {
+        $res = Yii::$app->db->createCommand('Select reg_id From '. self::tableNme() . ' Where reg_id = :id', [':id' => $id])->queryOne();
+//        Yii::info('Regiond::testExistRegion('.$id.', '.$name.')' . ($res === false ? ' false' : print_r($res, true)));
+        if( $res === false ) {
+//            Yii::info('Regiond::testExistRegion('.$id.', '.$name.') insert new');
+            Yii::$app->db->createCommand('Insert Into '. self::tableNme() . ' (reg_id, reg_name, reg_active) Values (:id, :name, 1)', [':id' => $id, ':name' => $name])->execute();
+        }
     }
 
 }
