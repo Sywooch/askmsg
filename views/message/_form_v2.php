@@ -56,6 +56,7 @@ else {
 echo '-->' . "\n";
 
 $isModerate = $model->scenario == 'moderator';
+$bShowAnswer = in_array($model->msg_flag, [Msgflags::MFLG_SHOW_NEWANSWER, Msgflags::MFLG_INT_NEWANSWER,]);
 
 $sFlagId = Html::getInputId($model, 'msg_flag');
 $sEmploeeId = Html::getInputId($model, 'msg_empl_id');
@@ -87,17 +88,29 @@ EOT;
 // Показываем/скрываем сообщение пользователя и ответ
 $sJs .=  <<<EOT
 //var oUserPart = jQuery(".togglepart");
-jQuery(".togglepart").on("click", function(event){
-    var ob = jQuery(this),
-        id = ob.attr("id"),
-        dest = id.split("_").pop(),
-        aText = ob.text().split(" "),
-        oDest = jQuery("#id_" + dest);
+var getDestObj = function(obLink) {
+        var id = obLink.attr("id"),
+            dest = id.split("_").pop();
+        return jQuery("#id_" + dest);
+    },
+    setToggleTitleByObj = function(obLink){
+        var aText = obLink.text().split(" "),
+            oDest = getDestObj(obLink);
+        aText[0] = oDest.is(":visible") ? "Скрыть" : "Показать";
+        obLink.text(aText.join(" "));
+    },
+    aLinks = jQuery(".togglepart");
+aLinks.on("click", function(event){
+    var obLink = jQuery(this),
+        oDest = getDestObj(obLink);
     event.preventDefault();
-    aText[0] = oDest.is(":visible") ? "Показать" : "Скрыть";
-    ob.text(aText.join(" "));
     oDest.toggle();
+    setToggleTitleByObj(obLink);
     return false;
+});
+aLinks.each(function(index, el){
+    var obLink = jQuery(this);
+    setToggleTitleByObj(obLink);
 });
 EOT;
 
@@ -593,7 +606,158 @@ $aFieldParam = [
         echo $form->errorSummary([$model]);
     }
 
-/*
+//    <?php
+    /************************************************************************************************
+     *
+     * Часть пользователя
+     *
+     */
+    if( $isModerate ):
+    ?>
+    <div id="id_userformpart" style="/*display: none; */clear: both; border: 1px solid #777777; border-radius: 4px; background-color: #eeeeee; padding-top: 2em; padding-bottom: 2em; margin-bottom: 2em;">
+    <?php
+        endif; // if( $isModerate ):
+    ?>
+
+        <div class="col-sm-12">
+            <?= $form
+                ->field($model, 'msg_subject',$aFieldParam['subjectfield'])
+                ->widget(Select2::classname(), $aFieldParam['subject']) ?>
+        </div>
+
+        <?php
+        if( $isModerate ):
+            ?>
+            <div class="col-sm-12">
+                <?= $form
+                    ->field($model, 'msg_pers_org', $aFieldParam['orgfield'])
+                    ->textInput(['maxlength' => 255]) ?>
+            </div>
+        <?php
+        endif; // if( $isModerate ):
+        ?>
+
+        <div class="col-sm-4">
+            <?= $form->field($model, 'msg_pers_lastname')->textInput(['maxlength' => 255]) ?>
+        </div>
+
+        <div class="col-sm-4">
+            <?= $form->field($model, 'msg_pers_name')->textInput(['maxlength' => 255]) ?>
+        </div>
+
+        <div class="col-sm-4">
+            <?= $form->field($model, 'msg_pers_secname')->textInput(['maxlength' => 255]) ?>
+        </div>
+
+        <div class="clearfix"></div>
+
+        <div class="col-sm-4">
+            <?= $form->field($model, 'msg_pers_email')->textInput(['maxlength' => 255]) ?>
+        </div>
+
+        <div class="col-sm-4">
+            <?= $form->field($model, 'msg_pers_phone')->widget(MaskedInput::className(),[
+                'name' => 'msg_pers_phone',
+                'mask' => '+7(999) 999-99-99'
+            ]) ?>
+        </div>
+
+        <div class="col-sm-4">
+            <?= $form
+                ->field($model, 'ekis_id')
+                ->widget(Select2::classname(), $aFieldParam['ekisid'])
+            . $form
+                ->field($model, 'msg_pers_org',['template' => "{input}", 'options' => ['tag' => 'span']])
+                ->hiddenInput()
+            . $form
+                ->field($model, 'msg_pers_region', ['template' => "{input}", 'options' => ['tag' => 'span']])
+                ->hiddenInput()
+            ?>
+        </div>
+
+
+        <div class="clearfix"></div>
+
+        <div class="col-sm-12">
+            <?= $form
+                ->field($model, 'msg_pers_text', $aFieldParam['textfield'])
+                ->textarea(['rows' => 6]) ?>
+        </div>
+
+        <?php
+        if( $model->isNewRecord ):
+            ?>
+            <div class="col-sm-12">
+                <?= $form
+                    ->field($model, 'file[]', $aFieldParam['filefield'])
+                    ->fileInput(['multiple' => true])
+                    ->hint('Максимальный размер файла: '
+                        . sprintf("%.1f Mb", Yii::$app->params['message.file.maxsize'] / 1000000)
+                        . ', Допустимые типы файлов: '
+                        . implode(',', Yii::$app->params['message.file.ext'])
+                    )
+                ?>
+
+            </div>
+
+            <?php
+            if( $model->isUseCaptcha() ) {
+                ?>
+                <div class="col-sm-12">
+                    <?= $form->field($model, 'verifyCode', $aFieldParam['filefield'])->widget(Captcha::className(), [
+                        'captchaAction' => 'message/captcha',
+                        'template' => '<div class="row"><div class="col-lg-2">{image}</div><div class="col-lg-3">{input}</div><div class="clearfix"></div><div class="col-lg-5">Введите код с картинки в текстовое поле</div></div>',
+                    ]) ?>
+                </div>
+            <?php
+            }
+            ?>
+
+        <?php
+        else:
+            $aFiles = $model->getUserFiles(true);
+            if( count($aFiles) > 0 ):
+                ?>
+                <div class="col-sm-12">
+                    <label for="message-msg_pers_text" class="control-label col-sm-1">Файлы</label>
+                    <div class="col-sm-11">
+                        <?php
+                        foreach($aFiles As $oFile):
+                            /** @var File  $oFile */
+                            ?>
+                            <div class="btn btn-default">
+                                <?= Html::a( Html::encode($oFile->file_orig_name), $oFile->getUrl()) ?>
+                                <?= Html::a('<span class="glyphicon glyphicon-remove"></span>', ['file/delete', 'id' => $oFile->file_id], ['class'=>"link_with_confirm", 'title'=>'Удалить файл ' . Html::encode($oFile->file_orig_name)]) ?>
+                            </div>
+                        <?php
+                            //                    <!-- ?= Html::a('<span class="glyphicon glyphicon-remove"></span>', ['file/delete', 'id' => $oFile->file_id]) ? -->
+                        endforeach;
+                        ?>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            <?php
+            endif;
+            ?>
+        <?php
+        endif;
+        ?>
+        <div class="clearfix"></div>
+
+        <?php
+        if( $isModerate ):
+        ?>
+    </div>
+<?php
+endif; // if( $isModerate ):
+/**
+ *
+ * Окончание части пользователя
+ *
+ ************************************************************************************************/
+/* ?> */
+
+    /*
     <div class="col-sm-4">
     </div>
     <div class="clearfix"></div>
@@ -683,13 +847,7 @@ $aFieldParam = [
         </div>
 
         <?php
-            if( in_array(
-                $model->msg_flag,
-                [
-                    Msgflags::MFLG_INT_NEWANSWER,
-                    Msgflags::MFLG_SHOW_NEWANSWER,
-                ])
-            ):
+            if( $bShowAnswer ):
         ?>
         <div class="col-sm-6">
             <?= $form
@@ -703,7 +861,6 @@ $aFieldParam = [
         ?>
 
         <?php
-            $bShowAnswer = in_array($model->msg_flag, [Msgflags::MFLG_SHOW_NEWANSWER, Msgflags::MFLG_INT_NEWANSWER,]);
             if( !empty($model->msg_answer)  ): ?>
         <div class="col-sm-12 thumbnail " id="id_answer" style="<?php $bShowAnswer ? '' : 'display: none;' ?>">
             <?php if( $bShowAnswer ): ?>
@@ -768,157 +925,6 @@ $aFieldParam = [
      ************************************************************************************************/
     ?>
 
-
-    <?php
-    /************************************************************************************************
-     *
-     * Часть пользователя
-     *
-     */
-    if( $isModerate ):
-    ?>
-        <div id="id_userformpart" style="display: none; clear: both; border: 1px solid #777777; border-radius: 4px; background-color: #eeeeee; padding-top: 2em; padding-bottom: 2em; margin-bottom: 2em;">
-    <?php
-    endif; // if( $isModerate ):
-    ?>
-
-    <div class="col-sm-12">
-        <?= $form
-            ->field($model, 'msg_subject',$aFieldParam['subjectfield'])
-            ->widget(Select2::classname(), $aFieldParam['subject']) ?>
-    </div>
-
-    <?php
-    if( $isModerate ):
-    ?>
-        <div class="col-sm-12">
-            <?= $form
-                ->field($model, 'msg_pers_org', $aFieldParam['orgfield'])
-                ->textInput(['maxlength' => 255]) ?>
-        </div>
-    <?php
-    endif; // if( $isModerate ):
-    ?>
-
-    <div class="col-sm-4">
-        <?= $form->field($model, 'msg_pers_lastname')->textInput(['maxlength' => 255]) ?>
-    </div>
-
-    <div class="col-sm-4">
-        <?= $form->field($model, 'msg_pers_name')->textInput(['maxlength' => 255]) ?>
-    </div>
-
-    <div class="col-sm-4">
-        <?= $form->field($model, 'msg_pers_secname')->textInput(['maxlength' => 255]) ?>
-    </div>
-
-    <div class="clearfix"></div>
-
-    <div class="col-sm-4">
-        <?= $form->field($model, 'msg_pers_email')->textInput(['maxlength' => 255]) ?>
-    </div>
-
-    <div class="col-sm-4">
-        <?= $form->field($model, 'msg_pers_phone')->widget(MaskedInput::className(),[
-            'name' => 'msg_pers_phone',
-            'mask' => '+7(999) 999-99-99'
-        ]) ?>
-    </div>
-
-    <div class="col-sm-4">
-        <?= $form
-            ->field($model, 'ekis_id')
-            ->widget(Select2::classname(), $aFieldParam['ekisid'])
-        . $form
-            ->field($model, 'msg_pers_org',['template' => "{input}", 'options' => ['tag' => 'span']])
-            ->hiddenInput()
-        . $form
-            ->field($model, 'msg_pers_region', ['template' => "{input}", 'options' => ['tag' => 'span']])
-            ->hiddenInput()
-        ?>
-    </div>
-
-
-    <div class="clearfix"></div>
-
-    <div class="col-sm-12">
-    <?= $form
-        ->field($model, 'msg_pers_text', $aFieldParam['textfield'])
-        ->textarea(['rows' => 6]) ?>
-    </div>
-
-    <?php
-    if( $model->isNewRecord ):
-    ?>
-    <div class="col-sm-12">
-        <?= $form
-            ->field($model, 'file[]', $aFieldParam['filefield'])
-            ->fileInput(['multiple' => true])
-            ->hint('Максимальный размер файла: '
-                . sprintf("%.1f Mb", Yii::$app->params['message.file.maxsize'] / 1000000)
-                . ', Допустимые типы файлов: '
-                . implode(',', Yii::$app->params['message.file.ext'])
-            )
-        ?>
-
-    </div>
-
-    <?php
-        if( $model->isUseCaptcha() ) {
-    ?>
-        <div class="col-sm-12">
-            <?= $form->field($model, 'verifyCode', $aFieldParam['filefield'])->widget(Captcha::className(), [
-                'captchaAction' => 'message/captcha',
-                'template' => '<div class="row"><div class="col-lg-2">{image}</div><div class="col-lg-3">{input}</div><div class="clearfix"></div><div class="col-lg-5">Введите код с картинки в текстовое поле</div></div>',
-            ]) ?>
-        </div>
-    <?php
-        }
-    ?>
-
-    <?php
-    else:
-        $aFiles = $model->getUserFiles(true);
-        if( count($aFiles) > 0 ):
-    ?>
-            <div class="col-sm-12">
-                <label for="message-msg_pers_text" class="control-label col-sm-1">Файлы</label>
-                <div class="col-sm-11">
-                    <?php
-                    foreach($aFiles As $oFile):
-                        /** @var File  $oFile */
-                    ?>
-                        <div class="btn btn-default">
-                            <?= Html::a( Html::encode($oFile->file_orig_name), $oFile->getUrl()) ?>
-                            <?= Html::a('<span class="glyphicon glyphicon-remove"></span>', ['file/delete', 'id' => $oFile->file_id], ['class'=>"link_with_confirm", 'title'=>'Удалить файл ' . Html::encode($oFile->file_orig_name)]) ?>
-                        </div>
-                    <?php
-    //                    <!-- ?= Html::a('<span class="glyphicon glyphicon-remove"></span>', ['file/delete', 'id' => $oFile->file_id]) ? -->
-                    endforeach;
-                    ?>
-                    <div class="clearfix"></div>
-                </div>
-            </div>
-        <?php
-        endif;
-        ?>
-    <?php
-    endif;
-    ?>
-    <div class="clearfix"></div>
-
-    <?php
-    if( $isModerate ):
-    ?>
-        </div>
-    <?php
-    endif; // if( $isModerate ):
-    /**
-     *
-     * Окончание части пользователя
-     *
-     ************************************************************************************************/
-    ?>
 
     <div class="col-sm-12">
         <div class="form-group">

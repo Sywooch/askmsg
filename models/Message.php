@@ -423,7 +423,7 @@ class Message extends \yii\db\ActiveRecord
             ],
             'moderator' => [
                 'title' => 'Обработка обращения',
-                'form' => '_form'
+                'form' => '_form_v2'
             ],
             'answer' => [
                 'title' => 'Написать ответ',
