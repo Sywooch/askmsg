@@ -43,9 +43,9 @@ $aTags = ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_t
 ?>
 <div class="message-index">
 
-    <div class="col-sm-12">
+    <!-- div class="col-sm-12" -->
         <div class="form-group">
-            <?= Html::a('Скрыть', '#', ['class' => 'btn btn-default pull-right', 'id'=>'hidesearchpanel', 'role'=>"button"]) ?>
+            <?= Html::a('Скрыть', '#', ['class' => 'btn btn-default pull-right', 'id'=>'hidesearchpanel', 'role'=>"button", 'style'=>'margin-right: 0;']) ?>
             <?php
 
             $bOnlyLoggedUser = ($action[0] == 'answerlist');
@@ -71,7 +71,7 @@ $aTags = ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_t
             ?>
             <div class="clearfix"></div>
         </div>
-    </div>
+    <!-- /div -->
 
 
     <?php
@@ -90,7 +90,8 @@ $aTags = ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_t
 var oPanel = jQuery("#{$idserchblock}"),
     oLink = jQuery("#hidesearchpanel"),
     renameButton = function() {
-        oLink.text((oPanel.is(":visible") ? "Скрыть" : "Показать") + " форму поиска");
+//        oLink.text((oPanel.is(":visible") ? "Скрыть" : "Показать") + " форму поиска");
+        oLink.text((oPanel.is(":visible") ? "-" : "+") + " поиск");
     },
     toggleSearchPanel = function() {
         oPanel.toggle();
@@ -128,7 +129,7 @@ EOT;
                         ['message/answer', 'id'=>$model->msg_id];
 // ['title' => 'Изменить Обращение ' . $model->msg_id])
 //                    update} {answer
-                    return Html::a('№ ' . $model->msg_id, $url) . '<span>' . date('d.m.Y H:i:s', strtotime($model->msg_createtime)) . '</span>';
+                    return Html::a('№ ' . $model->msg_id, $url) . '<span>' . date('d.m.Y H:i', strtotime($model->msg_createtime)) . '</span>';
                 },
                 'contentOptions' => [
                     'class' => 'griddate',
@@ -161,15 +162,28 @@ EOT;
                         . '</span>';
                 },
                 'contentOptions' => [
-                    'class' => 'griddate',
+                    'class' => 'griddate commandcell',
                 ],
             ],
+/*
             [
                 'class' => 'yii\grid\DataColumn',
                 'attribute' => 'askcontacts',
                 'filter' => false,
                 'content' => function ($model, $key, $index, $column) {
                     return Html::encode($model->msg_pers_email) . '<span>' . $model->msg_pers_phone . '</span>';
+                },
+                'contentOptions' => [
+                    'class' => 'griddate',
+                ],
+            ],
+*/
+            [
+                'class' => 'yii\grid\DataColumn',
+                'attribute' => 'msg_empl_command',
+                'filter' => false,
+                'content' => function ($model, $key, $index, $column) {
+                    return Html::encode($model->msg_empl_command) . '<span>' . Html::encode($model->msg_empl_remark) . '</span>';
                 },
                 'contentOptions' => [
                     'class' => 'griddate',

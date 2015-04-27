@@ -23,6 +23,9 @@ if( !isset($bOnlyLoggedUser) ) {
     $bOnlyLoggedUser = false;
 }
 
+if( !$bOnlyLoggedUser ) {
+    $aStatFlags = array_merge($aStatFlags, [Msgflags::MFLG_INT_NEWANSWER, Msgflags::MFLG_SHOW_NEWANSWER]);
+}
 // Статистику получаем из кеша или вычисляем и кладем в кеш
 
 $statKey = Message::KEY_STATMSG_DATA;
