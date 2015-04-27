@@ -181,6 +181,7 @@ EOT;
             [
                 'class' => 'yii\grid\DataColumn',
                 'attribute' => 'msg_empl_command',
+                'header' => 'Поручение',
                 'filter' => false,
                 'content' => function ($model, $key, $index, $column) {
                     return Html::encode($model->msg_empl_command) . '<span>' . Html::encode($model->msg_empl_remark) . '</span>';
