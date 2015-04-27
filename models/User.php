@@ -136,8 +136,8 @@ class User extends ActiveRecord  implements IdentityInterface
     {
         $scenarios = parent::scenarios();
         $scenarios['create'] = ['us_login', 'us_name', 'us_secondname', 'us_lastname', 'us_email', 'us_workposition',
-                                'us_active', 'selectedGroups'];
-        $scenarios['update'] = array_merge($scenarios['create'], ['newPassword']);
+                                'us_active', 'selectedGroups', 'newPassword'];
+        $scenarios['update'] = array_merge($scenarios['create'], []); // 'newPassword'
         $scenarios['importdata'] = [
             'us_login',
             'us_name',

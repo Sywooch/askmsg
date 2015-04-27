@@ -52,7 +52,9 @@ use app\models\Group;
 
     <?= $form->field($model, 'us_login')->textInput(['maxlength' => 255])->hint("необязательное поле, будет создан из email") ?>
 
-    <?= $form->field($model, 'newPassword')->textInput(['maxlength' => 32])->hint("если указать, то будет установлен новый пароль") ?>
+    <?= $form->field($model, 'newPassword')
+        ->textInput(['maxlength' => 32])
+        ->hint($model->isNewRecord ? "если не указать, то будет автоматически сгенерирован" : "если указать, то будет установлен новый пароль") ?>
 
     <?= $form->field($model, 'selectedGroups')->checkboxList(Group::getActiveGroups()) ?>
 

@@ -67,9 +67,15 @@ class PasswordBehavior extends Behavior
     public function setNewPassword($event)
     {
         if ( isset($this->attributes[$event->name]) && $this->attributes[$event->name] ) {
-            $sPassword = substr(str_replace(['_', '-'], ['', ''], Yii::$app->security->generateRandomString()), 0, 8);
             /** @var User $model */
             $model = $this->owner;
+
+            if( $model->newPassword == '' ) {
+                $sPassword = substr(str_replace(['_', '-'], ['', ''], Yii::$app->security->generateRandomString()), 0, 8);
+            }
+            else {
+                $sPassword = $model->newPassword;
+            }
             $model->newPassword = $sPassword;
             Yii::error('setNewPassword(): new password = ' . $sPassword);
 
@@ -78,7 +84,6 @@ class PasswordBehavior extends Behavior
             $template = empty($this->template) ? 'user_create_info' : $this->template;
             $subject = empty($this->subject) ? ('Уведомление портала ' . Yii::$app->name) : $this->subject;
             $model->sendNotificate($template, $subject, ['model' => $model] );
-
         }
     }
 
