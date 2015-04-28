@@ -854,6 +854,8 @@ class Message extends \yii\db\ActiveRecord
                 Msgflags::MFLG_SHOW_REVIS => [],
                 Msgflags::MFLG_INT_INSTR => [],
                 Msgflags::MFLG_INT_REVIS_INSTR => [],
+                Msgflags::MFLG_INT_NEWANSWER => [],
+                Msgflags::MFLG_SHOW_NEWANSWER => [],
                 Msgflags::MFLG_NEW => [
                     Msgflags::MFLG_SHOW_INSTR,
                     Msgflags::MFLG_SHOW_REVIS,
@@ -929,6 +931,8 @@ class Message extends \yii\db\ActiveRecord
                 Msgflags::MFLG_SHOW_REVIS => 'ans_notif_revis',
                 Msgflags::MFLG_INT_REVIS_INSTR => 'ans_notif_revis',
                 Msgflags::MFLG_NEW => 'ans_notif_esc',
+                Msgflags::MFLG_INT_NEWANSWER => 'ans_notif_answer',
+                Msgflags::MFLG_SHOW_NEWANSWER => 'ans_notif_answer',
             ],
             self::USERTYPE_CURATOR => [
                 Msgflags::MFLG_SHOW_INSTR => 'curator_notif_instr',

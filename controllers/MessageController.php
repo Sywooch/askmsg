@@ -285,6 +285,8 @@ class MessageController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $model->uploadFiles();
+            Yii::$app->getSession()->setFlash('error', 'Ваш ответ отправлен на проверку модератору.');
+
             return $this->redirect(['answerlist']);
         }
         return $this->render('create', [
