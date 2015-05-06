@@ -111,8 +111,8 @@ class Message extends \yii\db\ActiveRecord
             Rolesimport::ROLE_MODERATE_DOGM => [
                 Msgflags::MFLG_NEW,
 //                Msgflags::MFLG_INT_FIN_INSTR,
-                Msgflags::MFLG_INT_NEWANSWER,
-                Msgflags::MFLG_SHOW_NEWANSWER,
+//                Msgflags::MFLG_INT_NEWANSWER, // убрал 06.05.2015
+//                Msgflags::MFLG_SHOW_NEWANSWER, // убрал 06.05.2015
             ],
             Rolesimport::ROLE_ANSWER_DOGM => [
 //                Msgflags::MFLG_NEW,
