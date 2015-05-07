@@ -437,7 +437,10 @@ EOT;
                     $dStartNextQuart = mktime(0, 0, 0, $nFinQ + 1, 1, date('Y'));
 
                     $aQuartDig = ['I', 'II', 'III', 'IV'];
+                    $aMonth = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь', ];
                     $bWin = false;
+/*
+// на сервере не заработало
                     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                         $sSet = setlocale(LC_ALL, 'russian');
                         $bWin = true;
@@ -445,13 +448,14 @@ EOT;
 //                        setlocale(LC_ALL, 'ru_RU');
                         $sSet = setlocale(LC_ALL, 'ru_RU.UTF-8');
                     }
-
+*/
                     $sFormName = $searchModel->formName();
-                    Yii::info('CUR MONTH = ' . strftime('%B %Y', $dStartCurMonth) . ' ' . ($bWin ? 'WIN' : 'NOWIN') . ' sSet = ' . $sSet);
+//                    Yii::info('CUR MONTH = ' . strftime('%B %Y', $dStartCurMonth) . ' ' . ($bWin ? 'WIN' : 'NOWIN'));
 
                     $aDropdata = [
                         [
-                            'title' => 'Текущий месяц (' . ($bWin ? iconv('CP1251', 'UTF-8', strftime('%B %Y', $dStartCurMonth)) : strftime('%B %Y', $dStartCurMonth)) . ')',
+//                            'title' => 'Текущий месяц (' . ($bWin ? iconv('CP1251', 'UTF-8', strftime('%B %Y', $dStartCurMonth)) : strftime('%B %Y', $dStartCurMonth)) . ')',
+                            'title' => 'Текущий месяц (' . $aMonth[date('n', $dStartCurMonth) - 1] . ' ' . date('Y', $dStartCurMonth) . ')',
                             'url' => Url::to(
                                 array_merge(
                                     ['export'],
@@ -462,7 +466,8 @@ EOT;
                             'icon' => 'fa-file-excel-o',
                         ],
                         [
-                            'title' => 'Предыдущий месяц (' . ($bWin ? iconv('CP1251', 'UTF-8', strftime('%B %Y', $dStartPrevMonth)) : strftime('%B %Y', $dStartPrevMonth)) . ')',
+//                            'title' => 'Предыдущий месяц (' . ($bWin ? iconv('CP1251', 'UTF-8', strftime('%B %Y', $dStartPrevMonth)) : strftime('%B %Y', $dStartPrevMonth)) . ')',
+                            'title' => 'Предыдущий месяц (' . $aMonth[date('n', $dStartPrevMonth) - 1] . ' ' . date('Y', $dStartPrevMonth) . ')',
                             'url' => Url::to(
                                 array_merge(
                                     ['export'],
