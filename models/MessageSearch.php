@@ -255,8 +255,6 @@ class MessageSearch extends Message
             }
         }
 
-        $query->limit(20);
-
         $query->andFilterWhere(['like', 'msg_pers_name', $this->msg_pers_name])
             ->andFilterWhere(['like', 'msg_pers_secname', $this->msg_pers_secname])
 //            ->andFilterWhere(['like', 'msg_pers_lastname', $this->msg_pers_lastname])

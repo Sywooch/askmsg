@@ -436,11 +436,21 @@ EOT;
                     $dStartCurQuart = mktime(0, 0, 0, $nFinQ - 2, 1, date('Y'));
                     $dStartNextQuart = mktime(0, 0, 0, $nFinQ + 1, 1, date('Y'));
 
+                    $aQuartDig = ['I', 'II', 'III', 'IV'];
+                    $bWin = false;
+                    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                        setlocale(LC_ALL, 'russian');
+                        $bWin = true;
+                    } else {
+                        setlocale(LC_ALL, 'ru_RU');
+                    }
+
                     $sFormName = $searchModel->formName();
+                    Yii::info('CUR MONTH = ' . strftime('%B %Y', $dStartCurMonth) . ' ' . ($bWin ? 'WIN' : 'NOWIN'));
 
                     $aDropdata = [
                         [
-                            'title' => 'Текущий месяц',
+                            'title' => 'Текущий месяц (' . ($bWin ? iconv('CP1251', 'UTF-8', strftime('%B %Y', $dStartCurMonth)) : strftime('%B %Y', $dStartCurMonth)) . ')',
                             'url' => Url::to(
                                 array_merge(
                                     ['export'],
@@ -451,7 +461,7 @@ EOT;
                             'icon' => 'fa-file-excel-o',
                         ],
                         [
-                            'title' => 'Предыдущий месяц',
+                            'title' => 'Предыдущий месяц (' . ($bWin ? iconv('CP1251', 'UTF-8', strftime('%B %Y', $dStartPrevMonth)) : strftime('%B %Y', $dStartPrevMonth)) . ')',
                             'url' => Url::to(
                                 array_merge(
                                     ['export'],
@@ -462,7 +472,7 @@ EOT;
                             'icon' => 'fa-file-excel-o',
                         ],
                         [
-                            'title' => 'Текущий квартал',
+                            'title' => 'Текущий квартал (' . $aQuartDig[intval(date('n', $dStartCurQuart) / 3)] . ' ' . date('Y', $dStartCurQuart) . ')',
                             'url' => Url::to(
                                 array_merge(
                                     ['export'],
@@ -473,7 +483,7 @@ EOT;
                             'icon' => 'fa-file-excel-o',
                         ],
                         [
-                            'title' => 'Предыдущий квартал',
+                            'title' => 'Предыдущий квартал (' . $aQuartDig[intval(date('n', $dStartPrevQuart) / 3)] . ' ' . date('Y', $dStartPrevQuart) . ')',
                             'url' => Url::to(
                                 array_merge(
                                     ['export'],
