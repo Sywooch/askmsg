@@ -439,15 +439,15 @@ EOT;
                     $aQuartDig = ['I', 'II', 'III', 'IV'];
                     $bWin = false;
                     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                        setlocale(LC_ALL, 'russian');
+                        $sSet = setlocale(LC_ALL, 'russian');
                         $bWin = true;
                     } else {
 //                        setlocale(LC_ALL, 'ru_RU');
-                        setlocale(LC_ALL, 'ru_RU.UTF-8');
+                        $sSet = setlocale(LC_ALL, 'ru_RU.UTF-8');
                     }
 
                     $sFormName = $searchModel->formName();
-                    Yii::info('CUR MONTH = ' . strftime('%B %Y', $dStartCurMonth) . ' ' . ($bWin ? 'WIN' : 'NOWIN'));
+                    Yii::info('CUR MONTH = ' . strftime('%B %Y', $dStartCurMonth) . ' ' . ($bWin ? 'WIN' : 'NOWIN') . ' sSet = ' . $sSet);
 
                     $aDropdata = [
                         [
