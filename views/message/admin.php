@@ -442,7 +442,8 @@ EOT;
                         setlocale(LC_ALL, 'russian');
                         $bWin = true;
                     } else {
-                        setlocale(LC_ALL, 'ru_RU');
+//                        setlocale(LC_ALL, 'ru_RU');
+                        setlocale(LC_ALL, 'ru_RU.UTF-8');
                     }
 
                     $sFormName = $searchModel->formName();
