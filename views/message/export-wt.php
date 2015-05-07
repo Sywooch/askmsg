@@ -117,13 +117,14 @@ $styleSell = array(
 $oSheet->getColumnDimension('A')->setWidth(16);
 $oSheet->getColumnDimension('B')->setWidth(50);
 $oSheet->getColumnDimension('C')->setWidth(50);
-$oSheet->getColumnDimension('D')->setWidth(40);
+$oSheet->getColumnDimension('D')->setWidth(50);
+$oSheet->getColumnDimension('E')->setWidth(40);
 //$oSheet->getColumnDimension('D')->setAutoSize(true);
 //$oSheet->getColumnDimension('E')->setWidth(80);
 $oSheet->setCellValue('A1', Yii::$app->name)
     ->setCellValue('A2', 'Выгрузка от ' . date('d.m.Y H:i'));
-$objPHPExcel->getActiveSheet()->mergeCells('A1:D1');
-$objPHPExcel->getActiveSheet()->mergeCells('A2:D2');
+$objPHPExcel->getActiveSheet()->mergeCells('A1:E1');
+$objPHPExcel->getActiveSheet()->mergeCells('A2:E2');
 $oSheet->getStyle('A1')->applyFromArray($styleTitle);
 $oSheet->getStyle('A2')->applyFromArray($styleTitle);
 
@@ -132,13 +133,14 @@ $oSheet->fromArray(
 //        '№',
         '№' . "\r\n" . 'Дата',
         'Состояние',
-        'Проситель' . "\r\n" . 'Исполнитель',
+        'Проситель',
+        'Исполнитель',
         'Контакты',
     ],
     null,
     'A4'
 );
-$oSheet->getStyle('A4:D4')->applyFromArray($styleColTitle);
+$oSheet->getStyle('A4:E4')->applyFromArray($styleColTitle);
 
 $cou = 1;
 $nStartRow = 5;
@@ -154,7 +156,8 @@ for($page = 0; $page < $nPageCount; $page++) {
             [
                 $model->msg_id . "\r\n" . date("d.m.Y", strtotime($model->msg_createtime)),
                 preg_replace('|^\\[[^\\]]+\\]\\s+|', '', $model->flag->fl_name),
-                $model->getFullName() . (($model->msg_empl_id !== null) ?  ("\r\n" . $model->employee->getFullName()) : ''),
+                $model->getFullName(),
+                (($model->msg_empl_id !== null) ?  $model->employee->getFullName() : ''),
                 $model->msg_pers_email . "\r\n" . $model->msg_pers_phone,
             ],
             null,
@@ -165,7 +168,7 @@ for($page = 0; $page < $nPageCount; $page++) {
     }
 }
 
-$oStyle = $oSheet->getStyle('A'.$nStartRow.':D' . ($nRow-1));
+$oStyle = $oSheet->getStyle('A'.$nStartRow.':E' . ($nRow-1));
 $oStyle->applyFromArray($styleSell);
 $oStyle->getAlignment()->setWrapText(true);
 $oStyle->getAlignment()->setIndent(1);
@@ -183,9 +186,9 @@ $styleBorders = [
     ],
 ];
 
-$oSheet->getStyle('A4:D' . ($nRow - 1))->applyFromArray($styleBorders);
+$oSheet->getStyle('A4:E' . ($nRow - 1))->applyFromArray($styleBorders);
 
-$oSheet->getPageSetup()->setPrintArea('A1:D' . ($nRow - 1));
+$oSheet->getPageSetup()->setPrintArea('A1:E' . ($nRow - 1));
 
 
 $oUtil = new Exportutil();
