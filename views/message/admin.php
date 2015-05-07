@@ -425,6 +425,87 @@ EOT;
                             ['class' => 'btn btn-default', 'target' => '_blank']
                         );
                     }
+
+                    $dStartPrevMonth = mktime(0, 0, 0, date('n')-1, 1, date('Y'));
+                    $dStartCurMonth = mktime(0, 0, 0, date('n'), 1, date('Y'));
+                    $dStartNextMonth = mktime(0, 0, 0, date('n')+1, 1, date('Y'));
+
+                    $nFinQ = ceil(date('n') / 3) * 3;
+
+                    $dStartPrevQuart = mktime(0, 0, 0, $nFinQ - 5, 1, date('Y'));
+                    $dStartCurQuart = mktime(0, 0, 0, $nFinQ - 2, 1, date('Y'));
+                    $dStartNextQuart = mktime(0, 0, 0, $nFinQ + 1, 1, date('Y'));
+
+                    $sFormName = $searchModel->formName();
+
+                    $aDropdata = [
+                        [
+                            'title' => 'Текущий месяц',
+                            'url' => Url::to(
+                                array_merge(
+                                    ['export'],
+                                    [$sFormName.'[msg_createtime]' => date('d.m.Y', $dStartCurMonth) . '-' . date('d.m.Y', $dStartNextMonth)],
+                                    ['format' => 'xlsx']
+                                )
+                            ),
+                            'icon' => 'fa-file-excel-o',
+                        ],
+                        [
+                            'title' => 'Предыдущий месяц',
+                            'url' => Url::to(
+                                array_merge(
+                                    ['export'],
+                                    [$sFormName.'[msg_createtime]' => date('d.m.Y', $dStartPrevMonth) . '-' . date('d.m.Y', $dStartCurMonth)],
+                                    ['format' => 'xlsx']
+                                )
+                            ),
+                            'icon' => 'fa-file-excel-o',
+                        ],
+                        [
+                            'title' => 'Текущий квартал',
+                            'url' => Url::to(
+                                array_merge(
+                                    ['export'],
+                                    [$sFormName.'[msg_createtime]' => date('d.m.Y', $dStartCurQuart) . '-' . date('d.m.Y', $dStartNextQuart)],
+                                    ['format' => 'xlsx']
+                                )
+                            ),
+                            'icon' => 'fa-file-excel-o',
+                        ],
+                        [
+                            'title' => 'Предыдущий квартал',
+                            'url' => Url::to(
+                                array_merge(
+                                    ['export'],
+                                    [$sFormName.'[msg_createtime]' => date('d.m.Y', $dStartPrevQuart) . '-' . date('d.m.Y', $dStartCurQuart)],
+                                    ['format' => 'xlsx']
+                                )
+                            ),
+                            'icon' => 'fa-file-excel-o',
+                        ],
+                    ];
+
+                    $aIem = [];
+                    foreach($aDropdata As $v) {
+                        $aIem[] = Html::a(
+                            $v['title'], // '<i class="fa '.$v['icon'].' fa-fw"></i> ' .
+                            $v['url'],
+                            ['target' => '_blank'] // 'class' => 'btn btn-default',
+                        );
+                    }
+                    echo "\n\n" . Html::tag(
+                        'div',
+                        Html::button(
+                            'Все сообщения за ' . Html::tag('span', '', ['class' => 'caret',]),
+                            [
+                                'type' => 'button',
+                                'class' => 'btn btn-default dropdown-toggle',
+                                'data-toggle' => 'dropdown',
+                                'aria-expanded' => 'false',
+                            ]
+                        ) . Html::ul($aIem, ['encode' => false, 'class'=>"dropdown-menu", 'role'=>"menu", ]), // itemOptions
+                        ['class' => 'btn-group']
+                    ) . "\n\n";
 //                }
             // http://host04.design/message/export?msg_id=&msg_createtime=&msg_pers_lastname=%D0%BB%D0%B0&msg_pers_email=&msg_pers_org=14&msg_empl_id=&msg_flag%5B0%5D=2&msg_flag%5B1%5D=3&msg_flag%5B2%5D=4&msg_flag%5B3%5D=5&msg_flag%5B4%5D=6&msg_flag%5B5%5D=7&msg_flag%5B6%5D=8&msg_flag%5B7%5D=9&msg_flag%5B8%5D=10&msg_flag%5B9%5D=12&msg_subject=
             ?>

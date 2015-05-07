@@ -151,6 +151,8 @@ class MessageSearch extends Message
             $this->load($params);
         }
 
+        $aScenario = $this->scenarios();
+
         $query = Message::find()
             ->with('employee')
             ->with('curator')
@@ -205,14 +207,22 @@ class MessageSearch extends Message
 
         if( !empty($this->_flagsstring) ) {
             $this->msgflags = Msgflags::getIdByNames(explode(',', $this->_flagsstring));
-            Yii::info('this->_flagsstring = ' . $this->_flagsstring . "\nthis->msgflags = " . implode(', ', $this->msgflags) . "\n this->msg_flag = " . ($this->msg_flag? 'use' : 'not use'));
+//            Yii::info('this->_flagsstring = ' . $this->_flagsstring . "\nthis->msgflags = " . implode(', ', $this->msgflags) . "\n this->msg_flag = " . ($this->msg_flag? 'use' : 'not use'));
         }
 
-        $a = $this->makeDateRange('msg_createtime');
+        $a = $this->getDatePeriod('msg_createtime');
         if( count($a) > 1 ) {
             $query
-                ->andFilterWhere(['>', 'msg_createtime', $a[0]])
+                ->andFilterWhere(['>=', 'msg_createtime', $a[0]])
                 ->andFilterWhere(['<', 'msg_createtime', $a[1]]);
+        }
+        else {
+            $a = $this->makeDateRange('msg_createtime');
+            if (count($a) > 1) {
+                $query
+                    ->andFilterWhere(['>', 'msg_createtime', $a[0]])
+                    ->andFilterWhere(['<', 'msg_createtime', $a[1]]);
+            }
         }
 
         if( !empty($this->askid) ) {
@@ -244,6 +254,8 @@ class MessageSearch extends Message
                 $query->andFilterWhere(['or', ['like', 'msg_pers_lastname', $v], ['like', 'msg_pers_name', $v], ['like', 'msg_pers_secname', $v]] );
             }
         }
+
+        $query->limit(20);
 
         $query->andFilterWhere(['like', 'msg_pers_name', $this->msg_pers_name])
             ->andFilterWhere(['like', 'msg_pers_secname', $this->msg_pers_secname])
@@ -351,7 +363,7 @@ class MessageSearch extends Message
      *
      */
     public function prepareDateFilter(&$query) {
-        Yii::info('this->askid = ' . $this->askid);
+//        Yii::info('this->askid = ' . $this->askid);
         if( $this->askid != '' ) {
             if( preg_match('|^[\\d]+$|', $this->askid) ) {
                 // только одни цифры - предполагаем номер
@@ -367,6 +379,31 @@ class MessageSearch extends Message
             }
         }
     }
+
+    /**
+     *
+     * Из параметров пытаемся вытащить диапазон дат: 01.01.2015-01.05.2015
+     *
+     * @param string $name
+     *
+     */
+    public function getDatePeriod($name) {
+        $aRet = [];
+        $sData = trim($this->{$name});
+        if (preg_match('|^([\\d]{2})\\.([\\d]{2})\\.([\\d]{4})\\s*-\\s*([\\d]{2})\\.([\\d]{2})\\.([\\d]{4})$|', $sData, $a)) {
+//            Yii::info($sData . ' -> ' . print_r($a, true));
+            $aRet = [
+                date('Y-m-d H:i:s', mktime(0, 0, 0, intval($a[2]), intval($a[1]), intval($a[3]))),
+                date('Y-m-d H:i:s', mktime(0, 0, 0, intval($a[5]), intval($a[4]), intval($a[6]))),
+            ];
+//            Yii::info('getDatePeriod('.$name.') : ' . $sData . ' -> ' . print_r($aRet, true));
+        }
+        else {
+//            Yii::info('getDatePeriod('.$name.') : ' . $sData . ' -> no period');
+        }
+        return $aRet;
+    }
+
 
     /**
      *
