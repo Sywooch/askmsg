@@ -149,7 +149,7 @@ $this->registerCss($sCss);
                     }'),
 
                     'results' => new JsExpression('function (data, page) {
-                                console.log("results("+page+") data = ", data);
+//                                console.log("results("+page+") data = ", data);
                                 var more = (page * 10) < data.total; // whether or not there are more results available
                                 return {results: data.list, more: more};
 //                                return { results: data.list };

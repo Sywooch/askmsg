@@ -135,7 +135,7 @@ EOT;
 // Берем поручение из старых вариантов
 $sJs .=  <<<EOT
 jQuery('#idinstructionlist').on("select2:select", function(event){
-    console.log("change", event);
+//    console.log("change", event);
 });
 
 EOT;
@@ -305,8 +305,8 @@ $aFieldParam = [
         'pluginEvents' => [
                         'change' => 'function(event) {
                             // jQuery("#'.$sEmploeeId.'").val(event.val);
-                            console.log("change", event);
-                            console.log("New val = " + jQuery("#'.$sEmploeeId.'").val());
+//                            console.log("change", event);
+//                            console.log("New val = " + jQuery("#'.$sEmploeeId.'").val());
                             filterButtons();
                         }',
 //                        'select2-selecting' => 'function(event) { console.log("select2-selecting", event); }',

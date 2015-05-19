@@ -45,9 +45,9 @@ jQuery(".hidemoretext").each(function(index, element){
         oAns = ob.find(".answerblock");
     if( h > nMaxSize ) {
         if( oAns.length > 0 ) {
-            console.log(oAns.attr("id") + ": ", oAns.position(), nSmallSize);
+//            console.log(oAns.attr("id") + ": ", oAns.position(), nSmallSize);
             nSmallSize = Math.min(oAns.offset().top - ob.offset().top - 28, nSmallSize);
-            console.log(oAns.attr("id") + " -> " + nSmallSize);
+//            console.log(oAns.attr("id") + " -> " + nSmallSize);
         }
         ob
             .append("<div class=\"showmoretext\" href=\"#\"><span class=\"glyphicon glyphicon-chevron-down\"></span></div>")
