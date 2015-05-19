@@ -91,7 +91,7 @@ var oPanel = jQuery("#{$idserchblock}"),
     oLink = jQuery("#hidesearchpanel"),
     renameButton = function() {
 //        oLink.text((oPanel.is(":visible") ? "Скрыть" : "Показать") + " форму поиска");
-        oLink.text((oPanel.is(":visible") ? "-" : "+") + " поиск");
+        oLink.text(/*(oPanel.is(":visible") ? "-" : "+") + */"поиск");
     },
     toggleSearchPanel = function() {
         oPanel.toggle();
