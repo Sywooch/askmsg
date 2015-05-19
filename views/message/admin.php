@@ -368,14 +368,14 @@ EOT;
                         'attribute' => 'msg_pers_org',
                         'content' => function ($model, $key, $index, $column) {
                             /** @var Message $model */
-                            return htmlspecialchars_decode($model->msg_pers_org);
+                            return Html::decode($model->msg_pers_org);
                         },
                     ],
                     [
                         'attribute' => 'msg_pers_text',
                         'content' => function ($model, $key, $index, $column) {
                             /** @var Message $model */
-                            return strip_tags(htmlspecialchars_decode($model->msg_pers_text));
+                            return strip_tags(Html::decode($model->msg_pers_text));
                         },
                     ],
                     'msg_empl_command',
@@ -383,7 +383,7 @@ EOT;
                         'attribute' => 'msg_answer',
                         'content' => function ($model, $key, $index, $column) {
                             /** @var Message $model */
-                            return htmlspecialchars_decode(strip_tags($model->msg_answer));
+                            return Html::decode(strip_tags($model->msg_answer));
                         },
                     ],
                     'msg_empl_remark',

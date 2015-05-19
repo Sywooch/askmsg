@@ -11,6 +11,7 @@
 
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
+use yii\helpers\Html;
 
 use app\models\Message;
 use PhpOffice\PhpWord\IOFactory;
@@ -140,7 +141,7 @@ for($page = 0; $page < $nPageCount; $page++) {
         insertText($table->addCell($aWidth[0], $styleCell), $model->msg_id . "\r\n" . date("d.m.Y", strtotime($model->msg_createtime)) . "\r\n" . $model->flag->fl_sname, $fontStyle);
         insertText($table->addCell($aWidth[1], $styleCell), $model->getFullName() . "\r\n" . $model->msg_pers_email . "\r\n" . $model->msg_pers_phone . "\r\n\r\n" . (($model->msg_empl_id !== null) ? $model->employee->getFullName() : ''), $fontStyle);
         insertText($table->addCell($aWidth[2], $styleCell), ($model->subject ? ($model->subject->tag_title . "\r\n") : '') . $model->msg_pers_org, $fontStyle);
-        insertText($table->addCell($bLocal ? $aWidth[3] : $aWidth[3] / 3, $styleCell), $model->msg_pers_text, $fontStyle);
+        insertText($table->addCell($bLocal ? $aWidth[3] : $aWidth[3] / 3, $styleCell), Html::decode($model->msg_pers_text), $fontStyle);
 /*
         $table->addCell($n2sm)->addText(prepare($model->msg_id . "\r\n" . date("d.m.Y", strtotime($model->msg_createtime)) . "\r\n" . $model->flag->fl_sname));
         $table->addCell($n5_2sm)->addText(prepare($model->getFullName() . "\r\n" . $model->msg_pers_email . "\r\n" . $model->msg_pers_phone . "\r\n\r\n" . (($model->msg_empl_id !== null) ? $model->employee->getFullName() : '')));

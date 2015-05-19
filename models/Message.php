@@ -257,6 +257,8 @@ class Message extends \yii\db\ActiveRecord
         $fileCount = $this->countAvalableFile();
         $aFlagsToAnswer = [Msgflags::MFLG_INT_INSTR, Msgflags::MFLG_INT_REVIS_INSTR, Msgflags::MFLG_SHOW_INSTR,Msgflags::MFLG_SHOW_REVIS,];
         return [
+            [['msg_pers_text'], 'filter', 'on'=>'person', 'filter' => function($val){ return strip_tags($val, '<p><br>');  }, ], // в пользовательском вводе удаляем теги
+
             [['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_region'], 'required'],
             [['msg_answer'], 'required', 'on' => 'answer', ],
             [['msg_pers_org', 'ekis_id', 'msg_subject', 'msg_pers_secname'], 'required', 'on'=>'person', ],

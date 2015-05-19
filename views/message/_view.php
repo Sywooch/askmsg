@@ -49,7 +49,7 @@ $oSubj = $model->subject;
     ?>
 
     <div class="listtext">
-        <?= str_replace("\n", "&nbsp;<br />\n", Html::encode($model->msg_pers_text)) ?>
+        <?= str_replace("\n", "&nbsp;<br />\n", $model->msg_pers_text) ?>
     </div>
 
     <?php

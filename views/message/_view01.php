@@ -176,7 +176,7 @@ $this->registerJs($sJs, View::POS_READY, 'toggleuserpart');
         ?>
 
         <p class="text-justify">
-            <?= str_replace("\n", "<br />\n", Html::encode($model->msg_pers_text)) ?>
+            <?= str_replace("\n", "<br />\n", $model->msg_pers_text) ?>
             <?php /* if( $isShowAnswer  ): ?>
                 <br />
                 <?= Html::a('Показать ответ', '#', ['class' => 'togglepart btn btn-default', 'id'=>'toggle_answer'.$model->msg_id]) ?>

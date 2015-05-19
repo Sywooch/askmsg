@@ -679,9 +679,26 @@ $aFieldParam = [
         <div class="clearfix"></div>
 
         <div class="col-sm-12">
-            <?= $form
+            <?=
+            $model->isNewRecord
+            ? $form
                 ->field($model, 'msg_pers_text', $aFieldParam['textfield'])
-                ->textarea(['rows' => 6]) ?>
+                ->textarea(['rows' => 6])
+
+            : $form
+                ->field($model, 'msg_pers_text', $aFieldParam['textfield'])
+                ->widget(Widget::className(), [
+                    'settings' => [
+                        'lang' => 'ru',
+                        'minHeight' => 200,
+                        'buttons' => ['formatting', 'bold', 'italic', 'underline', 'deleted', 'unorderedlist', 'orderedlist', 'link', 'alignment'], // 'outdent', 'indent', 'image',
+                        'plugins' => [
+//                       'clips',
+                            'fullscreen',
+                        ]
+                    ]
+                ])
+            ?>
         </div>
 
         <?php

@@ -15,6 +15,8 @@ use app\components\Exportutil;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
 
+use yii\helpers\Html;
+
     $oUtil = new Exportutil();
     $sFilename = 'message-'.$model->msg_id.'.docx';
     $sf = $oUtil->getFilePath($sFilename);
@@ -152,7 +154,7 @@ use PhpOffice\PhpWord\PhpWord;
         $aStyleTitle['paragraph']
     );
 
-    $a = explode("\n", $model->msg_pers_text);
+    $a = explode("\n", strip_tags(Html::decode($model->msg_pers_text)));
     foreach($a As $v) {
         $v = trim($v);
         if( $v == '' ) {
