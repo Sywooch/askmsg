@@ -115,6 +115,7 @@ class User extends ActiveRecord  implements IdentityInterface
 //        \Yii::info("rules: " . print_r(array_keys(Group::getActiveGroups()), true));
         return [
             [['us_xtime', 'us_logintime', 'us_regtime', 'us_checkwordtime'], 'safe'],
+            [['us_email', 'us_name', 'us_secondname', 'us_lastname', ], 'filter', 'filter' => 'trim'],
             [['us_login', ], 'filter', 'filter' => function($v) { return empty($v) ? $this->getLoginFromEmail() : $v; }],
             [['us_password_hash', 'us_name', 'us_email', 'us_password_hash', 'selectedGroups'], 'required'], // 'us_login',
             [['us_workposition'], 'required', 'on' => ['create', 'update']],
