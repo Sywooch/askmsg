@@ -30,8 +30,11 @@ $this->params['breadcrumbs'] = [];
 <h1><?= Html::encode($this->title) ?></h1>
 */
 
-?>
+if( $model->isNewRecord ) {
+    echo $this->render('entry-text');
+}
 
+?>
 <div class="message-create">
 
     <?= $this->render($aData['form'], [
