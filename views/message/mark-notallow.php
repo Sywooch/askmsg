@@ -18,7 +18,7 @@ $this->params['breadcrumbs'] = [];
     <p>Здравствуйте, <?= $model->getShortName() ?>.</p>
     <p><strong>Ваше обращение № <?= $model->msg_id . ' от ' . date('d.m.Y', strtotime($model->msg_createtime)) ?> не может быть оценено</strong>.</p>
     <?php
-        if( $model->msg_mark !== 0 ) {
+        if( $model->msg_mark !== null ) {
     ?>
             <p>Оно было оценено ранее.</p>
     <?php

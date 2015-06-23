@@ -108,6 +108,11 @@ EOT;
     $this->registerJs($sJs, View::POS_READY , 'togglesearchpanel');
     $exportDataProvider = clone($dataProvider);
 
+    $sFlags = '';
+    foreach(Msgflags::getStateData() As $k=>$v) {
+        $sFlags .= '&MessageSearch[msg_flag][]=' . $k;
+    }
+
     ?>
 
     <?= GridView::widget([
@@ -155,10 +160,12 @@ EOT;
                 'attribute' => 'msg_pers_lastname',
                 'header' => 'Проситель',
                 'filter' => false,
-                'content' => function ($model, $key, $index, $column) {
+                'content' => function ($model, $key, $index, $column) use($sFlags) {
                     return Html::encode($model->msg_pers_lastname . ' ' . $model->msg_pers_name . ' ' . $model->msg_pers_secname )
+                        . ' '
+                        . Html::a('автор', '?MessageSearch[msg_pers_lastname]=' . rawurlencode($model->getFullName()) . $sFlags)
                         . '<span>' // . ($model->msg_flag ? $model->flag->fl_name : '--')
-                        . (($model->msg_empl_id !== null) ? Html::encode(' ' . $model->employee->getFullName()) : '')
+                        . (($model->msg_empl_id !== null) ? (Html::encode(' ' . $model->employee->getFullName()). ' ' . Html::a('исполнитель', '?MessageSearch[msg_empl_id]=' . $model->msg_empl_id . $sFlags)) : '')
                         . '</span>';
                 },
                 'contentOptions' => [
