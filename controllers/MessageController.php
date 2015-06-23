@@ -37,7 +37,7 @@ class MessageController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'list', 'create', 'view', 'export', 'captcha', ],
+                        'actions' => ['index', 'list', 'create', 'view', 'export', 'captcha', 'mark', ],
                         'roles' => ['?', '@'],
                     ],
                     [
@@ -352,6 +352,42 @@ class MessageController extends Controller
         if( $id == 0 ) {
             $model = new Message();
             $model->scenario = 'person';
+            if( Yii::$app->session->has('parent-msg-id') ) {
+                // была переадресация с оценки предыдущего сообщения
+                // нужно заполнить данные просителя из предыдущего сообщения
+                try {
+                    $oldModel = $this->findModel(Yii::$app->session->get('parent-msg-id', 0));
+                    $aAtr = [
+                        'msg_pers_name',
+                        'msg_pers_lastname',
+                        'msg_pers_email',
+                        'msg_pers_phone',
+                        'msg_pers_secname',
+                        'msg_pers_org',
+                        'msg_pers_region',
+                        'msg_subject',
+                        'ekis_id',
+                    ];
+                    foreach($aAtr As $v) {
+                        $model->{$v} = $oldModel->{$v};
+                    }
+                    $n = 72;
+                    $model->msg_pers_text = "Здравствуйте.\nНа мое обращение № {$oldModel->msg_id} от "
+                        . date('d.m.Y', strtotime($oldModel->msg_createtime))
+                        . " был получен следующий ответ (автор ответа - "
+                        . $oldModel->employee->getFullName()
+                        . "):\n\n"
+                        . str_pad(' Начало ответа ', $n, "-", STR_PAD_BOTH)
+                        . "\n"
+                        . trim(strip_tags(str_replace(['</p>', '<br'], ["</p>\n", "\n<br"], $oldModel->msg_answer)))
+                        . "\n"
+                        . str_pad(' Окончание ответа ', $n, "-", STR_PAD_BOTH)
+                        . "\n";
+                }
+                catch(Exception $e) {
+                    //
+                }
+            }
         }
         else {
             $model = $this->findModel($id);
@@ -370,7 +406,11 @@ class MessageController extends Controller
 
             if( $model->save() ) {
                 $model->uploadFiles();
+                if( Yii::$app->session->has('parent-msg-id') ) {
+                    Yii::$app->session->remove('parent-msg-id');
+                }
                 if( $model->scenario == 'person' ) {
+
                     return $this->render(
                         'thankyou',
                         [
@@ -432,6 +472,53 @@ class MessageController extends Controller
         }
 
         return str_replace("\n", "<br />\n", Html::encode($s));
+    }
+
+    /**
+     * Mark answer by customer
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionMark($id)
+    {
+        $model = $this->findModel($id);
+        if(    ($model->msg_mark !== null)
+            || (
+                   ($model->msg_flag != Msgflags::MFLG_SHOW_ANSWER)
+                && ($model->msg_flag != Msgflags::MFLG_INT_FIN_INSTR)
+                )
+        ) {
+            return $this->render('mark-notallow', [
+                'model' => $model,
+            ]);
+        }
+
+        $model->scenario = 'mark';
+        $model->msg_mark = 0;
+
+        if( Yii::$app->request->isAjax && $model->load(Yii::$app->request->post()) ) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            $aValidate = ActiveForm::validate($model);
+            return $aValidate;
+        }
+
+        if ( $model->load(Yii::$app->request->post()) ) {
+            $this->DoDelay('msgform.delay.time');
+            if( $model->save() ) {
+                if( isset($_POST['addmsg']) ) {
+                    Yii::$app->session->set('parent-msg-id', $model->msg_id);
+                    return $this->redirect(['create']);
+                }
+                return $this->render('mark-ok', [
+                    'model' => $model,
+                ]);
+            }
+        }
+
+        return $this->render('mark', [
+            'model' => $model,
+        ]);
+
     }
 
     /**

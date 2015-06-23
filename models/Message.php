@@ -51,6 +51,7 @@ use app\components\RustextValidator;
  * @property integer $msg_subject
  * @property integer $ekis_id
  * @property integer $msg_curator_id
+ * @property integer $msg_mark
  *
  *
  * @property string $employer
@@ -58,6 +59,7 @@ use app\components\RustextValidator;
  * @property string $askid
  * @property string $askcontacts
  * @property string $tags
+ * @property string $testemail
  *
  */
 class Message extends \yii\db\ActiveRecord
@@ -75,8 +77,14 @@ class Message extends \yii\db\ActiveRecord
     public $askcontacts; // Email и телефон
     public $tags; //
     public $_tagsstring; // теги строкой
+    public $testemail = ''; // проверочный email для оценки
 
     public $verifyCode;
+
+    public $aMark = [
+        0 => 'Нет',
+        5 => 'Да',
+    ];
 
     /**
      * @var mixed file аттрибут для генерации поля добавления файла
@@ -259,8 +267,11 @@ class Message extends \yii\db\ActiveRecord
         return [
             [['msg_pers_text'], 'filter', 'on'=>'person', 'filter' => function($val){ return strip_tags($val, '<p><br>');  }, ], // в пользовательском вводе удаляем теги
 
-            [['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_region'], 'required'],
+            [['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_region', 'msg_mark', 'testemail'], 'required'],
             [['msg_answer'], 'required', 'on' => 'answer', ],
+
+            [['testemail'], 'compare', 'compareValue' => $this->msg_pers_email, ],
+
             [['msg_pers_org', 'ekis_id', 'msg_subject', 'msg_pers_secname'], 'required', 'on'=>'person', ],
 //            [['msg_pers_secname'], 'required', 'on'=>['answer', 'person', 'moderator']],
             [['msg_createtime', 'msg_answertime'], 'filter', 'filter' => function($v){ return empty($v) ? new Expression('NOW()') : $v; }],
@@ -273,7 +284,7 @@ class Message extends \yii\db\ActiveRecord
             [['file'], 'file', 'maxFiles' => $fileCount, 'maxSize' => Yii::$app->params['message.file.maxsize'], 'extensions' => Yii::$app->params['message.file.ext']],
 //            [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}')), 'allowArray' => true],
             [['ekis_id'], 'setupEkisData', 'on'=>'person',],
-            [['msg_id', 'msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject', 'ekis_id', 'msg_curator_id'], 'integer'],
+            [['msg_id', 'msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject', 'ekis_id', 'msg_curator_id', 'msg_mark'], 'integer'],
 
             [['msg_pers_text'], 'string', 'max' => self::MAX_PERSON_TEXT_LENGTH, 'min' => 32, 'on' => 'person', 'tooShort' => 'Напишите более подробное сообщение'],
             [['msg_pers_text'], 'app\components\RustextValidator', 'on' => 'person', 'capital' => 0.2, 'russian' => 0.8, ],
@@ -294,6 +305,7 @@ class Message extends \yii\db\ActiveRecord
             ['verifyCode', 'captcha'],
 
             [['msg_pers_email'], 'email', 'except' => ['importdata']],
+            [['testemail'], 'email', ],
             [['employer', 'asker', 'askid', 'askcontacts', 'tags'], 'string', 'max' => 255],
             [['tagsstring'], 'string', 'max' => 1024],
             [['msg_empl_id', 'msg_empl_command'], 'required',
@@ -327,6 +339,11 @@ class Message extends \yii\db\ActiveRecord
     public function scenarios()
     {
         $scenarios = parent::scenarios();
+        $scenarios['mark'] = [
+            'msg_mark',
+            'testemail',
+        ];
+
         $scenarios['person'] = [
             'msg_pers_name',
             'msg_pers_lastname',
@@ -465,6 +482,7 @@ class Message extends \yii\db\ActiveRecord
             'tagsstring' => 'Теги',
             'msg_curator_id' => 'Контролер',
             'verifyCode' => 'Код',
+            'msg_mark' => 'Удовлетворены ли Вы качеством ответа?',
 
             'employer' => 'Исполнитель',
             'asker' => 'Проситель',
@@ -474,6 +492,7 @@ class Message extends \yii\db\ActiveRecord
             'tags' => 'Теги',
             'alltags' => 'Теги',
             'file' => 'Файл',
+            'testemail' => 'Email',
         ];
     }
 
