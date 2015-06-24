@@ -60,6 +60,7 @@ use app\components\RustextValidator;
  * @property string $askcontacts
  * @property string $tags
  * @property string $testemail
+ * @property string $marktext
  *
  */
 class Message extends \yii\db\ActiveRecord

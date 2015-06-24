@@ -541,7 +541,10 @@ class MessageController extends Controller
                         . trim(strip_tags(str_replace(['</p>', '<br'], ["</p>\n", "\n<br"], $model->msg_answer)))
                         . "\n"
                         . str_pad(' Окончание ответа ', $n, "-", STR_PAD_BOTH)
-                        . "\n";
+                        . "\n\n"
+                        . "Меня не удовлетворяет данный ответ по следующей причине: \n\n"
+                        . $model->marktext
+                        . "\n\n";
                     if( $newModel->save() ) {
                         $newModel->uploadFiles();
                     }
