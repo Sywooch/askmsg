@@ -26,8 +26,7 @@ $isShowAnswer = !empty($model->msg_answer)
     <?php if($isShowAnswer) { ?>
         <p><a href="" style="display: none;" id="id-show-msg-button" class="btn btn-default">Показать сообщение и ответ</a></p>
     <?php } ?>
-    <!-- /div>
-    <div class="col-sm-6" -->
+    </div>
     <?php
     $form = ActiveForm::begin([
         'id' => 'message-mark-form',
@@ -55,15 +54,19 @@ $isShowAnswer = !empty($model->msg_answer)
     // , ['options' => ['class' => 'col-sm-6']]
     ?>
 
+    <div class="col-sm-6 col-sm-offset-3">
     <?= $form->field($model, 'msg_mark')->radioList($model->aMark) // , ['labelOptions' => ['style'=>'font-size: 1.4em;']] ?>
     <?= $form->field($model, 'testemail')->textInput(['maxlength' => 64])->hint('Для проверки авторства обращения укажите Ваш email, который был указан при направлении обращения.') // , на который пришло оповещение об ответе ?>
+    </div>
     <!-- div class="btn-group" role="group" aria-label="">
         <button type="button" class="btn btn-default">Left</button>
         <button type="button" class="btn btn-default">Right</button>
     </div -->
     <!-- div class="col-sm-3" -->
+    <div class="col-sm-9 col-sm-offset-3">
     <?= Html::submitButton('Оценить ответ', ['class' => 'btn btn-success']) // btn-block ?>
     <?= Html::submitButton('Оценить ответ и написать обращение по ответу ', ['class' => 'btn btn-info', 'id'=>'id-button-new-message', 'name'=>'addmsg']) // btn-block, 'style'=>'display: none;' ?>
+    </div>
     <!-- /div -->
 
 
@@ -167,7 +170,6 @@ EOT;
 
 
     ?>
-    </div>
     <div class="clearfix" style="margin-bottom: 60px;"></div>
 
 

@@ -56,7 +56,7 @@ class Group extends \yii\db\ActiveRecord
     public static function setActiveGroups() {
         if( self::$_activeGroups === null ) {
             $aGroups = [Rolesimport::ROLE_ANSWER_DOGM, Rolesimport::ROLE_MODERATE_DOGM];
-            if( Yii::$app->user->can(Rolesimport::ROLE_ADMIN) ) {
+            if( property_exists(Yii::$app, 'user') && Yii::$app->user->can(Rolesimport::ROLE_ADMIN) ) {
                 $aGroups[] = Rolesimport::ROLE_ADMIN;
             }
             self::$_activeGroups = Group::find()
