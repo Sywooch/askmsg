@@ -233,4 +233,11 @@ class Msgflags extends \yii\db\ActiveRecord
         return trim(mb_substr($this->fl_name, 5, mb_strlen($this->fl_name, 'UTF-8'), 'UTF-8'));
     }
 
+    public static function makeSearchString($sModel) {
+        $sFlags = '';
+        foreach(self::getStateData() As $k=>$v) {
+            $sFlags .= '&'.$sModel.'[]=' . $k; // MessageSearch[msg_flag]
+        }
+        return $sFlags;
+    }
 }

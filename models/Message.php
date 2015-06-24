@@ -285,6 +285,7 @@ class Message extends \yii\db\ActiveRecord
 //            [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}')), 'allowArray' => true],
             [['ekis_id'], 'setupEkisData', 'on'=>'person',],
             [['msg_id', 'msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject', 'ekis_id', 'msg_curator_id', 'msg_mark'], 'integer'],
+            [['msg_mark'], 'in', 'range' => array_keys($this->aMark), ],
 
             [['msg_pers_text'], 'string', 'max' => self::MAX_PERSON_TEXT_LENGTH, 'min' => 32, 'on' => 'person', 'tooShort' => 'Напишите более подробное сообщение'],
             [['msg_pers_text'], 'app\components\RustextValidator', 'on' => 'person', 'capital' => 0.2, 'russian' => 0.8, ],

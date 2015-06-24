@@ -143,18 +143,18 @@ $this->registerJs($sJs, View::POS_READY, 'toggleuserpart');
                 $aFiles = $model->getUserFiles(false);
                 $nFilesExists = count($aFiles);
                 if( $nFilesExists > 0 ):
-                    ?>
+                ?>
                     <div class="listcommand">
                         <strong>Файлы к ответу: </strong>
                         <?php
                         foreach($aFiles As $oFile):
                             /** @var File  $oFile */
-                            ?>
-                            <?= Html::a(
-                            $oFile->file_orig_name,
-                            $oFile->getUrl()
-                        )
-                            ?>
+                        ?>
+                        <?= Html::a(
+                                $oFile->file_orig_name,
+                                $oFile->getUrl()
+                            )
+                        ?>
                         <?php
                         endforeach;
                         ?>

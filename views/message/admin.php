@@ -108,11 +108,6 @@ EOT;
     $this->registerJs($sJs, View::POS_READY , 'togglesearchpanel');
     $exportDataProvider = clone($dataProvider);
 
-    $sFlags = '';
-    foreach(Msgflags::getStateData() As $k=>$v) {
-        $sFlags .= '&MessageSearch[msg_flag][]=' . $k;
-    }
-
     ?>
 
     <?= GridView::widget([
@@ -148,7 +143,22 @@ EOT;
 //                'filter' => ArrayHelper::map(Msgflags::getStateData(), 'fl_id', 'fl_sname'),
                 'filterOptions' => ['class' => 'gridwidth7'],
                 'content' => function ($model, $key, $index, $column) {
-                    return '<span class="glyphicon glyphicon-'.$model->flag->fl_glyth.'" style="color: '.$model->flag->fl_glyth_color.'; font-size: 1.25em;"></span>' //  font-size: 1.25em;
+                    $sMark = '';
+                    if( $model->msg_mark !== null ) {
+                        $sColor = '#ff0000';
+                        $sGlith = 'remove-sign';
+                        if( $model->msg_mark == 5 ) {
+                            $sColor = '#00cc00';
+                            $sGlith = 'ok-sign';
+                        }
+                        $sMark = '<a href="#" class="pull-right" data-toggle="tooltip" data-placement="top" title="Проситель '.( $model->msg_mark != 5 ? 'не ' : '' ).'удвлетворен ответом">'
+                               . '<span class="glyphicon glyphicon-'
+                               . $sGlith
+                               . '" style="color: '
+                               . $sColor
+                               . '; font-size: 1.25em;"></span></a>';
+                    }
+                    return $sMark . '<span class="glyphicon glyphicon-'.$model->flag->fl_glyth.'" style=" margin-right: 1.25em; color: '.$model->flag->fl_glyth_color.'; font-size: 1.25em;"></span>' //  font-size: 1.25em;
                     . '<span class="inline">' . $model->flag->fl_sname . '</span>'; //  . ' ' . $model->msg_flag
                 },
                 'contentOptions' => [
@@ -160,12 +170,28 @@ EOT;
                 'attribute' => 'msg_pers_lastname',
                 'header' => 'Проситель',
                 'filter' => false,
-                'content' => function ($model, $key, $index, $column) use($sFlags) {
-                    return Html::encode($model->msg_pers_lastname . ' ' . $model->msg_pers_name . ' ' . $model->msg_pers_secname )
+                'content' => function ($model, $key, $index, $column) {
+                    $sEmpl = '';
+                    if( $model->msg_empl_id !== null ) {
+                        $sEmpl = Html::encode($model->employee->getFullName())
+                               . ' '
+                               . Html::a(
+                                    '<span class="glyphicon glyphicon-search inlineblock"></span>',
+                                    '?MessageSearch[msg_empl_id]=' . $model->msg_empl_id . Msgflags::makeSearchString('MessageSearch[msg_flag]'),
+                                    ['title'=>'Поиск ответов исполнителя']
+                               );
+                    }
+                    return Html::encode($model->getFullName())
                         . ' '
-                        . Html::a('автор', '?MessageSearch[msg_pers_lastname]=' . rawurlencode($model->getFullName()) . $sFlags)
-                        . '<span>' // . ($model->msg_flag ? $model->flag->fl_name : '--')
-                        . (($model->msg_empl_id !== null) ? (Html::encode(' ' . $model->employee->getFullName()). ' ' . Html::a('исполнитель', '?MessageSearch[msg_empl_id]=' . $model->msg_empl_id . $sFlags)) : '')
+                        . Html::a(
+                            '<span class="glyphicon glyphicon-search inlineblock"></span>',
+                            '?MessageSearch[msg_pers_lastname]='
+                                . rawurlencode($model->getFullName())
+                                . Msgflags::makeSearchString('MessageSearch[msg_flag]'),
+                            ['title'=>'Поиск вопросов просителя']
+                        )
+                        . '<span>'
+                        . $sEmpl
                         . '</span>';
                 },
                 'contentOptions' => [
@@ -302,6 +328,7 @@ jQuery('.showmail').on("click", function (event){
     return false;
 });
 
+jQuery('[data-toggle="tooltip"]').tooltip();
 
 EOT;
         $this->registerJs($sJs, View::POS_READY, 'showmodalmessage');

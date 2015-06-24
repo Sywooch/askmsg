@@ -407,6 +407,7 @@ class MessageController extends Controller
             if( $model->save() ) {
                 $model->uploadFiles();
                 if( Yii::$app->session->has('parent-msg-id') ) {
+                    // удаляем номер сообщения, на которое пишем ответ
                     Yii::$app->session->remove('parent-msg-id');
                 }
                 if( $model->scenario == 'person' ) {
@@ -494,7 +495,10 @@ class MessageController extends Controller
         }
 
         $model->scenario = 'mark';
-        $model->msg_mark = 0;
+        $model->msg_mark = Yii::$app->request->getQueryParam('mark', 0);
+        if( !isset($model->aMark[$model->msg_mark]) ) {
+            $model->msg_mark = 0;
+        }
 
         if( Yii::$app->request->isAjax && $model->load(Yii::$app->request->post()) ) {
             Yii::$app->response->format = Response::FORMAT_JSON;

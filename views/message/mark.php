@@ -3,6 +3,8 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\web\View;
+use app\models\Msgflags;
+use app\models\Rolesimport;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Message */
@@ -12,12 +14,17 @@ $this->params['breadcrumbs'] = [];
 // $this->params['breadcrumbs'][] = ['label' => 'Обращения', 'url' => $url];
 // $this->params['breadcrumbs'][] = $this->title;
 
+$isShowAnswer = !empty($model->msg_answer)
+    && (($model->msg_flag == Msgflags::MFLG_SHOW_ANSWER) || Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM));
+
 ?>
 <div class="message-mark">
     <div class="col-sm-6">
     <p>Здравствуйте, <?= $model->getShortName() ?>.</p>
     <p><strong>На Ваше обращение № <?= $model->msg_id . ' от ' . date('d.m.Y', strtotime($model->msg_createtime)) ?> был дан ответ </strong>.</p>
-    <p><a href="" style="display: none;" id="id-show-msg-button" class="btn btn-default">Показать сообщение и ответ</a></p>
+    <?php if($isShowAnswer) { ?>
+        <p><a href="" style="display: none;" id="id-show-msg-button" class="btn btn-default">Показать сообщение и ответ</a></p>
+    <?php } ?>
     </div>
     <div class="col-sm-6">
     <!-- p>Удовлетворены ли Вы качеством ответа?</p --><?php
@@ -48,7 +55,7 @@ $this->params['breadcrumbs'] = [];
     ?>
 
     <?= $form->field($model, 'msg_mark')->radioList($model->aMark) ?>
-    <?= $form->field($model, 'testemail')->textInput(['maxlength' => 64])->hint('Для проверки авторства обращения укажите Ваш email, который был указан при направлении обращения') ?>
+    <?= $form->field($model, 'testemail')->textInput(['maxlength' => 64])->hint('Для проверки авторства обращения укажите Ваш email, который был указан при направлении обращения, на который пришло оповещение об ответе.') ?>
     <!-- div class="btn-group" role="group" aria-label="">
         <button type="button" class="btn btn-default">Left</button>
         <button type="button" class="btn btn-default">Right</button>
@@ -131,9 +138,10 @@ $this->params['breadcrumbs'] = [];
             else {
                 oBut.hide();
             }
-        });
+        })
+        .trigger("change");
     jQuery("#id-show-msg-button")
-        .show()
+//        .show()
         .on("click", function(event){
             event.preventDefault();
             var ob = jQuery("#id-message-text"),
@@ -162,13 +170,13 @@ EOT;
 
 
     <div id="id-message-text" style="display: none;">
-    <?=
+    <?= $isShowAnswer ?
     $this->render(
         '_view02',
         [
             'model' => $model,
         ]
-    )
+    ) : ''
     ?>
     </div>
     <?= '' /* $this->render($aData['form'], [

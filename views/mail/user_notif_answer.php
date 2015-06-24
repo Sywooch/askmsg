@@ -17,6 +17,12 @@ use yii\helpers\Url;
 
 $aLink = ['message/view', 'id'=>$model->msg_id];
 
+$aMarkLink = ['message/mark', 'id'=>$model->msg_id];
+
+include dirname(__FILE__) . DIRECTORY_SEPARATOR . 'mail_styles_data.php';
+
+/* <?= $aMailTextStyles['large_text_01'] ?> */
+
 ?>
 
 <p>Здравствуйте, <?= Html::encode($model->getShortName()) ?>.</p>
@@ -24,6 +30,10 @@ $aLink = ['message/view', 'id'=>$model->msg_id];
 <p>Департамент образования города Москвы подготовил ответ на ваше обращение №<?= Html::encode($model->msg_id) ?>.</p>
 
 <p>Для просмотра обращения перейдите по ссылке: <?= Html::a(Url::to($aLink, true), Url::to($aLink, true)) ?></p>
+
+<p>Вы можете оценить этот ответ на сайте по ссылке <?= Html::a(Url::to($aMarkLink, true), Url::to($aMarkLink, true)) ?> :<br />
+    если вы удовлетворены ответом, выберите <a href="<?= Url::to(array_merge($aMarkLink, ['mark'=>5]), true) ?>">Да</a>,<br />
+    если не удовлетворены - <a href="<?= Url::to(array_merge($aMarkLink, ['mark'=>0]), true) ?>">Нет</a>.</p>
 
 <p>&nbsp;</p>
 <p>&nbsp;</p>

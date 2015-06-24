@@ -23,3 +23,7 @@
 .gridwidth7 {
     max-width: 7em;
 }
+
+.griddate span.glyphicon.inlineblock {
+    display: inline-block;
+}
