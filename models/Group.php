@@ -56,13 +56,16 @@ class Group extends \yii\db\ActiveRecord
     public static function setActiveGroups() {
         if( self::$_activeGroups === null ) {
             $aGroups = [Rolesimport::ROLE_ANSWER_DOGM, Rolesimport::ROLE_MODERATE_DOGM];
-            if( property_exists(Yii::$app, 'user') && Yii::$app->user->can(Rolesimport::ROLE_ADMIN) ) {
+            Yii::info('setActiveGroups(): property_exists(Yii::app, user) = ' . (property_exists(Yii::$app, 'user') ? 'true' : 'false'));
+            if( !property_exists(Yii::$app, 'user') || Yii::$app->user->can(Rolesimport::ROLE_ADMIN) ) {
                 $aGroups[] = Rolesimport::ROLE_ADMIN;
             }
+            Yii::info('setActiveGroups(): aGroups = ' . print_r($aGroups, true));
             self::$_activeGroups = Group::find()
                  ->where(['group_active'=>1, 'group_id' => $aGroups])
                  ->orderBy(['group_name' => SORT_ASC])
                  ->all();
+            Yii::info('setActiveGroups(): self::_activeGroups = ' . print_r(ArrayHelper::map(self::$_activeGroups,'group_id','group_name'), true));
         }
     }
 
@@ -71,6 +74,7 @@ class Group extends \yii\db\ActiveRecord
      */
     public static function getActiveGroups() {
         self::setActiveGroups();
+        Yii::info('getActiveGroups(): ' . print_r(ArrayHelper::map(self::$_activeGroups,'group_id','group_name'), true));
         return ArrayHelper::map(
                 self::$_activeGroups,
                 'group_id',
