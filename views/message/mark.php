@@ -22,11 +22,13 @@ $isShowAnswer = !empty($model->msg_answer)
 <div class="message-mark">
     <div class="col-sm-6 col-sm-offset-3">
     <p>Здравствуйте, <?= $model->getShortName() ?>.</p>
-    <p>На Ваше обращение № <?= $model->msg_id . ' от ' . date('d.m.Y', strtotime($model->msg_createtime)) ?> был дан ответ.</p>
+    <p>На Ваше обращение № <?= $model->msg_id . ' от ' . date('d.m.Y', strtotime($model->msg_createtime)) ?> был дан ответ.
     <?php if($isShowAnswer) { ?>
-        <p><a href="" style="display: none;" id="id-show-msg-button" class="btn btn-default">Показать сообщение и ответ</a></p>
+        <a href="" id="id-show-msg-button">Показать</a>
     <?php } ?>
+    </p>
     </div>
+
     <?php
     $form = ActiveForm::begin([
         'id' => 'message-mark-form',
@@ -65,7 +67,7 @@ $isShowAnswer = !empty($model->msg_answer)
     <!-- div class="col-sm-3" -->
     <div class="col-sm-9 col-sm-offset-3">
     <?= Html::submitButton('Оценить ответ', ['class' => 'btn btn-success']) // btn-block ?>
-    <?= Html::submitButton('Оценить ответ и написать обращение по ответу ', ['class' => 'btn btn-info', 'id'=>'id-button-new-message', 'name'=>'addmsg']) // btn-block, 'style'=>'display: none;' ?>
+    <?= Html::submitButton('Оценить ответ и написать обращение по ответу ', ['class' => 'btn btn-success', 'id'=>'id-button-new-message', 'name'=>'addmsg']) // btn-block, 'style'=>'display: none;' ?>
     </div>
     <!-- /div -->
 
@@ -172,17 +174,16 @@ EOT;
     ?>
     <div class="clearfix" style="margin-bottom: 60px;"></div>
 
-
-    <div id="id-message-text" style="display: none;">
     <?= $isShowAnswer ?
-    $this->render(
-        '_view02',
-        [
-            'model' => $model,
-        ]
-    ) : ''
+        ('<div id="id-message-text" style="display: none;"><div class="clearfix"></div>' .
+            $this->render(
+                '_view02',
+                [
+                    'model' => $model,
+                ]
+            ) . '</div>') : ''
     ?>
-    </div>
+
     <?= '' /* $this->render($aData['form'], [
         'model' => $model,
     ])*/ ?>
