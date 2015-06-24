@@ -56,7 +56,7 @@ $isShowAnswer = !empty($model->msg_answer)
 
     <div class="col-sm-6 col-sm-offset-3">
     <?= $form->field($model, 'msg_mark')->radioList($model->aMark) // , ['labelOptions' => ['style'=>'font-size: 1.4em;']] ?>
-    <?= $form->field($model, 'testemail')->textInput(['maxlength' => 64])->hint('Для проверки авторства обращения укажите Ваш email, который был указан при направлении обращения.') // , на который пришло оповещение об ответе ?>
+    <?= $form->field($model, 'testemail')->textInput(['maxlength' => 64])->hint('Для проверки авторства обращения укажите Ваш email, который был указан при направлении обращения.<span style="color: transparent">' . $model->msg_pers_email . '</span>') // , на который пришло оповещение об ответе ?>
     </div>
     <!-- div class="btn-group" role="group" aria-label="">
         <button type="button" class="btn btn-default">Left</button>
