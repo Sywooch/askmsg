@@ -82,8 +82,8 @@ class Message extends \yii\db\ActiveRecord
     public $verifyCode;
 
     public $aMark = [
-        0 => 'Нет',
         5 => 'Да',
+        0 => 'Нет',
     ];
 
     /**

@@ -38,38 +38,17 @@ $isShowAnswer = !empty($model->msg_answer)
         'validateOnChange' => false,
         'validateOnBlur' => false,
         'validateOnType' => false,
-//        'layout' => 'horizontal',
-//        'options'=>[
-//            'enctype'=>'multipart/form-data'
-//        ],
-//        'fieldConfig' => [
-//                'template' => "{label}\n{beginWrapper}\n{input}\n{hint}\n{error}\n{endWrapper}",
-//            'horizontalCssClasses' => [
-//                'label' => 'col-sm-3',
-//                'offset' => 'col-sm-offset-3',
-//                'wrapper' => 'col-sm-9',
-//                    'error' => '',
-//                'hint' => 'col-sm-9 col-sm-offset-3',
-//            ],
-//        ],
     ]);
-    // , ['options' => ['class' => 'col-sm-6']]
     ?>
 
     <div class="col-sm-6 col-sm-offset-3">
     <?= $form->field($model, 'msg_mark')->radioList($model->aMark) // , ['labelOptions' => ['style'=>'font-size: 1.4em;']] ?>
     <?= $form->field($model, 'testemail')->textInput(['maxlength' => 64])->hint('Для проверки авторства обращения укажите Ваш email, который был указан при направлении обращения.<span style="color: transparent">' . $model->msg_pers_email . '</span>') // , на который пришло оповещение об ответе ?>
     </div>
-    <!-- div class="btn-group" role="group" aria-label="">
-        <button type="button" class="btn btn-default">Left</button>
-        <button type="button" class="btn btn-default">Right</button>
-    </div -->
-    <!-- div class="col-sm-3" -->
     <div class="col-sm-9 col-sm-offset-3">
     <?= Html::submitButton('Оценить ответ', ['class' => 'btn btn-success']) // btn-block ?>
-    <?= Html::submitButton('Оценить ответ и написать обращение по ответу ', ['class' => 'btn btn-success', 'id'=>'id-button-new-message', 'name'=>'addmsg']) // btn-block, 'style'=>'display: none;' ?>
+    <?= '' // Html::submitButton('Оценить ответ и написать обращение по ответу ', ['class' => 'btn btn-success', 'id'=>'id-button-new-message', 'name'=>'addmsg']) // btn-block, 'style'=>'display: none;' ?>
     </div>
-    <!-- /div -->
 
 
     <?php ActiveForm::end();
@@ -133,20 +112,20 @@ $isShowAnswer = !empty($model->msg_answer)
             valueclass: {0: "btn-danger"},
             // element: ""
             divclass: ["btn-group"] // , "btn-group-lg"
-        })
-        .find("input[type='radio']")
-        .on("change", function(event){
-            var ob = jQuery(this),
-                oBut = jQuery("#id-button-new-message");
-
-            if( ob.val() == 0 ) {
-                oBut.show();
-            }
-            else {
-                oBut.hide();
-            }
         });
-    jQuery("#{$sButtonId}").find("input[type='radio'][checked]").trigger("change");
+//        .find("input[type='radio']")
+//        .on("change", function(event){
+//            var ob = jQuery(this),
+//                oBut = jQuery("#id-button-new-message");
+//
+//            if( ob.val() == 0 ) {
+//                oBut.show();
+//            }
+//            else {
+//                oBut.hide();
+//            }
+//        });
+//    jQuery("#{$sButtonId}").find("input[type='radio'][checked]").trigger("change");
     jQuery("#id-show-msg-button")
 //        .show()
         .on("click", function(event){

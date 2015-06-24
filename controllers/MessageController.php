@@ -495,7 +495,7 @@ class MessageController extends Controller
         }
 
         $model->scenario = 'mark';
-        $model->msg_mark = Yii::$app->request->getQueryParam('mark', 0);
+        $model->msg_mark = Yii::$app->request->getQueryParam('mark', 5);
         if( !isset($model->aMark[$model->msg_mark]) ) {
             $model->msg_mark = 0;
         }
