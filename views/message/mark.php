@@ -17,17 +17,18 @@ $this->params['breadcrumbs'] = [];
 $isShowAnswer = !empty($model->msg_answer)
     && (($model->msg_flag == Msgflags::MFLG_SHOW_ANSWER) || Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM));
 
+// <strong></strong>
 ?>
 <div class="message-mark">
-    <div class="col-sm-6">
+    <div class="col-sm-6 col-sm-offset-3">
     <p>Здравствуйте, <?= $model->getShortName() ?>.</p>
-    <p><strong>На Ваше обращение № <?= $model->msg_id . ' от ' . date('d.m.Y', strtotime($model->msg_createtime)) ?> был дан ответ </strong>.</p>
+    <p>На Ваше обращение № <?= $model->msg_id . ' от ' . date('d.m.Y', strtotime($model->msg_createtime)) ?> был дан ответ.</p>
     <?php if($isShowAnswer) { ?>
         <p><a href="" style="display: none;" id="id-show-msg-button" class="btn btn-default">Показать сообщение и ответ</a></p>
     <?php } ?>
-    </div>
-    <div class="col-sm-6">
-    <!-- p>Удовлетворены ли Вы качеством ответа?</p --><?php
+    <!-- /div>
+    <div class="col-sm-6" -->
+    <?php
     $form = ActiveForm::begin([
         'id' => 'message-mark-form',
         'enableAjaxValidation' => true,
@@ -54,8 +55,8 @@ $isShowAnswer = !empty($model->msg_answer)
     // , ['options' => ['class' => 'col-sm-6']]
     ?>
 
-    <?= $form->field($model, 'msg_mark')->radioList($model->aMark) ?>
-    <?= $form->field($model, 'testemail')->textInput(['maxlength' => 64])->hint('Для проверки авторства обращения укажите Ваш email, который был указан при направлении обращения, на который пришло оповещение об ответе.') ?>
+    <?= $form->field($model, 'msg_mark')->radioList($model->aMark) // , ['labelOptions' => ['style'=>'font-size: 1.4em;']] ?>
+    <?= $form->field($model, 'testemail')->textInput(['maxlength' => 64])->hint('Для проверки авторства обращения укажите Ваш email, который был указан при направлении обращения.') // , на который пришло оповещение об ответе ?>
     <!-- div class="btn-group" role="group" aria-label="">
         <button type="button" class="btn btn-default">Left</button>
         <button type="button" class="btn btn-default">Right</button>
@@ -124,22 +125,23 @@ $isShowAnswer = !empty($model->msg_answer)
 
     jQuery("#{$sButtonId}")
         .decorateradio({
-            valueclass: {0: "btn-danger"}
+            valueclass: {0: "btn-danger"},
             // element: ""
-            // divclass: ["btn-group", "btn-group-justified"]
+            divclass: ["btn-group"] // , "btn-group-lg"
         })
         .find("input[type='radio']")
         .on("change", function(event){
             var ob = jQuery(this),
                 oBut = jQuery("#id-button-new-message");
+
             if( ob.val() == 0 ) {
                 oBut.show();
             }
             else {
                 oBut.hide();
             }
-        })
-        .trigger("change");
+        });
+    jQuery("#{$sButtonId}").find("input[type='radio'][checked]").trigger("change");
     jQuery("#id-show-msg-button")
 //        .show()
         .on("click", function(event){
