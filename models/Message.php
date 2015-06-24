@@ -78,6 +78,7 @@ class Message extends \yii\db\ActiveRecord
     public $tags; //
     public $_tagsstring; // теги строкой
     public $testemail = ''; // проверочный email для оценки
+    public $marktext = ''; // текст для оценки
 
     public $verifyCode;
 
@@ -286,6 +287,9 @@ class Message extends \yii\db\ActiveRecord
             [['ekis_id'], 'setupEkisData', 'on'=>'person',],
             [['msg_id', 'msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject', 'ekis_id', 'msg_curator_id', 'msg_mark'], 'integer'],
             [['msg_mark'], 'in', 'range' => array_keys($this->aMark), ],
+            [['marktext'], 'required', 'when' => function($model){ return $model->msg_mark == 0; }, ],
+            [['marktext'], 'string', 'min'=>24, ],
+            [['marktext'], 'app\components\RustextValidator', 'capital' => 0.2, 'russian' => 0.8, ],
 
             [['msg_pers_text'], 'string', 'max' => self::MAX_PERSON_TEXT_LENGTH, 'min' => 32, 'on' => 'person', 'tooShort' => 'Напишите более подробное сообщение'],
             [['msg_pers_text'], 'app\components\RustextValidator', 'on' => 'person', 'capital' => 0.2, 'russian' => 0.8, ],
@@ -343,6 +347,7 @@ class Message extends \yii\db\ActiveRecord
         $scenarios['mark'] = [
             'msg_mark',
             'testemail',
+            'marktext',
         ];
 
         $scenarios['person'] = [
@@ -494,6 +499,7 @@ class Message extends \yii\db\ActiveRecord
             'alltags' => 'Теги',
             'file' => 'Файл',
             'testemail' => 'Email',
+            'marktext' => 'Причина',
         ];
     }
 

@@ -352,6 +352,7 @@ class MessageController extends Controller
         if( $id == 0 ) {
             $model = new Message();
             $model->scenario = 'person';
+/*
             if( Yii::$app->session->has('parent-msg-id') ) {
                 // была переадресация с оценки предыдущего сообщения
                 // нужно заполнить данные просителя из предыдущего сообщения
@@ -388,6 +389,7 @@ class MessageController extends Controller
                     //
                 }
             }
+*/
         }
         else {
             $model = $this->findModel($id);
@@ -509,12 +511,47 @@ class MessageController extends Controller
         if ( $model->load(Yii::$app->request->post()) ) {
             $this->DoDelay('msgform.delay.time');
             if( $model->save() ) {
-                if( isset($_POST['addmsg']) ) {
-                    Yii::$app->session->set('parent-msg-id', $model->msg_id);
-                    return $this->redirect(['create']);
+                $sMsg = '';
+                if( $model->msg_mark != 5 ) {
+                    // сохраняем новое обращение с причиной неудовлетворенности
+                    $newModel = new Message();
+                    $newModel->scenario = 'person';
+                    $aAtr = [
+                        'msg_pers_name',
+                        'msg_pers_lastname',
+                        'msg_pers_email',
+                        'msg_pers_phone',
+                        'msg_pers_secname',
+                        'msg_pers_org',
+                        'msg_pers_region',
+                        'msg_subject',
+                        'ekis_id',
+                    ];
+                    foreach($aAtr As $v) {
+                        $newModel->{$v} = $model->{$v};
+                    }
+                    $n = 72;
+                    $newModel->msg_pers_text = "Здравствуйте.\nНа мое обращение № {$model->msg_id} от "
+                        . date('d.m.Y', strtotime($model->msg_createtime))
+                        . " был получен следующий ответ (автор ответа - "
+                        . $model->employee->getFullName()
+                        . "):\n\n"
+                        . str_pad(' Начало ответа ', $n, "-", STR_PAD_BOTH)
+                        . "\n"
+                        . trim(strip_tags(str_replace(['</p>', '<br'], ["</p>\n", "\n<br"], $model->msg_answer)))
+                        . "\n"
+                        . str_pad(' Окончание ответа ', $n, "-", STR_PAD_BOTH)
+                        . "\n";
+                    if( $newModel->save() ) {
+                        $newModel->uploadFiles();
+                    }
+                    else {
+                        $sMsg = print_r($newModel->getErrors(), true);
+                    }
                 }
                 return $this->render('mark-ok', [
                     'model' => $model,
+                    'msg' => $sMsg,
                 ]);
             }
         }

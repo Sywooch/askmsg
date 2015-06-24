@@ -5,6 +5,9 @@ use yii\widgets\ActiveForm;
 use yii\web\View;
 use app\models\Msgflags;
 use app\models\Rolesimport;
+use yii\helpers\Url;
+use app\assets\JqueryfilerAsset;
+
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Message */
@@ -17,6 +20,135 @@ $this->params['breadcrumbs'] = [];
 $isShowAnswer = !empty($model->msg_answer)
     && (($model->msg_flag == Msgflags::MFLG_SHOW_ANSWER) || Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM));
 
+JqueryfilerAsset::register($this);
+
+$sExt = '["' . implode('","', Yii::$app->params['message.file.ext']) . '"]';
+$sFileExt = implode(', ', Yii::$app->params['message.file.ext']);
+$nMaxSize = Yii::$app->params['message.file.maxsize'] / 1000000;
+$sJs = <<<EOT
+$('#message-file').filer({
+        limit: 1,
+        maxSize: {$nMaxSize},
+        extensions: {$sExt},
+        changeInput: true,
+        showThumbs: true,
+        appendTo: null,
+        theme: "default",
+        templates: {
+            box: '<ul class="jFiler-item-list"></ul>',
+            item: '<li class="jFiler-item">\
+                        <div class="jFiler-item-container">\
+                            <div class="jFiler-item-inner">\
+                                <div class="jFiler-item-thumb">\
+                                    <div class="jFiler-item-status"></div>\
+                                    <div class="jFiler-item-info">\
+                                        <span class="jFiler-item-title"><b title="{{fi-name}}">{{fi-name | limitTo: 25}}</b></span>\
+                                    </div>\
+                                    {{fi-image}}\
+                                </div>\
+                                <div class="jFiler-item-assets jFiler-row">\
+                                    <ul class="list-inline pull-left">\
+                                        <li>{{fi-progressBar}}</li>\
+                                    </ul>\
+                                    <ul class="list-inline pull-right">\
+                                        <li><a class="icon-jfi-trash jFiler-item-trash-action"></a></li>\
+                                    </ul>\
+                                </div>\
+                            </div>\
+                        </div>\
+                    </li>',
+            itemAppend: '<li class="jFiler-item">\
+                        <div class="jFiler-item-container">\
+                            <div class="jFiler-item-inner">\
+                                <div class="jFiler-item-thumb">\
+                                    <div class="jFiler-item-status"></div>\
+                                    <div class="jFiler-item-info">\
+                                        <span class="jFiler-item-title"><b title="{{fi-name}}">{{fi-name | limitTo: 25}}</b></span>\
+                                    </div>\
+                                    {{fi-image}}\
+                                </div>\
+                                <div class="jFiler-item-assets jFiler-row">\
+                                    <ul class="list-inline pull-left">\
+                                        <span class="jFiler-item-others">{{fi-icon}} {{fi-size2}}</span>\
+                                    </ul>\
+                                    <ul class="list-inline pull-right">\
+                                        <li><a class="icon-jfi-trash jFiler-item-trash-action"></a></li>\
+                                    </ul>\
+                                </div>\
+                            </div>\
+                        </div>\
+                    </li>',
+            progressBar: '<div class="bar"></div>',
+            itemAppendToEnd: false,
+            removeConfirmation: true,
+            _selectors: {
+                list: '.jFiler-item-list',
+                item: '.jFiler-item',
+                progressBar: '.bar',
+                remove: '.jFiler-item-trash-action',
+            }
+        },
+        dragDrop: {
+            dragEnter: null,
+            dragLeave: null,
+            drop: null,
+        },
+        addMore: true,
+        clipBoardPaste: true,
+        excludeName: null,
+        beforeShow: function(){return true},
+        onSelect: function(){},
+        afterShow: function(){},
+        onRemove: function(){},
+        onEmpty: function(){},
+        captions: {
+            button: "Выберите файл",
+            feedback: "Выбрано файлов для загрузки",
+            feedback2: "Выбрано файлов",
+            drop: "Перетащите сюда файлы для загрузки",
+            removeConfirmation: "Удалить этот файл?",
+            errors: {
+                filesLimit: "Можно загрузить не более {{fi-limit}} файлов.",
+                filesType: "Файлы только типов {$sFileExt} разрешены к загрузке.",
+                filesSize: "{{fi-name}} слишком большой! Выберите файл до {{fi-maxSize}} MB.",
+                filesSizeAll: "Слишком большие файлы выбрали! Пожалуйста ограничьте их размер {{fi-maxSize}} MB."
+            }
+        }
+    });
+EOT;
+$this->registerJs($sJs, View::POS_READY, 'jqueryfiler');
+
+$aFieldParam = [
+    'file' => [
+        'options'=>[
+            //                    'accept'=>'image/*',
+            'multiple'=> !Yii::$app->user->isGuest
+        ],
+        'pluginOptions'=>[
+            'uploadUrl' => Url::to(['file/upload']),
+            'allowedFileExtensions' => Yii::$app->params['message.file.ext'],
+            'maxFileCount' => 3,
+            'showPreview' => true,
+            'showCaption' => true,
+            'showRemove' => true,
+            'showUpload' => false,
+        ]
+    ],
+
+    'filefield' => [
+/*
+
+        'horizontalCssClasses' => [
+            'label' => 'col-sm-1',
+            'offset' => 'col-sm-offset-1',
+            'wrapper' => 'col-sm-11',
+        ],
+        'hintOptions' => [
+            'class' => 'col-sm-11 col-sm-offset-1',
+        ],
+*/
+    ],
+];
 // <strong></strong>
 ?>
 <div class="message-mark">
@@ -44,9 +176,22 @@ $isShowAnswer = !empty($model->msg_answer)
     <div class="col-sm-6 col-sm-offset-3">
     <?= $form->field($model, 'msg_mark')->radioList($model->aMark) // , ['labelOptions' => ['style'=>'font-size: 1.4em;']] ?>
     <?= $form->field($model, 'testemail')->textInput(['maxlength' => 64])->hint('Для проверки авторства обращения укажите Ваш email, который был указан при направлении обращения.<span style="color: transparent">' . $model->msg_pers_email . '</span>') // , на который пришло оповещение об ответе ?>
+    <div id="id-marktext" style="display: none;">
+    <?= $form->field($model, 'marktext')->textarea(['rows' => 4])->hint('Укажите, что именно Вас не устраивает в ответе.') ?>
+    <?= $form
+        ->field($model, 'file[]', $aFieldParam['filefield'])
+        ->fileInput(['multiple' => true])
+        ->hint('Максимальный размер файла: '
+            . sprintf("%.1f Mb", Yii::$app->params['message.file.maxsize'] / 1000000)
+            . ', Допустимые типы файлов: '
+            . implode(',', Yii::$app->params['message.file.ext'])
+        )
+    ?>
+
+    </div>
     </div>
     <div class="col-sm-9 col-sm-offset-3">
-    <?= Html::submitButton('Оценить ответ', ['class' => 'btn btn-success']) // btn-block ?>
+    <?= Html::submitButton('Отправить оценку', ['class' => 'btn btn-success']) // btn-block ?>
     <?= '' // Html::submitButton('Оценить ответ и написать обращение по ответу ', ['class' => 'btn btn-success', 'id'=>'id-button-new-message', 'name'=>'addmsg']) // btn-block, 'style'=>'display: none;' ?>
     </div>
 
@@ -112,20 +257,20 @@ $isShowAnswer = !empty($model->msg_answer)
             valueclass: {0: "btn-danger"},
             // element: ""
             divclass: ["btn-group"] // , "btn-group-lg"
+        })
+        .find("input[type='radio']")
+        .on("change", function(event){
+            var ob = jQuery(this),
+                oBut = jQuery("#id-marktext");
+
+            if( ob.val() == 0 ) {
+                oBut.show();
+            }
+            else {
+                oBut.hide();
+            }
         });
-//        .find("input[type='radio']")
-//        .on("change", function(event){
-//            var ob = jQuery(this),
-//                oBut = jQuery("#id-button-new-message");
-//
-//            if( ob.val() == 0 ) {
-//                oBut.show();
-//            }
-//            else {
-//                oBut.hide();
-//            }
-//        });
-//    jQuery("#{$sButtonId}").find("input[type='radio'][checked]").trigger("change");
+    jQuery("#{$sButtonId}").find("input[type='radio'][checked]").trigger("change");
     jQuery("#id-show-msg-button")
 //        .show()
         .on("click", function(event){
