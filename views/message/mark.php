@@ -197,7 +197,7 @@ $aFieldParam = [
     <?= $form->field($model, 'msg_mark')->radioList($model->aMark) // , ['labelOptions' => ['style'=>'font-size: 1.4em;']] ?>
     <?= $form->field($model, 'testemail')->textInput(['maxlength' => 64, 'style'=>'width: 120px;'])->hint('Для проверки авторства обращения укажите проверочный код, который указан в письме об ответе на обращение.<span style="color: #f0f0f0">' . $model->getTestCode() . '</span>') // , на который пришло оповещение об ответе ?>
     <div id="id-marktext" style="display: none;">
-    <?= $form->field($model, 'marktext')->textarea(['rows' => 4])->hint('Укажите, что именно Вас не устраивает в ответе.') ?>
+    <?= $form->field($model, 'marktext')->textarea(['rows' => 8])->hint('Укажите, что именно Вас не устраивает в ответе.') ?>
     <?= $form
         ->field($model, 'file[]', $aFieldParam['filefield'])
         ->fileInput(['multiple' => true])
