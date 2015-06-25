@@ -145,10 +145,10 @@ EOT;
                 'content' => function ($model, $key, $index, $column) {
                     $sMark = '';
                     if( $model->msg_mark !== null ) {
-                        $sColor = '#ff0000';
+                        $sColor = '#ee2222';
                         $sGlith = 'remove-sign';
                         if( $model->msg_mark == 5 ) {
-                            $sColor = '#00cc00';
+                            $sColor = '#2e8b57';
                             $sGlith = 'ok-sign';
                         }
                         $sMark = '<a href="#" class="pull-right" data-toggle="tooltip" data-placement="top" title="Проситель '.( $model->msg_mark != 5 ? 'не ' : '' ).'удвлетворен ответом">'

@@ -170,12 +170,15 @@ $aFieldParam = [
         'validateOnChange' => false,
         'validateOnBlur' => false,
         'validateOnType' => false,
+        'options'=>[
+            'enctype'=>'multipart/form-data'
+        ],
     ]);
     ?>
 
     <div class="col-sm-6 col-sm-offset-3">
     <?= $form->field($model, 'msg_mark')->radioList($model->aMark) // , ['labelOptions' => ['style'=>'font-size: 1.4em;']] ?>
-    <?= $form->field($model, 'testemail')->textInput(['maxlength' => 64])->hint('Для проверки авторства обращения укажите Ваш email, который был указан при направлении обращения.<span style="color: transparent">' . $model->msg_pers_email . '</span>') // , на который пришло оповещение об ответе ?>
+    <?= $form->field($model, 'testemail')->textInput(['maxlength' => 64])->hint('Для проверки авторства обращения укажите Ваш email, который был указан при направлении обращения.<span style="color: #f0f0f0">' . $model->msg_pers_email . '</span>') // , на который пришло оповещение об ответе ?>
     <div id="id-marktext" style="display: none;">
     <?= $form->field($model, 'marktext')->textarea(['rows' => 4])->hint('Укажите, что именно Вас не устраивает в ответе.') ?>
     <?= $form
