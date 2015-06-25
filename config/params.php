@@ -9,7 +9,7 @@ return [
     'message.file.newcount' => 1,
     'message.file.answercount' => 3,
     'message.file.uploaddir' => '@webroot/upload/files',
-    'message.encode.key' => 'some secret text',
+    'message.encode.key' => 'some0secret1text',
     'message.encode.method' => 'bf-cbc',
     'message.encode.iv' => '56897ngq',
 ];
