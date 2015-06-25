@@ -272,7 +272,8 @@ class Message extends \yii\db\ActiveRecord
             [['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_region', 'msg_mark', 'testemail'], 'required'],
             [['msg_answer'], 'required', 'on' => 'answer', ],
 
-            [['testemail'], 'compare', 'compareValue' => $this->msg_pers_email, ],
+//            [['testemail'], 'email', ],
+            [['testemail'], 'compare', 'compareValue' => $this->getTestCode(), ], // $this->msg_pers_email
 
             [['msg_pers_org', 'ekis_id', 'msg_subject', 'msg_pers_secname'], 'required', 'on'=>'person', ],
 //            [['msg_pers_secname'], 'required', 'on'=>['answer', 'person', 'moderator']],
@@ -311,7 +312,6 @@ class Message extends \yii\db\ActiveRecord
             ['verifyCode', 'captcha'],
 
             [['msg_pers_email'], 'email', 'except' => ['importdata']],
-            [['testemail'], 'email', ],
             [['employer', 'asker', 'askid', 'askcontacts', 'tags'], 'string', 'max' => 255],
             [['tagsstring'], 'string', 'max' => 1024],
             [['msg_empl_id', 'msg_empl_command'], 'required',
@@ -499,7 +499,7 @@ class Message extends \yii\db\ActiveRecord
             'tags' => 'Теги',
             'alltags' => 'Теги',
             'file' => 'Файл',
-            'testemail' => 'Email',
+            'testemail' => 'Проверочный код',
             'marktext' => 'Причина',
         ];
     }
@@ -1093,5 +1093,71 @@ class Message extends \yii\db\ActiveRecord
         return isset(Yii::$app->params['msgform.use.captcha'])
             && Yii::$app->params['msgform.use.captcha'];
     }
+
+    /**
+     * Кодируем данные
+     *
+     * @return string
+     */
+    public static function encodeData($key, $method, $iv, $data)
+    {
+//        $sDate = preg_replace('|[^\\d]|', '', $this->msg_createtime);
+        return bin2hex(openssl_encrypt($data, $method, $key, OPENSSL_RAW_DATA, $iv));
+    }
+
+    /**
+     * Декодируем данные
+     *
+     * @return string
+     */
+    public static function decodeData($key, $method, $iv, $data)
+    {
+        return openssl_decrypt(hex2bin($data), $method, $key, OPENSSL_RAW_DATA, $iv);
+    }
+
+    /**
+     * Кодируем адрес
+     *
+     * @return string
+     */
+    public function getMarkUrl()
+    {
+        $method = Yii::$app->params['message.encode.method'];
+        $key = Yii::$app->params['message.encode.key'];
+        $iv = Yii::$app->params['message.encode.iv'];
+        return ['mark', 'sign' => self::encodeData($key, $method, $iv, $this->msg_id)];
+    }
+
+    /**
+     * Получаем проверочный код
+     *
+     * @return string
+     */
+    public function getTestCode()
+    {
+//        $method = Yii::$app->params['message.encode.method'];
+//        $key = Yii::$app->params['message.encode.key'];
+//        $iv = Yii::$app->params['message.encode.iv'];
+//        return substr(self::encodeData($key, $method, $iv, $this->msg_createtime), -4);
+        $sDate = preg_replace('|[^\\d]|', '', $this->msg_createtime);
+        return substr($sDate, -4);
+    }
+
+    /**
+     * Декодируем адрес
+     *
+     * @return string
+     */
+    public static function findModelFromMarkUrl()
+    {
+        $method = Yii::$app->params['message.encode.method'];
+        $key = Yii::$app->params['message.encode.key'];
+        $iv = Yii::$app->params['message.encode.iv'];
+        $sign = Yii::$app->request->getQueryParam('sign', '');
+        $id = self::decodeData($key, $method, $iv, $sign);
+        $model = Message::findOne($id);
+        return $model;
+    }
+
 
 }

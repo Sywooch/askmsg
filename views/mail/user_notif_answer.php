@@ -17,7 +17,8 @@ use yii\helpers\Url;
 
 $aLink = ['message/view', 'id'=>$model->msg_id];
 
-$aMarkLink = ['message/mark', 'id'=>$model->msg_id];
+// $aMarkLink = ['message/mark', 'id'=>$model->msg_id];
+$aMarkLink = $model->getMarkUrl();
 
 include dirname(__FILE__) . DIRECTORY_SEPARATOR . 'mail_styles_data.php';
 
@@ -34,6 +35,8 @@ include dirname(__FILE__) . DIRECTORY_SEPARATOR . 'mail_styles_data.php';
 <p>Вы можете оценить этот ответ на сайте по ссылке <?= Html::a(Url::to($aMarkLink, true), Url::to($aMarkLink, true)) ?> :<br />
     если вы удовлетворены ответом, выберите <a href="<?= Url::to(array_merge($aMarkLink, ['mark'=>5]), true) ?>">Да</a>,<br />
     если не удовлетворены - <a href="<?= Url::to(array_merge($aMarkLink, ['mark'=>0]), true) ?>">Нет</a>.</p>
+
+<p>Для выставления оценки Вам понадбится проверочный код: <?= $model->getTestCode() ?> .</p>
 
 <p>&nbsp;</p>
 <p>&nbsp;</p>

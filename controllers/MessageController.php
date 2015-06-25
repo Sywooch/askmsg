@@ -479,12 +479,15 @@ class MessageController extends Controller
 
     /**
      * Mark answer by customer
-     * @param integer $id
      * @return mixed
      */
-    public function actionMark($id)
+    public function actionMark()
     {
-        $model = $this->findModel($id);
+//        $model = $this->findModel($id);
+        $model = Message::findModelFromMarkUrl() ;
+        if( $model === null ) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
         if(    ($model->msg_mark !== null)
             || (
                    ($model->msg_flag != Msgflags::MFLG_SHOW_ANSWER)

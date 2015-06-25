@@ -8,6 +8,23 @@ use app\models\Rolesimport;
 use yii\helpers\Url;
 use app\assets\JqueryfilerAsset;
 
+/*
+
+$enc = openssl_encrypt($str, 'bf-ecb', $key, true);
+$dec = openssl_decrypt($enc, 'bf-ecb', $key, true);
+echo(bin2hex($enc).PHP_EOL);
+
+*/
+/*
+$key = '9876543210';
+// $method = 'bf-ecb';
+$method = 'aes-256-ecb';
+for($i = 0; $i < 10; $i++ ) {
+    $n = $model->msg_id + $i;
+    $s = openssl_encrypt($n, $method, $key, true);
+    echo $n . ' : ' . bin2hex($s) . ' = ' . openssl_decrypt($s, $method, $key, true) . "<br />\n";
+}
+*/
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Message */
@@ -178,7 +195,7 @@ $aFieldParam = [
 
     <div class="col-sm-6 col-sm-offset-3">
     <?= $form->field($model, 'msg_mark')->radioList($model->aMark) // , ['labelOptions' => ['style'=>'font-size: 1.4em;']] ?>
-    <?= $form->field($model, 'testemail')->textInput(['maxlength' => 64])->hint('Для проверки авторства обращения укажите Ваш email, который был указан при направлении обращения.<span style="color: #f0f0f0">' . $model->msg_pers_email . '</span>') // , на который пришло оповещение об ответе ?>
+    <?= $form->field($model, 'testemail')->textInput(['maxlength' => 64, 'style'=>'width: 120px;'])->hint('Для проверки авторства обращения укажите проверочный код, который указан в письме об ответе на обращение.<span style="color: #f0f0f0">' . $model->getTestCode() . '</span>') // , на который пришло оповещение об ответе ?>
     <div id="id-marktext" style="display: none;">
     <?= $form->field($model, 'marktext')->textarea(['rows' => 4])->hint('Укажите, что именно Вас не устраивает в ответе.') ?>
     <?= $form

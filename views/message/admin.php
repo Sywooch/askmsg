@@ -158,6 +158,9 @@ EOT;
                                . $sColor
                                . '; font-size: 1.25em;"></span></a>';
                     }
+                    else {
+                        $sMark = Html::a('.', $model->getMarkUrl(), ['style'=>'display: none;']);
+                    }
                     return $sMark . '<span class="glyphicon glyphicon-'.$model->flag->fl_glyth.'" style=" margin-right: 1.25em; color: '.$model->flag->fl_glyth_color.'; font-size: 1.25em;"></span>' //  font-size: 1.25em;
                     . '<span class="inline">' . $model->flag->fl_sname . '</span>'; //  . ' ' . $model->msg_flag
                 },
