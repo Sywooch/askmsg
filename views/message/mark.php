@@ -211,7 +211,7 @@ $aFieldParam = [
     </div>
     </div>
     <div class="col-sm-9 col-sm-offset-3">
-    <?= Html::submitButton('Отправить оценку', ['class' => 'btn btn-success']) // btn-block ?>
+    <?= Html::submitButton('Отправить', ['class' => 'btn btn-success']) // btn-block ?>
     <?= '' // Html::submitButton('Оценить ответ и написать обращение по ответу ', ['class' => 'btn btn-success', 'id'=>'id-button-new-message', 'name'=>'addmsg']) // btn-block, 'style'=>'display: none;' ?>
     </div>
 
