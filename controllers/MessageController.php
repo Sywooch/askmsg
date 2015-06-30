@@ -422,7 +422,9 @@ class MessageController extends Controller
                     );
                 }
                 else {
-                    return $this->redirect(['moderatelist']);
+                    if( !isset($_POST['savebutton']) ) {
+                        return $this->redirect(['moderatelist']);
+                    }
                 }
             }
 

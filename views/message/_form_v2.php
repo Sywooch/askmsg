@@ -966,7 +966,7 @@ endif; // if( $isModerate ):
                         );
                     ?>
             <div class="col-sm-3">
-                    <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success btn-block']) ?>
+                    <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success btn-block', 'name' => 'savebutton']) ?>
             </div>
 
 
