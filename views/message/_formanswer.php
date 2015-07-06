@@ -110,7 +110,13 @@ $aFieldParam = [
 
     <?php
         if( $model->msg_answer == '' ) {
-            $model->msg_answer = 'Уважаемая(-ый) ' . $model->getShortName() . "!\n\nС уважением, " . Yii::$app->user->identity->getFullName() . '.';
+            $model->msg_answer = 'Уважаем'
+                . ($model->tryGender() == 'ж' ? 'ая' : 'ый')
+                . ' '
+                . $model->getShortName()
+                . "!\n\nС уважением, "
+                . Yii::$app->user->identity->getFullName()
+                . '.';
         }
 
         // Фокус на редактор помещаем

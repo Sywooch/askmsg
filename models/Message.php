@@ -268,6 +268,7 @@ class Message extends \yii\db\ActiveRecord
         $aFlagsToAnswer = [Msgflags::MFLG_INT_INSTR, Msgflags::MFLG_INT_REVIS_INSTR, Msgflags::MFLG_SHOW_INSTR,Msgflags::MFLG_SHOW_REVIS,];
         return [
             [['msg_pers_text'], 'filter', 'on'=>'person', 'filter' => function($val){ return strip_tags($val, '<p><br>');  }, ], // в пользовательском вводе удаляем теги
+            [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', ], 'filter', 'on'=>'person', 'filter' => function($val){ return strip_tags($val);  }, ],
 
             [['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_region', 'msg_mark', 'testemail'], 'required'],
             [['msg_answer'], 'required', 'on' => 'answer', ],
@@ -305,6 +306,7 @@ class Message extends \yii\db\ActiveRecord
                 'pattern' => '|^[А-Яа-яЁё]{2}[-А-Яа-яЁё\\s]*$|u', 'message' => 'Допустимы символы русского алфавита',
                 'when' => function($model) { return ($this->scenario != 'importdata'); },
             ],
+            [['msg_pers_name', ], 'filterUserName', 'on' => 'person', ],
             [['msg_pers_phone', ], 'match',
                 'pattern' => '|^\\+7\\([\\d]{3}\\)\s+[\\d]{3}-[\\d]{2}-[\\d]{2}$|', 'message' => 'Нужно указать правильный телефон',
             ],
@@ -319,6 +321,19 @@ class Message extends \yii\db\ActiveRecord
                 'whenClient' => "function (attribute, value) { return [".implode(',', $aFlagsToAnswer)."].indexOf(parseInt($('#".Html::getInputId($this, 'msg_flag') ."').val())) != -1 ;}"
             ]
         ];
+    }
+
+    /**
+     * Проверка на одно и тоже слово в полях ФИО
+     *
+     * @param $attribute
+     * @param $params
+     */
+    public function filterUserName($attribute, $params) {
+        if( ($this->msg_pers_name == $this->msg_pers_secname)
+         && ($this->msg_pers_name == $this->msg_pers_lastname) ) {
+            $this->addError($attribute, 'Неправильное имя');
+        }
     }
 
     public function setupEkisData($attribute, $params) {
@@ -1160,4 +1175,38 @@ class Message extends \yii\db\ActiveRecord
     }
 
 
+    public function tryGender() {
+        $sEnc = 'UTF-8';
+        $sname = mb_strtolower($this->msg_pers_name, $sEnc);
+        $ssecname = mb_strtolower($this->msg_pers_secname, $sEnc);
+        $slastname = mb_strtolower($this->msg_pers_lastname, $sEnc);
+        $slast = mb_substr($sname, -1, 1, $sEnc);
+        $g = '';
+        if( ($slast == 'а') || ($slast == 'я') ) {
+            $g = 'ж';
+            if( in_array($sname, ['ваня', 'петя', 'саня', 'сеня', 'илья', ]) ) {
+                $g = 'м';
+            }
+        }
+        else if( $slast == 'и' ) {
+            $g = 'м';
+            if( (mb_substr($ssecname, -1, 1, $sEnc) == 'а') || (mb_substr($slastname, -1, 1, $sEnc) == 'а') ) {
+                $g = 'ж';
+            }
+        }
+        else if( $sname == 'любовь' ) {
+            $g = 'ж';
+        }
+        else {
+            $g = 'м';
+            if( (mb_substr($ssecname, -1, 1, $sEnc) == 'а') || (mb_substr($slastname, -1, 1, $sEnc) == 'а') ) {
+                $g = 'ж';
+            }
+            else if( in_array($sname, ['айсель', 'мелине', 'набат', 'наринэ', 'армине', 'гузель', 'биргюль', 'марине', ]) ) {
+                $g = 'ж';
+            }
+        }
+
+        return $g;
+    }
 }

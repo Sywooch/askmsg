@@ -11,6 +11,7 @@ use app\models\Usergroup;
 use Yii;
 use yii\console\Controller;
 use app\models\User;
+use app\models\Message;
 
 /**
  * This command echoes the first argument that you have entered.
@@ -76,6 +77,48 @@ class HelloController extends Controller
             if( !$orole->save() ) {
                 $s = 'Error save init admin: ' . print_r($model->getErrors());
             }
+        }
+    }
+
+    public function actionGender() {
+//        print_r(iconv_get_encoding());
+//        return;
+        $q = Message::find()->where('msg_id > 0');
+        $sEnc = 'UTF-8';
+        $a = [];
+        $nCou = 300;
+        /** @var Message $ob */
+        foreach($q->each() As $ob) {
+            $sG = $ob->tryGender();
+            $s = $ob->getFullName() . ' ' . $sG . "\n";
+            $sname = mb_strtolower($ob->msg_pers_name, $sEnc);
+
+            if( isset($a[$sname]) ) {
+                $a[$sname]['cou']++;
+                $a[$sname]['f'] .= "\n" . $ob->getFullName();
+//                echo 'Inc ' . iconv('UTF-8', 'CP866', $sname) . ' ' . $a[$sname]['cou'] . "\n";
+            }
+            else {
+                $a[$sname] = ['cou' => 1, 'g' => $sG, 'name' => $sname, 'f' => $ob->getFullName()];
+//                echo 'Add ' . iconv('UTF-8', 'CP866', $sname) . "\n";
+            }
+//            if( 'айсулуу' == $sname ) {
+//                echo iconv('UTF-8', 'CP866', $s);
+//            }
+            // echo iconv('UTF-8', 'WINDOWS-1251', $s);
+//            echo iconv('UTF-8', 'CP866', $s);
+//            if( $nCou-- == 0 ) {
+//                break;
+//            }
+        }
+        usort($a, function($a, $b){ return strcmp(sprintf("%s-%05d", $a['g'], $a['cou']), sprintf("%s-%05d", $b['g'], $b['cou'])); });
+//            $a['g'] > $b['g']) || ($a['cou'] > $b['cou']); });
+        foreach($a As $v) {
+            if( $v['cou'] != 2 || $v['g'] != 'м' ) {
+                continue;
+            }
+            $s = $v['name'] . ' ' . $v['g'] . ' ' . $v['cou'] . ($v['cou'] == 2 && $v['g'] == 'м' ? $v['f'] : '') . "\n";
+            echo iconv('UTF-8', 'CP866', $s);
         }
     }
 }
