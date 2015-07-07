@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "96390dd217bcb5f2b557f2907973d740",
+    "hash": "6e3ee58c35b4d2759ed3244590d05ea9",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
@@ -622,7 +622,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kartik-v/yii2-datecontrol/zipball/e64aec336c3fc8eb22e056749a6cc35e18997e19",
+                "url": "https://api.github.com/repos/kartik-v/yii2-datecontrol/zipball/16d34bcbebee43f494b0dd5034d45796d3cef826",
                 "reference": "e64aec336c3fc8eb22e056749a6cc35e18997e19",
                 "shasum": ""
             },
@@ -813,7 +813,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kartik-v/yii2-mpdf/zipball/b73e05b72ebaa05de904bd88c0a703eb4ee38f16",
+                "url": "https://api.github.com/repos/kartik-v/yii2-mpdf/zipball/f65fe859e01374545276d40428d6ff75e4985050",
                 "reference": "b73e05b72ebaa05de904bd88c0a703eb4ee38f16",
                 "shasum": ""
             },
@@ -1743,7 +1743,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kartik-v/yii2-widgets/zipball/ec147a73b5d4f4a20aaaea2ae2c63e6a0cb0bfa7",
+                "url": "https://api.github.com/repos/kartik-v/yii2-widgets/zipball/b7eb84987a1bb55e227f6bf148a8322ec553a427",
                 "reference": "ec147a73b5d4f4a20aaaea2ae2c63e6a0cb0bfa7",
                 "shasum": ""
             },
@@ -1794,6 +1794,46 @@
                 "yii2"
             ],
             "time": "2015-02-26 16:21:10"
+        },
+        {
+            "name": "mosedu/yii2-multirows",
+            "version": "1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mosedu/yii2-multirows.git",
+                "reference": "322cad3beb530460464dde488bb5a33246225880"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mosedu/yii2-multirows/zipball/322cad3beb530460464dde488bb5a33246225880",
+                "reference": "322cad3beb530460464dde488bb5a33246225880",
+                "shasum": ""
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "mosedu\\multirows\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Victor Kozmin",
+                    "email": "promcalc@gmail.com",
+                    "homepage": "http://zeltorg.ru/"
+                }
+            ],
+            "description": "Widget to show dynamicaly add new form rows with model fields.",
+            "keywords": [
+                "dynamic",
+                "multirows",
+                "widget",
+                "yii2"
+            ],
+            "time": "2015-05-22 13:56:36"
         },
         {
             "name": "nategood/httpful",
@@ -2130,7 +2170,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tecnickcom/TCPDF/zipball/a2e8f5b505a7a14a4ed960313c4baf699fd1f4bb",
+                "url": "https://api.github.com/repos/tecnickcom/TCPDF/zipball/fa6ab8a1e1fbabb9e6cfd2f807514fa1497240e4",
                 "reference": "a2e8f5b505a7a14a4ed960313c4baf699fd1f4bb",
                 "shasum": ""
             },

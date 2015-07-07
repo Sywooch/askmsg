@@ -44,7 +44,8 @@
         "kartik-v/yii2-mpdf": "dev-master",
         "tecnick.com/tcpdf": "dev-master",
         "dompdf/dompdf": "dev-master",
-        "phpoffice/phpword": "dev-master"
+        "phpoffice/phpword": "dev-master",
+        "mosedu/yii2-multirows": "*"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",

@@ -330,9 +330,11 @@ class Message extends \yii\db\ActiveRecord
      * @param $params
      */
     public function filterUserName($attribute, $params) {
+        Yii::info('filterUserName('.$attribute.'): ' . $this->msg_pers_name . $this->msg_pers_secname . $this->msg_pers_lastname);
         if( ($this->msg_pers_name == $this->msg_pers_secname)
          && ($this->msg_pers_name == $this->msg_pers_lastname) ) {
             $this->addError($attribute, 'Неправильное имя');
+            Yii::info('filterUserName('.$attribute.'): error');
         }
     }
 
