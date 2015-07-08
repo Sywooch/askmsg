@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Message;
 use Yii;
 use app\models\Notificateact;
 use app\models\NotificateactSearch;
@@ -13,6 +14,8 @@ use yii\web\Response;
 use app\models\Rolesimport;
 use app\models\Msgflags;
 use mosedu\multirows\MultirowsBehavior;
+use app\models\MessageSearch;
+use app\components\SwiftHeaders;
 
 /**
  * NotificateactController implements the CRUD actions for Notificateact model.
@@ -27,7 +30,7 @@ class NotificateactController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'process', /*'create', 'view', 'update', 'delete', 'admin', */],
+                        'actions' => ['index', 'process', 'send', /*'create', 'view', 'update', 'delete', 'admin', */],
                         'roles' => [Rolesimport::ROLE_MODERATE_DOGM],
                     ],
                 ],
@@ -96,7 +99,73 @@ class NotificateactController extends Controller
     public function actionProcess()
     {
         $aActions = Notificateact::find()->where('true')->orderBy('ntfd_message_age')->all();
-        return $this->findMessages($aActions);
+        $searchModel = new MessageSearch();
+        $dataProvider = $searchModel->searchNotificate(Yii::$app->request->queryParams, $this->findMessages($aActions));
+
+        return $this->render('//message/notifylist', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    /**
+     *
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionSend()
+    {
+        $aErr = [];
+        $id = Yii::$app->request->post('id', 0);
+        /** @var Message $model */
+        $model = Message::find()->with('employee', 'curator')->where(['msg_id' => $id])->one();
+//        Yii::info('actionSend(): id = ' . $id . ' model = ' . ($model === null ? 'null' : $model->msg_id));
+
+        if( $model !== null ) {
+            $days = Notificateact::getAdge($model->msg_createtime);
+            $aAct = Notificateact::find()->where('ntfd_message_age = '.$days)->all();
+            $user = Yii::$app->user->identity;
+            $aMessages = [];
+            /** @var Notificateact $ob */
+            foreach($aAct As $ob) {
+//                Yii::info('actionSend(): Act = ' . $ob->ntfd_operate);
+                $sTemplate = 'notificate_' . $ob->ntfd_operate;
+                $email = '';
+                if( ($ob->ntfd_operate == Notificateact::ACTI_EMAIL_EPLOEE) && ($model->employee !== null) ) {
+                    $email = $model->employee->us_email;
+                }
+                else if( ($ob->ntfd_operate == Notificateact::ACTI_EMAIL_CONTROLER) && ($model->curator !== null) ) {
+                    $email = $model->curator->us_email;
+                }
+                else if( $ob->ntfd_operate == Notificateact::ACTI_EMAIL_MODERATOR ) {
+                    $email = $user->us_email;
+                }
+//                Yii::info('actionSend(): email = ' . $email);
+                if( $email != '' ) {
+                    $oMsg = Yii::$app->mailer->compose($sTemplate, ['model' => $model, 'user' => $user, ])
+                        ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+                        ->setTo($email)
+                        ->setSubject('Напоминание об обращении №' . $model->msg_id . ' от ' . date('d.m.Y', strtotime($model->msg_createtime)));
+
+                    SwiftHeaders::setAntiSpamHeaders($oMsg, ['email' => Yii::$app->params['supportEmail']]);
+                    $aMessages[] = $oMsg;
+                }
+                else {
+                    Yii::info('actionSend(): Error Not found email ['.$id.'] for act [' . $ob->ntfd_operate . ']');
+//                    $aErr['error'] = ['message' => 'Not found email ['.$id.'] for act [' . $ob->ntfd_operate . ']'];
+                }
+            }
+            if( count($aMessages) > 0 ) {
+//                Yii::info('actionSend(): count(aMessages) = ' . count($aMessages));
+                Yii::$app->mailer->sendMultiple($aMessages);
+                $aErr['data'] = ['message' => 'Message ' . $id . ' send ' . count($aMessages) . ' emails'];
+            }
+        }
+        else {
+            $aErr['error'] = ['message' => 'Not found message ['.$id.']'];
+        }
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return $aErr; // $_POST;
     }
 
     /**
@@ -250,8 +319,11 @@ class NotificateactController extends Controller
      * @param array $aActions Notificateact
      */
     public function findMessages($aActions) {
-        $tToday = mktime(0, 0, 0);
-        $n24 = 86400; // 24 * 3600
+//        $n24 = 86400; // 24 * 3600
+//        $tToday = mktime(0, 0, 0);
+//        $tToday = mktime(0, 0, 0, 3, date("j"), date('Y')) - $n24;
+        $tToday = Notificateact::getToday();
+
         /** @var Notificateact $ob */
         $sWhere = '';
         $aFlags = [
@@ -264,11 +336,12 @@ class NotificateactController extends Controller
 
         ];
         foreach($aActions As $ob) {
-            $t1 = $tToday - $ob->ntfd_message_age * $n24;
-            $t2 = $t1 + $n24;
+            $t1 = $tToday - $ob->ntfd_message_age * Notificateact::DAY_DURATION;
+            $t2 = $t1 + Notificateact::DAY_DURATION;
             $sWhere .= ($sWhere == '' ? '' : ' Or ') . '(msg_createtime >= \''.date('Y-m-d H:i:s', $t1).'\' And msg_createtime < \''.date('Y-m-d H:i:s', $t2).'\' /* '.$ob->ntfd_message_age.' */ )';
         }
         $sWhere = "({$sWhere}) And msg_flag In (" . implode(',', $aFlags) . ")";
+        Yii::info('findMessages(): ' . $sWhere);
         return $sWhere;
     }
 }

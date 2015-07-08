@@ -40,7 +40,7 @@ class Notificatelog extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'ntflg_id' => 'Ntflg ID',
+            'ntflg_id' => 'id',
             'ntflg_msg_id' => 'Обращение',
             'ntflg_ntfd_id' => 'Действие',
             'ntflg_notiftime' => 'Дата действия',

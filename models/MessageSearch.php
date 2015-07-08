@@ -138,6 +138,7 @@ class MessageSearch extends Message
 
         return $this->search(null);
     }
+
     /**
      * Creates data provider instance with search query applied
      *
@@ -532,4 +533,49 @@ class MessageSearch extends Message
         return $aRet;
     }
 
-}
+
+    /**
+     * Creates data provider instance with search query applied
+     *
+     * @param array $params
+     *
+     * @return ActiveDataProvider
+     */
+    public function searchNotificate($params, $sWhere = '')
+    {
+        if ($params !== null) {
+            $this->load($params);
+        }
+
+        $aScenario = $this->scenarios();
+
+        $query = Message::find()
+            ->with('employee')
+            ->with('curator')
+            ->with('answers')
+            ->with('alltags')
+            ->with('flag');
+
+        $query->andWhere($sWhere);
+//        $query->andFilterWhere($sWhere);
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'sort' => [
+                'defaultOrder' => [
+                    'msg_createtime' => SORT_ASC
+                ]
+            ],
+            'pagination' => [
+                'defaultPageSize' => 50,
+                'pageSize' => 50,
+            ],
+
+        ]);
+
+        return $dataProvider;
+
+    }
+
+
+    }
