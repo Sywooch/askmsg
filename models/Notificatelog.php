@@ -46,4 +46,26 @@ class Notificatelog extends \yii\db\ActiveRecord
             'ntflg_notiftime' => 'Дата действия',
         ];
     }
+
+    /**
+     * @param $msgId
+     * @throws \yii\db\Exception
+     */
+    public static function addNotify($msgId) {
+        $sSql = 'Update ' . self::tableName() . ' Set ntflg_msg_id = ' . $msgId . ', ntflg_notiftime = NOW() Where ntflg_msg_id = 0 Limit 1';
+        $command = Yii::$app->db->createCommand($sSql);
+        if( $command->execute() == 0 ) {
+            $sSql = 'Insert Into ' . self::tableName() . ' (ntflg_msg_id, ntflg_notiftime) values (' . $msgId . ',  NOW())';
+            Yii::$app->db->createCommand($sSql)->execute();
+        }
+    }
+
+    /**
+     * @throws \yii\db\Exception
+     */
+    public static function clearNotify() {
+        $sSql = 'Update ' . self::tableName() . ' Set ntflg_msg_id = 0, ntflg_notiftime = NULL Where ntflg_notiftime <> DATE(NOW()) And ntflg_msg_id Is Not Null';
+        Yii::$app->db->createCommand($sSql)->execute();
+    }
+
 }

@@ -16,6 +16,7 @@ use app\models\Msgflags;
 use mosedu\multirows\MultirowsBehavior;
 use app\models\MessageSearch;
 use app\components\SwiftHeaders;
+use app\models\Notificatelog;
 
 /**
  * NotificateactController implements the CRUD actions for Notificateact model.
@@ -125,7 +126,7 @@ class NotificateactController extends Controller
             $days = Notificateact::getAdge($model->msg_createtime);
             $aAct = Notificateact::find()->where('ntfd_message_age = '.$days)->all();
             $user = Yii::$app->user->identity;
-            $aMessages = [];
+            $aEmails = [];
             /** @var Notificateact $ob */
             foreach($aAct As $ob) {
 //                Yii::info('actionSend(): Act = ' . $ob->ntfd_operate);
@@ -148,17 +149,19 @@ class NotificateactController extends Controller
                         ->setSubject('Напоминание об обращении №' . $model->msg_id . ' от ' . date('d.m.Y', strtotime($model->msg_createtime)));
 
                     SwiftHeaders::setAntiSpamHeaders($oMsg, ['email' => Yii::$app->params['supportEmail']]);
-                    $aMessages[] = $oMsg;
+                    $aEmails[] = $oMsg;
                 }
                 else {
                     Yii::info('actionSend(): Error Not found email ['.$id.'] for act [' . $ob->ntfd_operate . ']');
 //                    $aErr['error'] = ['message' => 'Not found email ['.$id.'] for act [' . $ob->ntfd_operate . ']'];
                 }
             }
-            if( count($aMessages) > 0 ) {
-//                Yii::info('actionSend(): count(aMessages) = ' . count($aMessages));
-                Yii::$app->mailer->sendMultiple($aMessages);
-                $aErr['data'] = ['message' => 'Message ' . $id . ' send ' . count($aMessages) . ' emails'];
+            if( count($aEmails) > 0 ) {
+//                Yii::info('actionSend(): count(aEmails) = ' . count($aEmails));
+                Notificatelog::clearNotify();
+                Notificatelog::addNotify($id);
+                Yii::$app->mailer->sendMultiple($aEmails);
+                $aErr['data'] = ['message' => 'Message ' . $id . ' send ' . count($aEmails) . ' emails'];
             }
         }
         else {

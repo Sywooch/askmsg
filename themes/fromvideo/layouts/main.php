@@ -64,6 +64,34 @@ if( $isAdmin || $isModerate ) {
 if( $isAdmin || $isAnswer ) {
     $aMenuItems[] = ['label' => 'Отвечать', 'url' => ['message/answerlist']];
 }
+
+if( $isAdmin || $isModerate ) {
+    $aMenuItems[] = [
+        'label' => ' ', // <span class="glyphicon glyphicon-triangle-bottom"></span>
+//        'url' => ['message/moderatelist'],
+        'items' => [
+            ['label' => 'Список оповещений', 'url' => ['notificateact/index'], 'options' => ['class' => 'nocommonclass'], ],
+            ['label' => 'Оповестить исполнителей', 'url' => ['notificateact/process'], 'options' => ['class' => 'nocommonclass'], ],
+//            '<li class="divider"></li>',
+//            '<li class="dropdown-header">Dropdown Header</li>',
+//            ['label' => 'Level 1 - Dropdown B', 'url' => '#'],
+        ],
+    ];
+}
+/*
+<li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Action</a></li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else here</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="#">Separated link</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="#">One more separated link</a></li>
+          </ul>
+        </li>
+*/
 /*
 $aMenuItems[] = Yii::$app->user->isGuest ?
     ['label' => 'Вход', 'url' => ['/site/login']] :

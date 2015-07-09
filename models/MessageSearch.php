@@ -554,7 +554,10 @@ class MessageSearch extends Message
             ->with('curator')
             ->with('answers')
             ->with('alltags')
-            ->with('flag');
+            ->with('flag')
+            ->joinWith('notifylog')
+            ->andWhere(Notificatelog::tableName() . '.ntflg_id Is Null');
+            /*->where('notifylog')*/;
 
         $query->andWhere($sWhere);
 //        $query->andFilterWhere($sWhere);

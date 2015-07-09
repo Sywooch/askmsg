@@ -167,3 +167,18 @@ span.description {
     color: #333333;
     text-decoration: none;
 }
+
+#head ul.menu li.nocommonclass.active {
+    background-color: transparent;
+    background-image: none;
+}
+
+#head ul.menu li.nocommonclass.active a {
+    color: #2e6da4;
+}
+
+.dropdown-menu > .nocommonclass > a{
+    background-color: transparent;
+    background-image: none;
+}
+

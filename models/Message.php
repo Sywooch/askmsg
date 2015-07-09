@@ -25,6 +25,7 @@ use app\components\NotificateBehavior;
 use Httpful\Request;
 use Httpful\Response;
 use app\components\RustextValidator;
+use app\models\Notificatelog;
 
 /**
  * This is the model class for table "{{%message}}".
@@ -630,6 +631,16 @@ class Message extends \yii\db\ActiveRecord
     public function setAlltags($tags)
     {
         $this->alltags = $tags;
+    }
+
+    /**
+     *  Связь с табличкой, хранящей лог оповещений
+     */
+    public function getNotifylog() {
+        return $this->hasOne(
+            Notificatelog::className(),
+            ['ntflg_msg_id' => 'msg_id']
+        );
     }
 
     /**
