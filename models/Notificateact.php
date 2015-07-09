@@ -112,8 +112,8 @@ class Notificateact extends \yii\db\ActiveRecord
      */
     public static function getToday() {
         if( self::$_todayTime === null ) {
-//            self::$_todayTime = mktime(0, 0, 0);
-            self::$_todayTime = mktime(0, 0, 0, 3, date("j"), date('Y')) - self::DAY_DURATION;
+            self::$_todayTime = mktime(0, 0, 0);
+//            self::$_todayTime = mktime(0, 0, 0, 3, date("j"), date('Y')) - self::DAY_DURATION;
         }
         return self::$_todayTime;
     }

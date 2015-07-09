@@ -343,6 +343,9 @@ class NotificateactController extends Controller
             $t2 = $t1 + Notificateact::DAY_DURATION;
             $sWhere .= ($sWhere == '' ? '' : ' Or ') . '(msg_createtime >= \''.date('Y-m-d H:i:s', $t1).'\' And msg_createtime < \''.date('Y-m-d H:i:s', $t2).'\' /* '.$ob->ntfd_message_age.' */ )';
         }
+        if( $sWhere == '' ) {
+            $sWhere = false;
+        }
         $sWhere = "({$sWhere}) And msg_flag In (" . implode(',', $aFlags) . ")";
         Yii::info('findMessages(): ' . $sWhere);
         return $sWhere;
