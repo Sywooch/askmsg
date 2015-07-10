@@ -158,7 +158,7 @@ $this->registerJs($sJs, View::POS_READY, 'toggleuserpart');
         <div class="clearfix"></div>
     </div>
 
-    <div class="panel-body hidemoretext">
+    <div class="panel-body hidemoretext" style="padding-bottom: 32px;">
         <?php
         if( $isDopFields ) :
         ?>
