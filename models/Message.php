@@ -288,7 +288,7 @@ class Message extends \yii\db\ActiveRecord
             [['file'], 'safe'],
             [['file'], 'file', 'maxFiles' => $fileCount, 'maxSize' => Yii::$app->params['message.file.maxsize'], 'extensions' => Yii::$app->params['message.file.ext']],
 //            [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}')), 'allowArray' => true],
-            [['ekis_id'], 'setupEkisData', 'on'=>'person',],
+            [['ekis_id'], 'setupEkisData', 'on'=>['person', 'moderator'],],
             [['msg_id', 'msg_active', 'msg_pers_region', 'msg_empl_id', 'msg_flag', 'msg_subject', 'ekis_id', 'msg_curator_id', 'msg_mark'], 'integer'],
             [['msg_mark'], 'in', 'range' => array_keys($this->aMark), ],
             [['marktext'], 'required', 'when' => function($model){ return $model->msg_mark == 0; }, ],
