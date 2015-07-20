@@ -395,7 +395,7 @@ class MessageSearch extends Message
                 date('Y-m-d H:i:s', mktime(0, 0, 0, intval($a[2]), intval($a[1]), intval($a[3]))),
                 date('Y-m-d H:i:s', mktime(0, 0, 0, intval($a[5]), intval($a[4]), intval($a[6]))),
             ];
-//            Yii::info('getDatePeriod('.$name.') : ' . $sData . ' -> ' . print_r($aRet, true));
+            Yii::info('getDatePeriod('.$name.') : ' . $sData . ' -> ' . print_r($aRet, true));
         }
         else {
 //            Yii::info('getDatePeriod('.$name.') : ' . $sData . ' -> no period');
