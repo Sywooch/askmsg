@@ -283,7 +283,7 @@ class Message extends \yii\db\ActiveRecord
             [['msg_createtime', 'msg_answertime'], 'safe'],
             [['msg_flag'], 'required'],
 //            [['answers'], 'safe'],
-            [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}')), 'allowArray' => true],
+            [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, ['us_active' => User::STATUS_ACTIVE], '{{val}}')), 'allowArray' => true],
             [['alltags'], 'in', 'range' => ($this->scenario != 'importdata') ? array_keys(ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_title')) : [], 'allowArray' => true],
             [['file'], 'safe'],
             [['file'], 'file', 'maxFiles' => $fileCount, 'maxSize' => Yii::$app->params['message.file.maxsize'], 'extensions' => Yii::$app->params['message.file.ext']],

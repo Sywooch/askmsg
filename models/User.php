@@ -452,28 +452,41 @@ class User extends ActiveRecord  implements IdentityInterface
      *  Поиск пользователей по их группе
      *
      * @param integer $idGroup
-     * @param string $sQuery
+     * @param string|array $sQuery
      * @param string $format
      * @return array
      *
      */
     public static function getGroupUsers($idGroup, $sQuery = '', $format = '') {
-        $sKey = $idGroup .  $sQuery . $format;
+        $sKey = str_replace(["\n", "\r", ' ',], ['', '', '',], $idGroup .  '_' . (is_array($sQuery) ? print_r($sQuery, true): $sQuery) . '_' . $format);
+//        Yii::info('getGroupUsers(): sKey = '.$sKey);
         if( isset(self::$_cache[$sKey]) ) {
+//            Yii::info('getGroupUsers(): return self::_cache['.$sKey.']');
             return self::$_cache[$sKey];
         }
+//        Yii::info('getGroupUsers(): sQuery = ' . print_r($sQuery, true));
+//        Yii::info('getGroupUsers(): debug_backtrace = ' . print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 6), true));
 
         $aWhere = [
-            'usgr_gid' => $idGroup,
-            'us_active' => self::STATUS_ACTIVE,
+            'usgr_gid' => $idGroup
         ];
-        if( $sQuery !== '' ) {
-            $aWhere = array_merge(
-                ['and'],
+
+        if( is_string($sQuery) && ($sQuery !== '') ) {
+            $aWhere = [
+                'and',
                 $aWhere,
 //                ['or', ['like', 'us_lastname', $sQuery], ['like', 'us_name', $sQuery], ['like', 'us_secondname', $sQuery]],
                 ['like', 'us_lastname', $sQuery]
-            );
+            ];
+//            Yii::info('getGroupUsers(): string aWhere = ' . print_r($aWhere, true));
+        }
+        else if( is_array($sQuery) ) {
+            $aWhere = [
+                'and',
+                $aWhere,
+                $sQuery
+            ];
+//            Yii::info('getGroupUsers(): array aWhere = ' . print_r($aWhere, true));
         }
 
         $aUsers =  User::find()

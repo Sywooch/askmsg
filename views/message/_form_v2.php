@@ -292,7 +292,7 @@ EOT;
 $this->registerJs($sJs, View::POS_READY, 'jqueryfiler');
 
 // $aAnsw = User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}');
-$aAnsw = User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', "{{val}}\n{{pos}}");
+$aAnsw = User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, ['or', ['us_active' => User::STATUS_ACTIVE], ['us_id' => $model->msg_empl_id]], "{{val}}\n{{pos}}");
 
 $aFieldParam = [
     'answer' => [

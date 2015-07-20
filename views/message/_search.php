@@ -121,7 +121,8 @@ if( !isset($action) ) {
 
     <div class="col-sm-4">
     <?php
-    $aAnsw = User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}');
+//    $aAnsw = User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}');
+    $aAnsw = User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', "{{val}}\n{{pos}}");
     ?>
 
     <?= $form
@@ -132,6 +133,15 @@ if( !isset($action) ) {
             'options' => ['placeholder' => 'Выберите из списка ...'],
             'pluginOptions' => [
                 'allowClear' => true,
+                'formatResult' => new JsExpression('function(object, container, query, escapeMarkup){
+                    var markup=[], aLines = object.text.split("\\n");
+                    window.Select2.util.markMatch(aLines[0], query.term, markup, escapeMarkup);
+                    return markup.join("") + "\\n<span class=\\"description\\">"+escapeMarkup(aLines[1])+"</span>";
+                }'),
+                'formatSelection' => new JsExpression('function (data, container, escapeMarkup) {
+                    var aLines = data ? data.text.split("\\n") : [];
+                    return data ? escapeMarkup(aLines[0]) : undefined;
+                }'),
             ],
             'pluginEvents' => [
 //                        'change' => 'function(event) { jQuery("#'.Html::getInputId($model, 'msg_empl_id').'").val(event.val); console.log("change", event); }',
