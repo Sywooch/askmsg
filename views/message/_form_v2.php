@@ -291,7 +291,8 @@ $('#message-file').filer({
 EOT;
 $this->registerJs($sJs, View::POS_READY, 'jqueryfiler');
 
-$aAnsw = User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}');
+// $aAnsw = User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}');
+$aAnsw = User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', "{{val}}\n{{pos}}");
 
 $aFieldParam = [
     'answer' => [
@@ -299,8 +300,34 @@ $aFieldParam = [
         'language' => 'ru',
         'options' => ['placeholder' => 'Выберите из списка ...'],
         'pluginOptions' => [
+//            'data' => $aAnsw,
             'allowClear' => true,
-//                        'formatResult' => new JsExpression('function(object, container, query){ console.log("format: ", object, container, query); container.append(object.text);  }'),
+            'formatResult' => new JsExpression('function(object, container, query, escapeMarkup){
+//                console.log("format: ", object, container, query);
+                var markup=[], aLines = object.text.split("\\n");
+                window.Select2.util.markMatch(aLines[0], query.term, markup, escapeMarkup);
+                return markup.join("") + "\\n<span class=\\"description\\">"+escapeMarkup(aLines[1])+"</span>";
+            }'),
+            'formatSelection' => new JsExpression('function (data, container, escapeMarkup) {
+                var aLines = data ? data.text.split("\\n") : [];
+//                console.log("formatSelection: ", data, container);
+                return data ? escapeMarkup(aLines[0]) : undefined;
+            }'),
+            /*
+                    // <span class="description">
+            formatResult: function(result, container, query, escapeMarkup) {
+                var markup=[];
+                markMatch(this.text(result), query.term, markup, escapeMarkup);
+                return markup.join("");
+            },
+        text = function (item) { return ""+item.text; };
+        util: {
+            debounce: debounce,
+            markMatch: markMatch,
+            escapeMarkup: defaultEscapeMarkup,
+            stripDiacritics: stripDiacritics
+        },
+            */
         ],
         'pluginEvents' => [
                         'change' => 'function(event) {
@@ -321,6 +348,15 @@ $aFieldParam = [
         ],
         'pluginOptions' => [
             'allowClear' => true,
+            'formatResult' => new JsExpression('function(object, container, query, escapeMarkup){
+                    var markup=[], aLines = object.text.split("\\n");
+                    window.Select2.util.markMatch(aLines[0], query.term, markup, escapeMarkup);
+                    return markup.join("") + "\\n<span class=\\"description\\">"+escapeMarkup(aLines[1])+"</span>";
+            }'),
+            'formatSelection' => new JsExpression('function (data, container, escapeMarkup) {
+                var aLines = data ? data.text.split("\\n") : [""];
+                return data ? escapeMarkup(aLines[0]) : undefined;
+            }'),
         ],
     ],
     'tags' => [
