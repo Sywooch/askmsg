@@ -25,6 +25,10 @@ echo $format;
 echo ' ' . $dataProvider->pagination->pageCount;
 echo ' ' . $dataProvider->pagination->totalCount;
 
+$nMaxCount = $dataProvider->pagination->totalCount;
+
+Yii::info('export-wt : ' . $format. ' ' . $dataProvider->pagination->pageCount . ' ' . $dataProvider->pagination->totalCount);
+
 $objPHPExcel = new PHPExcel();
 $oSheet = $objPHPExcel->getSheet(0);
 
