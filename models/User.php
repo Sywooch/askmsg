@@ -463,7 +463,10 @@ class User extends ActiveRecord  implements IdentityInterface
             return self::$_cache[$sKey];
         }
 
-        $aWhere = ['usgr_gid' => $idGroup];
+        $aWhere = [
+            'usgr_gid' => $idGroup,
+            'us_active' => self::STATUS_ACTIVE,
+        ];
         if( $sQuery !== '' ) {
             $aWhere = array_merge(
                 ['and'],
