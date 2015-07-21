@@ -135,23 +135,23 @@ $sGridId = 'natificateMessageList';
                 'content' => function ($model, $key, $index, $column) {
                     $sEmpl = '';
                     if( $model->msg_empl_id !== null ) {
-                        $sEmpl = Html::encode($model->employee->getFullName())
+                        $sEmpl = Html::encode($model->employee->getFullName())/*
                                . ' '
                                . Html::a(
                                     '<span class="glyphicon glyphicon-search inlineblock"></span>',
                                     '?MessageSearch[msg_empl_id]=' . $model->msg_empl_id . Msgflags::makeSearchString('MessageSearch[msg_flag]'),
                                     ['title'=>'Поиск ответов исполнителя']
-                               );
+                               )*/;
                     }
                     return Html::encode($model->getFullName())
-                        . ' '
+/*                        . ' '
                         . Html::a(
                             '<span class="glyphicon glyphicon-search inlineblock"></span>',
                             '?MessageSearch[msg_pers_lastname]='
                                 . rawurlencode($model->getFullName())
                                 . Msgflags::makeSearchString('MessageSearch[msg_flag]'),
                             ['title'=>'Поиск вопросов просителя']
-                        )
+                        )*/
                         . '<span>'
                         . $sEmpl
                         . '</span>';
@@ -299,6 +299,7 @@ jQuery('#doprocess').on("click", function(event) {
     console.log("keys = ", keys);
 
         if( keys.length > 0 ) {
+            keys.reverse();
             var f = function(){
                 if( keys.length > 0 ) {
                     var id = keys.pop();

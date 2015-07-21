@@ -124,14 +124,17 @@ class NotificateactController extends Controller
 
         if( $model !== null ) {
             $days = Notificateact::getAdge($model->msg_createtime);
-            $aAct = Notificateact::find()->where('ntfd_message_age = '.$days)->all();
+            $aAct = Notificateact::getDateAct($model->msg_createtime);
+//            $aAct = Notificateact::find()->where('ntfd_message_age = '.$days)->all();
             $user = Yii::$app->user->identity;
             $aEmails = [];
             /** @var Notificateact $ob */
-            foreach($aAct As $ob) {
-//                Yii::info('actionSend(): Act = ' . $ob->ntfd_operate);
-                $sTemplate = 'notificate_' . $ob->ntfd_operate;
+            foreach($aAct As $idAct=>$ob) {
+                Yii::info('actionSend(): Act = ' . $idAct);
+//                $sTemplate = 'notificate_' . $ob->ntfd_operate;
+                $sTemplate = 'notificate_' . $idAct;
                 $email = '';
+/*
                 if( ($ob->ntfd_operate == Notificateact::ACTI_EMAIL_EPLOEE) && ($model->employee !== null) ) {
                     $email = $model->employee->us_email;
                 }
@@ -139,6 +142,16 @@ class NotificateactController extends Controller
                     $email = $model->curator->us_email;
                 }
                 else if( $ob->ntfd_operate == Notificateact::ACTI_EMAIL_MODERATOR ) {
+                    $email = $user->us_email;
+                }
+  */
+                if( ($idAct == Notificateact::ACTI_EMAIL_EPLOEE) && ($model->employee !== null) ) {
+                    $email = $model->employee->us_email;
+                }
+                else if( ($idAct == Notificateact::ACTI_EMAIL_CONTROLER) && ($model->curator !== null) ) {
+                    $email = $model->curator->us_email;
+                }
+                else if( $idAct == Notificateact::ACTI_EMAIL_MODERATOR ) {
                     $email = $user->us_email;
                 }
 //                Yii::info('actionSend(): email = ' . $email);
@@ -152,7 +165,8 @@ class NotificateactController extends Controller
                     $aEmails[] = $oMsg;
                 }
                 else {
-                    Yii::info('actionSend(): Error Not found email ['.$id.'] for act [' . $ob->ntfd_operate . ']');
+                    Yii::info('actionSend(): Error Not found email ['.$id.'] for act [' . $idAct . ']');
+//                    Yii::info('actionSend(): Error Not found email ['.$id.'] for act [' . $ob->ntfd_operate . ']');
 //                    $aErr['error'] = ['message' => 'Not found email ['.$id.'] for act [' . $ob->ntfd_operate . ']'];
                 }
             }
@@ -262,8 +276,8 @@ class NotificateactController extends Controller
             if( $nIndex !== -1 ) {
                 // все нормально, запись остается нужно флаг поменять
 //                Yii::info('saveActions save ' . $oAction->udat_id . '['.$nIndex.'] permission = ' . $aData[$nIndex]['udat_role_id']);
-//                $oAction->ntfd_flag = $aData[$nIndex]['ntfd_flag'];
-//                $oAction->save();
+                $oAction->attributes = $aData[$nIndex];
+                $oAction->save();
                 unset($aData[$nIndex]);
             }
             else {
@@ -341,7 +355,7 @@ class NotificateactController extends Controller
         foreach($aActions As $ob) {
             $t1 = $tToday - $ob->ntfd_message_age * Notificateact::DAY_DURATION;
             $t2 = $t1 + Notificateact::DAY_DURATION;
-            $sWhere .= ($sWhere == '' ? '' : ' Or ') . '(msg_createtime >= \''.date('Y-m-d H:i:s', $t1).'\' And msg_createtime < \''.date('Y-m-d H:i:s', $t2).'\' /* '.$ob->ntfd_message_age.' */ )';
+            $sWhere .= ($sWhere == '' ? '' : ' Or ') . '(' . (($ob->ntfd_flag & 1) > 0 ? '' : 'msg_createtime >= \''.date('Y-m-d H:i:s', $t1).'\' And') . ' msg_createtime < \''.date('Y-m-d H:i:s', $t2).'\'' . ' /* '.$ob->ntfd_message_age . (($ob->ntfd_flag & 1) > 0 ? '+' : '') . ' */ )';
         }
         if( $sWhere == '' ) {
             $sWhere = 'FALSE';

@@ -9,7 +9,9 @@ use app\models\Notificateactl;
 /* @var $form yii\widgets\ActiveForm */
 
 $sId = $index;
-
+if( ($model->ntfd_flag & 1) > 0 ) {
+    $model->ntfd_message_age .= '+';
+}
 ?>
 
 <div class="col-sm-1">

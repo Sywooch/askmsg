@@ -41,6 +41,7 @@ class Notificateact extends \yii\db\ActiveRecord
             [['ntfd_message_age', 'ntfd_operate'], 'required'],
             [['ntfd_operate'], 'in', 'range' => array_keys($this->acts)],
 
+            [['ntfd_message_age', ], 'validateAge', ],
             [['ntfd_message_age', 'ntfd_operate', 'ntfd_flag'], 'integer']
         ];
     }
@@ -56,6 +57,19 @@ class Notificateact extends \yii\db\ActiveRecord
             'ntfd_operate' => 'Действие',
             'ntfd_flag' => 'Дополнительные флаги',
         ];
+    }
+
+    public function validateAge($attribute, $params) {
+        $sVal = trim($this->$attribute);
+        Yii::info('validateAge('.$attribute.') ['.$this->ntfd_id.'] sVal = '.$sVal.' params = ' . print_r($params, true));
+        if( substr($sVal, -1) == '+' ) {
+            $sVal = intval($sVal);
+            $this->ntfd_flag = 1;
+        }
+        else {
+            $this->ntfd_flag = 0;
+        }
+        $this->$attribute = $sVal;
     }
 
     /**
@@ -87,24 +101,42 @@ class Notificateact extends \yii\db\ActiveRecord
      */
     public static function getDateAct($sDate) {
         $days = self::getAdge($sDate);
-        Yii::info('getDateAct('.$sDate.'): ' . date("d.m.Y H:i:s", self::getToday()) . ' - ' . date("d.m.Y H:i:s", strtotime($sDate)) . ' = ' . $days);
+//        Yii::info('getDateAct('.$sDate.'): ' . date("d.m.Y H:i:s", self::getToday()) . ' - ' . date("d.m.Y H:i:s", strtotime($sDate)) . ' = ' . $days);
 
         if( self::$_allAct === null ) {
             self::$_allAct = [];
             $aActions = Notificateact::find()->orderBy('ntfd_message_age')->all();
             /** @var Notificateact $ob */
             foreach($aActions As $ob) {
-                if( !isset(self::$_allAct[$ob->ntfd_message_age]) ) {
-                    self::$_allAct[$ob->ntfd_message_age] = [];
+                $sKey = $ob->ntfd_message_age . (($ob->ntfd_flag & 1) > 0 ? '+' : '');
+                if( !isset(self::$_allAct[$sKey]) ) {
+                    self::$_allAct[$sKey] = [];
                 }
-                self::$_allAct[$ob->ntfd_message_age][] = $ob->getActTitle($ob->ntfd_operate);
+                self::$_allAct[$sKey][$ob->ntfd_operate] = $ob->getActTitle($ob->ntfd_operate);
             }
         }
 
+        $aAct = [];
+        foreach(self::$_allAct As $k => $v) {
+            if( $k == $days ) {
+                foreach($v As $k1=>$v1) {
+                    $aAct[$k1] = $v1;
+                }
+//                $aAct = array_merge($aAct, $v);
+            }
+            else if( (substr($k, -1) == '+') && ($days > intval($k, 10)) ) {
+                foreach($v As $k1=>$v1) {
+                    $aAct[$k1] = $v1;
+                }
+//                $aAct = array_merge($aAct, $v);
+            }
+        }
+/*
         if( isset(self::$_allAct[$days]) ) {
             return self::$_allAct[$days];
         }
-        return [];
+*/
+        return $aAct;
     }
 
     /**
@@ -113,7 +145,7 @@ class Notificateact extends \yii\db\ActiveRecord
     public static function getToday() {
         if( self::$_todayTime === null ) {
             self::$_todayTime = mktime(0, 0, 0);
-//            self::$_todayTime = mktime(0, 0, 0, 3, date("j"), date('Y')) - self::DAY_DURATION;
+            self::$_todayTime = mktime(0, 0, 0, 3, date("j"), date('Y')) - self::DAY_DURATION;
         }
         return self::$_todayTime;
     }
