@@ -320,7 +320,12 @@ class Message extends \yii\db\ActiveRecord
             [['msg_empl_id', 'msg_empl_command'], 'required',
                 'when' => function($model) use ($aFlagsToAnswer) { return ($this->scenario != 'importdata') && in_array($this->msg_flag, $aFlagsToAnswer); },
                 'whenClient' => "function (attribute, value) { return [".implode(',', $aFlagsToAnswer)."].indexOf(parseInt($('#".Html::getInputId($this, 'msg_flag') ."').val())) != -1 ;}"
+            ],
+            [['msg_empl_remark'], 'required',
+                'when' => function($model) { return in_array($this->msg_flag, [Msgflags::MFLG_INT_REVIS_INSTR, Msgflags::MFLG_SHOW_REVIS]); },
+                'whenClient' => "function (attribute, value) { return [".implode(',', [Msgflags::MFLG_INT_REVIS_INSTR, Msgflags::MFLG_SHOW_REVIS])."].indexOf(parseInt($('#".Html::getInputId($this, 'msg_flag') ."').val())) != -1 ;}"
             ]
+
         ];
     }
 
@@ -363,6 +368,12 @@ class Message extends \yii\db\ActiveRecord
     public function scenarios()
     {
         $scenarios = parent::scenarios();
+        $scenarios['curatortest'] = [
+            'msg_empl_remark',
+            'msg_answer',
+            'msg_flag',
+        ];
+
         $scenarios['mark'] = [
             'msg_mark',
             'testemail',
@@ -947,7 +958,7 @@ class Message extends \yii\db\ActiveRecord
      */
     public function isNeedNotificate($sType = '') {
         $bRet = $this->isFlagChanged();
-        Yii::info('isNeedNotificate('.$sType.') flag ' . ($bRet ? '' : 'not ') . 'changed');
+//        Yii::info('isNeedNotificate('.$sType.') flag ' . ($bRet ? '' : 'not ') . 'changed');
 
         if( $bRet ) {
             $transTable = $this->getTransflags($sType);
@@ -955,10 +966,10 @@ class Message extends \yii\db\ActiveRecord
              || ( !empty($transTable[$this->msg_flag]) && !in_array($this->_oldAttributes['msg_flag'], $transTable[$this->msg_flag]))
             ) {
                 $bRet = false;
-                Yii::info('isNeedNotificate('.$sType.') = false [' . implode(',', (isset($transTable[$this->msg_flag]) && is_array($transTable[$this->msg_flag])) ? $transTable[$this->msg_flag] : []) . '] ' . $this->_oldAttributes['msg_flag'] . ' -> ' . $this->msg_flag);
+//                Yii::info('isNeedNotificate('.$sType.') = false [' . implode(',', (isset($transTable[$this->msg_flag]) && is_array($transTable[$this->msg_flag])) ? $transTable[$this->msg_flag] : []) . '] ' . $this->_oldAttributes['msg_flag'] . ' -> ' . $this->msg_flag);
             }
             else {
-                Yii::info('isNeedNotificate('.$sType.') = true [' . implode(',', $transTable[$this->msg_flag]) . '] ' . $this->_oldAttributes['msg_flag'] . ' -> ' . $this->msg_flag);
+//                Yii::info('isNeedNotificate('.$sType.') = true [' . implode(',', $transTable[$this->msg_flag]) . '] ' . $this->_oldAttributes['msg_flag'] . ' -> ' . $this->msg_flag);
             }
         }
         return $bRet;

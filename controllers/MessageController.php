@@ -42,7 +42,7 @@ class MessageController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['toword', 'send'],
+                        'actions' => ['toword', 'send', 'curatortest'],
                         'roles' => ['@'],
                     ],
                     [
@@ -432,6 +432,47 @@ class MessageController extends Controller
 //        else {
 //            Yii::info('MESSAGE ERROR: ' . print_r($model->getErrors(), true));
             return $this->render('create', [
+                'model' => $model,
+            ]);
+//        }
+    }
+
+    /**
+     * Curator tests existing Message model.
+     *
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionCuratortest($id = 0)
+    {
+        $model = $this->findModel($id);
+        $isAdmin = Yii::$app->user->can(Rolesimport::ROLE_ADMIN);
+        if( ($model->msg_curator_id !== Yii::$app->user->getId()) && !$isAdmin ) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        $model->scenario = 'curatortest';
+        if( $model->msg_empl_id !== null ) {
+            $model->employer = $model->employee->getFullName();
+        }
+
+        if ( $model->load(Yii::$app->request->post()) ) {
+
+            $this->DoDelay('msgform.delay.time');
+
+            if( $model->save() ) {
+                return $this->render(
+                    'curatortested',
+                    [
+                        'model' => $model,
+                    ]
+                );
+            }
+
+        }
+//        else {
+//            Yii::info('MESSAGE ERROR: ' . print_r($model->getErrors(), true));
+            return $this->render('_form_curator', [
                 'model' => $model,
             ]);
 //        }

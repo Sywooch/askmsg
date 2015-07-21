@@ -184,7 +184,6 @@ $aMenuItems[] = Yii::$app->user->isGuest ?
                                         <div class="row">
                                             <div class="col-xs-12">
                                                 <br />
-                                                <br />
                                                 <?= Alert::widget(); ?>
                                                 <?= $content ?>
                                             </div>
@@ -205,8 +204,8 @@ $aMenuItems[] = Yii::$app->user->isGuest ?
 
 
         </div></div>
-    <div id="footer" class="container-fluid">
-        <div class="row">
+    <div id="footer" style="width: 100%; max-width: 100%;">
+        <div class="container-fluid" style="max-width: 1300px;">
 
             <div class="col-xs-6">
                 <span class="text-url">&copy; 2015</span> <a class="text-url mr" href="http://dogm.mos.ru">Департамент образования города Москвы</a>

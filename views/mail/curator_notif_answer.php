@@ -19,6 +19,7 @@ include dirname(__FILE__) . DIRECTORY_SEPARATOR . 'mail_styles_data.php';
 /* @var $model app\models\Message */
 
 $aLink = ['message/answer', 'id'=>$model->msg_id];
+$aLinkCurator = ['message/curatortest', 'id'=>$model->msg_id]
 ?>
 
 <p>Здравствуйте, <?= Html::encode($model->curator->getShortName()) ?>.</p>
@@ -31,7 +32,7 @@ $aLink = ['message/answer', 'id'=>$model->msg_id];
 <p<?= $aMailTextStyles['large_text_01'] ?>><b>Обращение: </b></p>
 <p><?= Html::encode($model->msg_oldcomment) ?></p>
 <p><?= ($model->subject ? Html::encode($model->subject->tag_title) : '') ?></p>
-<p><?= Html::encode($model->msg_pers_text) ?></p>
+<p><?= $model->msg_pers_text // Html::encode($model->msg_pers_text) ?></p>
 
 <p<?= $aMailTextStyles['large_text_01'] ?>>Текст поручения:</p>
 <p><?= Html::encode($model->msg_empl_command) ?></p>
@@ -59,6 +60,8 @@ if( count($allusers) > 1 ) {
 
 
 <p<?= $aMailTextStyles['large_text_01'] ?>><b>Информация Вам направлена для осуществления контроля исполнения данного поручения</b></p>
+
+<p><b>Осуществить проверку сообщения необходимо по ссылке <?= Html::a(Url::to($aLinkCurator, true), Url::to($aLinkCurator, true)) ?></b></p>
 
 <p>&nbsp;</p>
 <p>&nbsp;</p>
