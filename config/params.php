@@ -12,4 +12,5 @@ return [
     'message.encode.key' => 'some0secret1text',
     'message.encode.method' => 'bf-cbc',
     'message.encode.iv' => '56897ngq',
+    'import.host' => 'map.production.mskobr.ru',
 ];
