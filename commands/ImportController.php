@@ -93,10 +93,10 @@ class ImportController extends Controller {
                 SwiftHeaders::setAntiSpamHeaders($oMsg, ['email' => Yii::$app->params['supportEmail']]);
                 $oMsg->send();
             }
-//            echo $val[0] . "\n";
+
             if( count($val) > 0 ) {
                 $sql = 'Insert Into {{%sovet}} Values ' . implode(',', $val);
-                echo $sql . "\n";
+//                echo $sql . "\n";
                 $db->createCommand($sql)->execute();
             }
         }
@@ -120,7 +120,8 @@ class ImportController extends Controller {
                 }
                 if( count($val) > 0 ) {
                     $sql = 'Insert Into {{%orgsovet}} (orgsov_sovet_id, orgsov_ekis_id) Values ' . implode(',', $val);
-                    echo $sql . "\n";
+                    echo "insert ".count($val)." values for id = {$id}\n";
+//                    echo $sql . "\n";
                     $db->createCommand($sql)->execute();
                 }
             }
