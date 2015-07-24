@@ -164,13 +164,17 @@ for($page = 0; $page < $nPageCount; $page++) {
     $dataProvider->refresh();
 
     foreach($dataProvider->getModels() As $model) {
+        $sSovet = $model->sovet ? $model->sovet->sovet_title : '';
+        $a = explode(',', $sSovet);
+        $sSovet = array_pop($a);
+
         $oSheet->fromArray(
             [
                 $model->msg_id,
                 date("d.m.Y", strtotime($model->msg_createtime)),
                 $model->msg_pers_org,
                 ($model->region !== null) ?  $model->region->reg_name : '',
-                $model->sovet ? $model->sovet->sovet_title : '',
+                $sSovet,
                 count($model->alltags) > 0 ? implode(', ', ArrayHelper::map($model->alltags, 'tag_id', 'tag_title')) : '',
                 ($model->msg_empl_id !== null) ?  $model->employee->getFullName() : '',
             ],
