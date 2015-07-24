@@ -159,8 +159,9 @@ class MessageSearch extends Message
             ->with('curator')
             ->with('answers')
             ->with('alltags')
+            ->with('region')
 //            ->with('orgsovet')
-//            ->with('sovet')
+            ->with('sovet')
 //            ->with('attachments')
             ->with('flag');
 
