@@ -63,10 +63,6 @@ class ImportController extends Controller {
                     continue;
                 }
 
-                if( $v['id'] == 7 ) {
-                    $v['name'] = str_replace(',', ' ', $v['name']);
-                }
-
                 $n = substr_count($v['name'], ',');
                 if( $n != 1 ) {
                     $aErrInSovet[] = $v;
