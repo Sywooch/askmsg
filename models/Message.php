@@ -26,6 +26,8 @@ use Httpful\Request;
 use Httpful\Response;
 use app\components\RustextValidator;
 use app\models\Notificatelog;
+use app\models\Orgsovet;
+use app\models\Sovet;
 
 /**
  * This is the model class for table "{{%message}}".
@@ -674,6 +676,24 @@ class Message extends \yii\db\ActiveRecord
             }
         }
         $this->_tagsstring = $a;
+    }
+
+    /**
+     *  Связь сообщения и номера совета директоров учреждения по ekis_id
+     */
+    public function getOrgsovet() {
+        return $this->hasOne(Orgsovet::className(), ['orgsov_ekis_id' => 'ekis_id']);
+    }
+
+    /**
+     *  Связь сообщения и совета директоров учреждения по ekis_id
+     */
+    public function getSovet() {
+        return $this->hasOne(
+                Sovet::className(),
+                ['sovet_id' => 'orgsov_sovet_id']
+            )
+            ->via('orgsovet');
     }
 
     /**

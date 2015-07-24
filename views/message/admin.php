@@ -193,6 +193,9 @@ EOT;
                                 . Msgflags::makeSearchString('MessageSearch[msg_flag]'),
                             ['title'=>'Поиск вопросов просителя']
                         )
+//                        . '<span>'
+//                        . ($model->sovet ? $model->sovet->sovet_title : 'null')
+//                        . '</span>'
                         . '<span>'
                         . $sEmpl
                         . '</span>';
