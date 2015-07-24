@@ -3,6 +3,7 @@
 return [
     'adminEmail' => 'devmosedu@yandex.ru',
     'supportEmail' => 'devmosedu@yandex.ru',
+    'notifyEmail' => 'KozminVA@edu.mos.ru',
     'user.passwordResetTokenExpire' => '3600',
     'message.file.ext' => ['doc', 'docx', 'xls', 'xlsx', 'jpg', 'png', 'pdf', 'txt', 'zip'],
     'message.file.maxsize' => 5000000,

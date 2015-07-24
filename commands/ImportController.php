@@ -10,9 +10,12 @@ namespace app\commands;
 
 use Yii;
 use yii\console\Controller;
+use yii\helpers\Html;
 
 use Httpful\Request;
 use Httpful\Response;
+
+use app\components\SwiftHeaders;
 
 class ImportController extends Controller {
 
@@ -29,6 +32,7 @@ class ImportController extends Controller {
      */
     public function actionSovet()
     {
+        $_SERVER['HTTP_HOST'] = 'ask.educom.ru';
         $sPathSovet = '/api/dicts/council.json';
         $sPathOrg = '/api/eduoffices/sphinx.json?archive=0&area=0&district=0&metro=0&program=0&council=%d&type=0&class=0&by_order=0&by_legal=0&page=1&limit=10000';
 
@@ -48,18 +52,50 @@ class ImportController extends Controller {
 
         $SovetId = [];
         if( count($response->body) > 0 ) {
+            $aErrInSovet = [];
 //        if( false ) {
             $db->createCommand('Delete From {{%sovet}} Where sovet_id > 0')->execute();
             $db->createCommand('Alter Table {{%sovet}} AUTO_INCREMENT = 1')->execute();
             $val = [];
+            $aErrInSovet = [];
             foreach($response->body As $v) {
                 if( $v['id'] < 1 ) {
                     continue;
                 }
+
+                if( $v['id'] == 7 ) {
+                    $v['name'] = str_replace(',', ' ', $v['name']);
+                }
+
+                $n = substr_count($v['name'], ',');
+                if( $n != 1 ) {
+                    $aErrInSovet[] = $v;
+                }
+
 //                echo print_r($v, true) . "\n";
                 $val[] = '('.$v['id'].', '.$db->quoteValue($v['name']).')';
                 $SovetId[] = $v['id'];
 //                break;
+            }
+            if( count($aErrInSovet) > 0 ) {
+                $sErr = '';
+                foreach($aErrInSovet As $v) {
+                    $sErr .= ($sErr == '' ? '' : "\n")
+                            . $v['name'] . " [".$v['id']."]";
+                }
+                $sErr = "Мы ждем запятую в названии совета директоров:\n" . $sErr;
+                echo str_repeat('*', 60) . "\n";
+                echo '*' . str_pad('Error in council:', 58, ' ', STR_PAD_BOTH) . "*\n";
+                echo str_repeat('*', 60) . "\n";
+                echo $sErr . "\n";
+                echo str_repeat('*', 60) . "\n";
+                $subject = Yii::$app->name . ': неполадки с Советом директоров' ;
+                $oMsg = Yii::$app->mailer->compose('@app/views/mail/notificate_support', ['html'=> nl2br(Html::encode($sErr)),])
+                    ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+                    ->setTo(isset(Yii::$app->params['notifyEmail']) ? Yii::$app->params['notifyEmail'] : Yii::$app->params['supportEmail'])
+                    ->setSubject($subject);
+                SwiftHeaders::setAntiSpamHeaders($oMsg, ['email' => Yii::$app->params['supportEmail']]);
+                $oMsg->send();
             }
 //            echo $val[0] . "\n";
             if( count($val) > 0 ) {
