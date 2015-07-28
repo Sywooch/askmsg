@@ -146,7 +146,7 @@ $this->registerJs($sJs, View::POS_READY, 'toggleuserpart');
         <div class="col-sm-6 no-horisontal-padding">
             <div class="col-sm-3">
                 <?= '№ ' . $model->msg_id . ' ' ?>
-                <span class="dopline"><?= date('d.m.Y H:i:s', strtotime($model->msg_createtime)) ?></span>
+                <span class="dopline"><?= date('d.m.Y H:i', strtotime($model->msg_createtime)) ?></span>
             </div>
             <div class="col-sm-9">
                 <strong><?= Html::encode($model->getFullName()) ?></strong>
@@ -226,6 +226,13 @@ $this->registerJs($sJs, View::POS_READY, 'toggleuserpart');
                     </div>
                 <?php
                 endif; // if( $nFilesExists > 0 ):
+                ?>
+                <?php
+                if( $model->msg_answertime !== null ) {
+                    ?>
+                    <span class="dopline"><?= date('d.m.Y', strtotime($model->msg_answertime)) ?></span>
+                <?php
+                }
                 ?>
             </div>
         <?php endif; ?>
