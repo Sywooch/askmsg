@@ -934,7 +934,7 @@ class Message extends \yii\db\ActiveRecord
             self::USERTYPE_PERSON => [
                 Msgflags::MFLG_SHOW_NO_ANSWER => [Msgflags::MFLG_NEW],
                 Msgflags::MFLG_SHOW_INSTR => [Msgflags::MFLG_NEW],
-                Msgflags::MFLG_SHOW_ANSWER => [Msgflags::MFLG_SHOW_INSTR, Msgflags::MFLG_SHOW_NEWANSWER, Msgflags::MFLG_SHOW_REVIS,],
+                Msgflags::MFLG_SHOW_ANSWER => [Msgflags::MFLG_SHOW_INSTR, Msgflags::MFLG_SHOW_NEWANSWER, Msgflags::MFLG_SHOW_REVIS, Msgflags::MFLG_SHOW_NOSOGL, ],
                 Msgflags::MFLG_INT_FIN_INSTR => [],
             ],
             self::USERTYPE_ANSWER => [
@@ -958,8 +958,10 @@ class Message extends \yii\db\ActiveRecord
                 Msgflags::MFLG_SHOW_REVIS => [],
                 Msgflags::MFLG_INT_INSTR => [],
                 Msgflags::MFLG_INT_REVIS_INSTR => [],
-                Msgflags::MFLG_INT_NEWANSWER => [],
-                Msgflags::MFLG_SHOW_NEWANSWER => [],
+//                Msgflags::MFLG_INT_NEWANSWER => [],
+//                Msgflags::MFLG_SHOW_NEWANSWER => [],
+                Msgflags::MFLG_SHOW_NOSOGL => [],
+                Msgflags::MFLG_INT_NOSOGL => [],
             ],
             self::USERTYPE_SOANSWER => [
                 Msgflags::MFLG_SHOW_INSTR => [],
@@ -1027,8 +1029,10 @@ class Message extends \yii\db\ActiveRecord
                 Msgflags::MFLG_INT_INSTR => 'curator_notif_instr',
                 Msgflags::MFLG_SHOW_REVIS => 'curator_notif_revis',
                 Msgflags::MFLG_INT_REVIS_INSTR => 'curator_notif_revis',
-                Msgflags::MFLG_INT_NEWANSWER => 'curator_notif_answer',
-                Msgflags::MFLG_SHOW_NEWANSWER => 'curator_notif_answer',
+//                Msgflags::MFLG_INT_NEWANSWER => 'curator_notif_answer',
+//                Msgflags::MFLG_SHOW_NEWANSWER => 'curator_notif_answer',
+                Msgflags::MFLG_SHOW_NOSOGL => 'curator_notif_answer',
+                Msgflags::MFLG_INT_NOSOGL => 'curator_notif_answer',
             ],
             self::USERTYPE_SOANSWER => [
                 Msgflags::MFLG_SHOW_INSTR => 'soans_notif_instr',
@@ -1038,6 +1042,7 @@ class Message extends \yii\db\ActiveRecord
 
         foreach($aType As $sType) {
             if ($this->isNeedNotificate($sType)) {
+//                Yii::info('sendUserNotification(' . $sType . ') need notify');
                 if (!isset($aTemplates[$sType])) {
                     Yii::info('sendUserNotification(' . $sType . ') ERROR: not found notification template');
                     continue;
@@ -1082,6 +1087,7 @@ class Message extends \yii\db\ActiveRecord
                         break;
 
                     case self::USERTYPE_CURATOR:
+//                        Yii::info('sendUserNotification(' . $sType . ') case self::USERTYPE_CURATOR');
                         if( $this->curator !== null ) {
                             $aFiles = array_merge($this->getUserFiles(true), $this->getUserFiles(false));
                             $a = User::find()->where(['us_id' => array_slice($this->getAllanswers(), 1)])->all();
@@ -1098,9 +1104,15 @@ class Message extends \yii\db\ActiveRecord
                             }
                             $aMessages[] = $oMsg;
                         }
+//                        else {
+//                            Yii::info('sendUserNotification(' . $sType . ') curator === null');
+//                        }
                         break;
                 } // switch ($sType)
             } // if ($this->isNeedNotificate($sType))
+            else {
+                Yii::info('sendUserNotification(' . $sType . ') NOT need notify');
+            }
         } // foreach($aType As $sType)
 
         if( count($aMessages) > 0 ) {

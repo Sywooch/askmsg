@@ -218,7 +218,7 @@ $aFieldParam = [
             <div class="form-group field-message-msg_subject">
             <label class="control-label col-sm-2" for="message-msg_subject">Тема</label>
             <div class="col-sm-10">
-                <input class="form-control" type="text" readonly="" value="<?= Html::encode($model->subject->tag_title) ?>">
+                <input class="form-control" type="text" readonly="" value="<?= $model->subject !== null ? Html::encode($model->subject->tag_title) : '' ?>">
             </div>
             </div>
             <?= '' /* $form
@@ -413,7 +413,7 @@ $aFieldParam = [
              *
              */
                 $aOp = array_reduce(
-                    Msgflags::getStateTransModer($model->msg_flag),
+                    Msgflags::getStateTransCurator($model->msg_flag),
                     function ( $carry , $item ) {
                         $sTitle = Msgflags::getStateTitle($item, 'fl_command');
                         if( $sTitle != '' ) {

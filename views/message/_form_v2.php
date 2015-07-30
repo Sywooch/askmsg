@@ -56,7 +56,7 @@ else {
 echo '-->' . "\n";
 
 $isModerate = $model->scenario == 'moderator';
-$bShowAnswer = in_array($model->msg_flag, [Msgflags::MFLG_SHOW_NEWANSWER, Msgflags::MFLG_INT_NEWANSWER,]);
+$bShowAnswer = in_array($model->msg_flag, [Msgflags::MFLG_SHOW_NEWANSWER, Msgflags::MFLG_INT_NEWANSWER, Msgflags::MFLG_SHOW_NOSOGL, Msgflags::MFLG_INT_NOSOGL, ]);
 
 $sFlagId = Html::getInputId($model, 'msg_flag');
 $sEmploeeId = Html::getInputId($model, 'msg_empl_id');

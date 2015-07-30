@@ -35,7 +35,7 @@ $aOp = array_reduce(
 );
 */
 $aOp = array_reduce(
-    Msgflags::getStateTransAnswer($model->msg_flag),
+    Msgflags::getStateTransAnswer($model->msg_flag, $model->msg_curator_id !== null),
     function ( $carry , $item ) {
         $sTitle = Msgflags::getStateTitle($item, 'fl_command');
         if( $sTitle != '' ) {

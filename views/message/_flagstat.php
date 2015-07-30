@@ -23,8 +23,27 @@ if( !isset($bOnlyLoggedUser) ) {
     $bOnlyLoggedUser = false;
 }
 
+
 if( !$bOnlyLoggedUser ) {
-    $aStatFlags = array_merge($aStatFlags, [Msgflags::MFLG_INT_NEWANSWER, Msgflags::MFLG_SHOW_NEWANSWER]);
+    $aStatFlags = array_merge(
+        $aStatFlags,
+        [
+            Msgflags::MFLG_INT_NEWANSWER,
+            Msgflags::MFLG_SHOW_NEWANSWER,
+            Msgflags::MFLG_SHOW_NOSOGL,
+            Msgflags::MFLG_INT_NOSOGL,
+        ]);
+
+    $aMainStat = [
+        Msgflags::MFLG_SHOW_INSTR,
+        Msgflags::MFLG_INT_INSTR,
+        Msgflags::MFLG_SHOW_REVIS,
+        Msgflags::MFLG_INT_REVIS_INSTR,
+        Msgflags::MFLG_INT_NEWANSWER,
+        Msgflags::MFLG_SHOW_NEWANSWER,
+        Msgflags::MFLG_SHOW_NOSOGL,
+        Msgflags::MFLG_INT_NOSOGL,
+    ];
 }
 // Статистику получаем из кеша или вычисляем и кладем в кеш
 
@@ -59,14 +78,73 @@ if( count($aData) > 0 ) {
     ?>
     <div>
     <?php
+    $aDop = [];
     foreach($aStatFlags As $v) {
         if( !isset($aData[$v]) ) {
             continue;
         }
 //        $s = trim(preg_replace('|^\\[[^\\]]+\\]|', '', $ad['fl_name']));
         $s = trim($aData[$v]['fl_sname']);
-        echo Html::a($s . ' ' . $aData[$v]['cou'], '?' . Html::getInputName(new MessageSearch(), 'msg_flag') . '=' . $v, ['class'=>'btn btn-success faststatlink', 'role'=>"button"]);
+        $sLink = Html::a(
+            $s . ' ' . $aData[$v]['cou'],
+            '?' . Html::getInputName(new MessageSearch(), 'msg_flag') . '=' . $v,
+            [
+                'class'=>'btn btn-success faststatlink',
+                'role'=>"button",
+            ]
+        );
+        if( !isset($aMainStat) || in_array($v, $aMainStat)) {
+            echo $sLink;
+        }
+        else {
+            $aDop[] = Html::a(
+                $s . ' ' . $aData[$v]['cou'],
+                '?' . Html::getInputName(new MessageSearch(), 'msg_flag') . '=' . $v,
+                ['style' => 'margin: 3px 0;']
+            );
+        }
     }
+    if( count($aDop) > 0 ) {
+        echo Html::tag(
+            'div',
+            Html::a(
+                '<span class="caret"></span>',
+                '#',
+                [
+                    'data-target' => '#',
+                    'data-toggle' => 'dropdown',
+                    'role' => 'button',
+                    'aria-haspopup' => 'true',
+                    'aria-expanded' => 'false'
+                ]
+            )
+            . Html::tag(
+                'ul',
+                '<li>' . implode('</li><li>', $aDop) . '</li>',
+                [
+                    'class' => 'dropdown-menu nohoverlink',
+                    'aria-labelledby' => 'dLabel'
+                ]
+            ),
+            [
+                'class' => 'dropdown',
+                'style' => 'display: inline-block;',
+            ]
+//            <div class="dropdown">
+//
+//  <ul class="dropdown-menu" aria-labelledby="dLabel">
+//  </ul>
+//</div>
+
+        );
+    }
+    /*
+<div class="dropdown">
+    <a data-target="#" href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></a>
+  <ul class="dropdown-menu" aria-labelledby="dLabel">
+  </ul>
+</div>
+    */
     ?>
     </div>
     <?php

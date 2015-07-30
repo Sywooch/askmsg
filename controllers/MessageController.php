@@ -447,7 +447,8 @@ class MessageController extends Controller
     {
         $model = $this->findModel($id);
         $isAdmin = Yii::$app->user->can(Rolesimport::ROLE_ADMIN);
-        if( ($model->msg_curator_id !== Yii::$app->user->getId()) && !$isAdmin ) {
+        $notTest = !in_array($model->msg_flag, [Msgflags::MFLG_SHOW_NOSOGL, Msgflags::MFLG_INT_NOSOGL, ]);
+        if( $notTest || (($model->msg_curator_id !== Yii::$app->user->getId()) && !$isAdmin) ) {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
 

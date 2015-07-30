@@ -45,7 +45,9 @@ class Msgflags extends \yii\db\ActiveRecord
     const MFLG_SHOW_ANSWER = 4;      //	[103] Опубликованные ответы               ** видимо посетителям
     const MFLG_NEW = 1;              //	[100] Новые
     const MFLG_SHOW_INSTR = 2;       //	[101] Поручения                           ** видимо посетителям
-    const MFLG_SHOW_NEWANSWER = 3;  //	[102] Ответ дан, но не виден              ** видимо посетителям
+    const MFLG_SHOW_NEWANSWER = 3;   //	[102] Ответ дан, но не виден              ** видимо посетителям
+    const MFLG_SHOW_NOSOGL = 13;     //	[112] Ответ дан, но не согласован         ** видимо посетителям
+    const MFLG_INT_NOSOGL = 14;      //	[113] Ответ дан, но не согласован
 
     public static $_aNames = null;
 
@@ -148,6 +150,8 @@ class Msgflags extends \yii\db\ActiveRecord
             self::MFLG_INT_NEWANSWER => [self::MFLG_INT_REVIS_INSTR, self::MFLG_INT_FIN_INSTR, self::MFLG_NEW, ],
             self::MFLG_INT_REVIS_INSTR => [self::MFLG_NEW, ],
             self::MFLG_INT_FIN_INSTR => [self::MFLG_SHOW_ANSWER, self::MFLG_NOSHOW],
+            self::MFLG_SHOW_NOSOGL => [self::MFLG_SHOW_REVIS, self::MFLG_SHOW_ANSWER, ], // self::MFLG_SHOW_NEWANSWER,
+            self::MFLG_INT_NOSOGL => [self::MFLG_INT_REVIS_INSTR, self::MFLG_INT_FIN_INSTR, ], // self::MFLG_INT_NEWANSWER,
         ];
         return isset($aTrans[$nState]) ? $aTrans[$nState] : [];
     }
@@ -156,16 +160,32 @@ class Msgflags extends \yii\db\ActiveRecord
      * Выдача возможных переходов из текущего состояния для ответчика
      *
      * @param int $nState состояние, из которого хотим получить возможные варианты
+     * @return array варианты переходов
+     *
+     */
+    public static function getStateTransAnswer($nState = 0, $hasCurator = false)
+    {
+        $aTrans = [
+            self::MFLG_SHOW_INSTR => [$hasCurator ? self::MFLG_SHOW_NOSOGL : self::MFLG_SHOW_NEWANSWER, ],
+            self::MFLG_SHOW_REVIS => [$hasCurator ? self::MFLG_SHOW_NOSOGL : self::MFLG_SHOW_NEWANSWER, ],
+            self::MFLG_INT_INSTR => [$hasCurator ? self::MFLG_INT_NOSOGL : self::MFLG_INT_NEWANSWER, ],
+            self::MFLG_INT_REVIS_INSTR => [$hasCurator ? self::MFLG_INT_NOSOGL : self::MFLG_INT_NEWANSWER, ],
+        ];
+        return isset($aTrans[$nState]) ? $aTrans[$nState] : [];
+    }
+
+    /**
+     * Выдача возможных переходов из текущего состояния для контролера
+     *
+     * @param int $nState состояние, из которого хотим получить возможные варианты
      * @return array вариантьы переходов
      *
      */
-    public static function getStateTransAnswer($nState = 0)
+    public static function getStateTransCurator($nState = 0)
     {
         $aTrans = [
-            self::MFLG_SHOW_INSTR => [self::MFLG_SHOW_NEWANSWER, ],
-            self::MFLG_SHOW_REVIS => [self::MFLG_SHOW_NEWANSWER, ],
-            self::MFLG_INT_INSTR => [self::MFLG_INT_NEWANSWER, ],
-            self::MFLG_INT_REVIS_INSTR => [self::MFLG_INT_NEWANSWER],
+            self::MFLG_SHOW_NOSOGL => [self::MFLG_SHOW_NEWANSWER, self::MFLG_SHOW_REVIS, ],
+            self::MFLG_INT_NOSOGL => [self::MFLG_INT_NEWANSWER, self::MFLG_INT_REVIS_INSTR, ],
         ];
         return isset($aTrans[$nState]) ? $aTrans[$nState] : [];
     }
