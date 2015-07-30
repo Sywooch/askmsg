@@ -108,7 +108,7 @@ $styleColTitle = array(
     ),
 );
 
-$styleSell = array(
+$styleCell = array(
     'font' => array(
         'bold' => false,
         'size' => 10,
@@ -120,6 +120,13 @@ $styleSell = array(
     ),
 );
 
+$styleCenterCell = array(
+    'alignment' => array(
+        'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+        'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+    ),
+);
+
 
 $oSheet->getColumnDimension('A')->setWidth(12);
 $oSheet->getColumnDimension('B')->setWidth(16);
@@ -128,7 +135,8 @@ $oSheet->getColumnDimension('D')->setWidth(40);
 $oSheet->getColumnDimension('E')->setWidth(40);
 $oSheet->getColumnDimension('F')->setWidth(20);
 $oSheet->getColumnDimension('G')->setWidth(30);
-$sLastCol = 'G';
+$oSheet->getColumnDimension('H')->setWidth(16);
+$sLastCol = 'H';
 //$oSheet->getColumnDimension('D')->setAutoSize(true);
 //$oSheet->getColumnDimension('E')->setWidth(80);
 $oSheet->setCellValue('A1', Yii::$app->name)
@@ -148,6 +156,7 @@ $oSheet->fromArray(
         'МРСД',
         'Тег',
         'Исполнитель',
+        'Оценка',
     ],
     null,
     'A4'
@@ -177,6 +186,7 @@ for($page = 0; $page < $nPageCount; $page++) {
                 $sSovet,
                 count($model->alltags) > 0 ? implode(', ', ArrayHelper::map($model->alltags, 'tag_id', 'tag_title')) : '',
                 ($model->msg_empl_id !== null) ?  $model->employee->getFullName() : '',
+                $model->msg_mark !== null ? ($model->msg_mark == 5 ? '+' : '-') : ''
             ],
             null,
             'A' . $nRow
@@ -187,9 +197,12 @@ for($page = 0; $page < $nPageCount; $page++) {
 }
 
 $oStyle = $oSheet->getStyle('A'.$nStartRow.':' . $sLastCol . ($nRow-1));
-$oStyle->applyFromArray($styleSell);
+$oStyle->applyFromArray($styleCell);
 $oStyle->getAlignment()->setWrapText(true);
 $oStyle->getAlignment()->setIndent(1);
+
+$oSheet->getStyle('H'.$nStartRow.':H' . ($nRow-1))->applyFromArray($styleCenterCell);
+
 
 $styleBorders = [
     'borders' => [
