@@ -312,10 +312,17 @@ jQuery('.showinmodal').on("click", function (event){
         oLink = $(this);
 
     oBody.text("");
-    oBody.load(oLink.attr('href'), params);
-    ob.find('.modal-header span').text(oLink.attr('title'));
-    ob.modal('show');
-//    jQuery(".modal-content").css({'max-height': jQuery('window').height() * 0.7 + 'px'})
+    oBody.load(
+        oLink.attr('href'),
+        params,
+        function(responseText, textStatus, jqXHR){
+            ob.find('.modal-header span').text(oLink.attr('title'));
+            ob.modal('show');
+        }
+    );
+//    ob.find('.modal-header span').text(oLink.attr('title'));
+//    ob.modal('show');
+
     return false;
 });
 
