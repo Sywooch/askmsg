@@ -144,11 +144,13 @@ class NotificateactController extends Controller
                 else if( $ob->ntfd_operate == Notificateact::ACTI_EMAIL_MODERATOR ) {
                     $email = $user->us_email;
                 }
-  */
-                if( ($idAct == Notificateact::ACTI_EMAIL_EPLOEE) && ($model->employee !== null) ) {
+*/
+                $bSoglas = in_array($model->msg_flag, [Msgflags::MFLG_SHOW_NOSOGL, Msgflags::MFLG_INT_NOSOGL, ]);
+
+                if( !$bSoglas && ($idAct == Notificateact::ACTI_EMAIL_EPLOEE) && ($model->employee !== null) ) {
                     $email = $model->employee->us_email;
                 }
-                else if( ($idAct == Notificateact::ACTI_EMAIL_CONTROLER) && ($model->curator !== null) ) {
+                else if( $bSoglas && ($idAct == Notificateact::ACTI_EMAIL_CONTROLER) && ($model->curator !== null) ) {
                     $email = $model->curator->us_email;
                 }
                 else if( $idAct == Notificateact::ACTI_EMAIL_MODERATOR ) {
@@ -350,6 +352,8 @@ class NotificateactController extends Controller
             Msgflags::MFLG_INT_INSTR,
             Msgflags::MFLG_SHOW_INSTR,
             Msgflags::MFLG_SHOW_REVIS,
+            Msgflags::MFLG_SHOW_NOSOGL,
+            Msgflags::MFLG_INT_NOSOGL,
 
         ];
         foreach($aActions As $ob) {

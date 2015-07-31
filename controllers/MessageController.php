@@ -459,8 +459,6 @@ class MessageController extends Controller
 
         if ( $model->load(Yii::$app->request->post()) ) {
 
-            $this->DoDelay('msgform.delay.time');
-
             if( $model->save() ) {
                 return $this->render(
                     'curatortested',
