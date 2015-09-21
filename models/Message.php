@@ -230,6 +230,8 @@ class Message extends \yii\db\ActiveRecord
                             return [
                                 'msg_flag' => $ob->msg_flag,
                                 'answers' => $ob->allanswers,
+                                'msg_empl_id' => $ob->msg_empl_id,
+                                'msg_curator_id' => $ob->msg_curator_id,
                             ];
                         },
                     ],
@@ -1041,6 +1043,8 @@ class Message extends \yii\db\ActiveRecord
         ];
 
         foreach($aType As $sType) {
+            $aMessages = array_merge($aMessages, $this->getChangePersonNotifyMail($sType));
+
             if ($this->isNeedNotificate($sType)) {
 //                Yii::info('sendUserNotification(' . $sType . ') need notify');
                 if (!isset($aTemplates[$sType])) {
@@ -1119,6 +1123,83 @@ class Message extends \yii\db\ActiveRecord
             Yii::$app->mailer->sendMultiple($aMessages);
         }
     }
+
+    /**
+     * Добавление шаблонов для отправки писем при смене ответственных лиц
+     * @param string $type
+     * @return array
+     */
+    public function getChangePersonNotifyMail($type) {
+
+        Yii::info('getChangePersonNotifyMail('.$type.')');
+        $aRet = [];
+        $a = null;
+        switch($type) {
+            case self::USERTYPE_ANSWER:
+                Yii::info('getChangePersonNotifyMail('.$type.'): USERTYPE_ANSWER ' . $this->_oldAttributes['msg_empl_id'] . ' -> ' . $this->msg_empl_id);
+                if( $this->_oldAttributes['msg_empl_id'] != $this->msg_empl_id ) {
+                    // сменился ответчик
+                    // Отправить старому письмо, что он снят и новому, что назначен
+                    Yii::info('getChangePersonNotifyMail('.$type.'): '.$this->_oldAttributes['msg_empl_id'].' != '.$this->msg_empl_id);
+                    $aUsers = User::findAll(['us_id' => [$this->_oldAttributes['msg_empl_id'], intval($this->msg_empl_id, 10)]]);
+                    unset($this->employee);
+                    foreach($aUsers As $ob) {
+                        if( $ob->us_id == $this->msg_empl_id ) {
+                            $sTemplate = 'ans_notif_instr';
+                            $email = $ob->us_email;
+                        }
+                        else {
+                            $sTemplate = 'ans_notif_noneed';
+                            $email = $ob->us_email;
+                        }
+                        Yii::info('getChangePersonNotifyMail('.$type.'): us_id = '.$ob->us_id.' -> ' . $sTemplate . ", " . $email);
+                        $aRet[] = Yii::$app->mailer->compose($sTemplate, ['model' => $this, 'user' => $ob])
+                            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+                            ->setTo($email)
+                            ->setSubject('Обращение №' . $this->msg_id . ' от ' . date('d.m.Y', strtotime($this->msg_createtime)));
+                    }
+                }
+                break;
+            case self::USERTYPE_CURATOR:
+                Yii::info('getChangePersonNotifyMail('.$type.'): USERTYPE_CURATOR ' . $this->_oldAttributes['msg_curator_id'] . ' -> ' . $this->msg_curator_id);
+                if( $this->_oldAttributes['msg_curator_id'] != $this->msg_curator_id ) {
+                    // сменился куратор
+                    // Отправить старому письмо, что он снят и новому, что назначен
+                    Yii::info('getChangePersonNotifyMail('.$type.'): '.$this->_oldAttributes['msg_curator_id'].' != '.$this->msg_curator_id);
+                    $aUsers = User::findAll(['us_id' => [$this->_oldAttributes['msg_curator_id'], intval($this->msg_curator_id, 10)]]);
+                    $a = User::find()->where(['us_id' => array_slice($this->getAllanswers(), 1)])->all();
+                    $aFiles = array_merge($this->getUserFiles(true), $this->getUserFiles(false));
+                    unset($this->curator);
+                    foreach($aUsers As $ob) {
+                        if( $ob->us_id == $this->msg_curator_id ) {
+                            $sTemplate = 'curator_notif_instr';
+                            $email = $ob->us_email;
+                        }
+                        else {
+                            $sTemplate = 'curator_notif_noneed';
+                            $email = $ob->us_email;
+                        }
+                        Yii::info('getChangePersonNotifyMail('.$type.'): us_id = '.$ob->us_id.' -> ' . $sTemplate . ", " . $email);
+                        $oMsg = Yii::$app->mailer->compose($sTemplate, ['model' => $this, 'allusers' => $a, 'user' => $ob,])
+                            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+                            ->setTo($email)
+                            ->setSubject('Обращение №' . $this->msg_id . ' от ' . date('d.m.Y', strtotime($this->msg_createtime)));
+                        if (count($aFiles) > 0) {
+                            foreach ($aFiles As $obFile) {
+                                /** @var File $obFile */
+                                $oMsg->attach($obFile->getFullpath(), ['fileName' => $obFile->file_orig_name]);
+                            }
+                        }
+                        $aRet[] = $oMsg;
+                    }
+                }
+                break;
+            case self::USERTYPE_SOANSWER:
+                break;
+        }
+        return $aRet;
+    }
+
 
     /**
      * @param $id
