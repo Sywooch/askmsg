@@ -1046,7 +1046,7 @@ class Message extends \yii\db\ActiveRecord
             $aMessages = array_merge($aMessages, $this->getChangePersonNotifyMail($sType));
 
             if ($this->isNeedNotificate($sType)) {
-//                Yii::info('sendUserNotification(' . $sType . ') need notify');
+                Yii::info('sendUserNotification(' . $sType . ') need notify');
                 if (!isset($aTemplates[$sType])) {
                     Yii::info('sendUserNotification(' . $sType . ') ERROR: not found notification template');
                     continue;
@@ -1137,7 +1137,7 @@ class Message extends \yii\db\ActiveRecord
         switch($type) {
             case self::USERTYPE_ANSWER:
                 Yii::info('getChangePersonNotifyMail('.$type.'): USERTYPE_ANSWER ' . $this->_oldAttributes['msg_empl_id'] . ' -> ' . $this->msg_empl_id);
-                if( $this->_oldAttributes['msg_empl_id'] != $this->msg_empl_id ) {
+                if( !empty($this->_oldAttributes['msg_empl_id']) && ($this->_oldAttributes['msg_empl_id'] != $this->msg_empl_id) ) {
                     // сменился ответчик
                     // Отправить старому письмо, что он снят и новому, что назначен
                     Yii::info('getChangePersonNotifyMail('.$type.'): '.$this->_oldAttributes['msg_empl_id'].' != '.$this->msg_empl_id);
@@ -1162,7 +1162,7 @@ class Message extends \yii\db\ActiveRecord
                 break;
             case self::USERTYPE_CURATOR:
                 Yii::info('getChangePersonNotifyMail('.$type.'): USERTYPE_CURATOR ' . $this->_oldAttributes['msg_curator_id'] . ' -> ' . $this->msg_curator_id);
-                if( $this->_oldAttributes['msg_curator_id'] != $this->msg_curator_id ) {
+                if( !empty($this->_oldAttributes['msg_curator_id']) && ($this->_oldAttributes['msg_curator_id'] != $this->msg_curator_id) ) {
                     // сменился куратор
                     // Отправить старому письмо, что он снят и новому, что назначен
                     Yii::info('getChangePersonNotifyMail('.$type.'): '.$this->_oldAttributes['msg_curator_id'].' != '.$this->msg_curator_id);
