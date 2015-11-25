@@ -197,7 +197,8 @@ class MessageSearch extends Message
             $query->andFilterWhere(['or', ['msg_id' => $ansQuery], ['msg_empl_id' => $this->msg_empl_id]]);
         }
         else {
-            $query->andFilterWhere(['msg_empl_id' => $this->msg_empl_id]);
+            $query->andFilterWhere(['or', ['msg_empl_id' => $this->msg_empl_id], ['msg_curator_id' => $this->msg_empl_id], ]);
+
         }
 
         if( !empty($this->alltags) ) {
