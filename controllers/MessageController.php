@@ -29,6 +29,7 @@ class MessageController extends Controller
 
     public $defaultAction = 'create';
 
+
     public function behaviors()
     {
         return [
@@ -280,7 +281,14 @@ class MessageController extends Controller
         $model->scenario = 'answer';
 
         if( !$model->isAnswerble ) {
-            throw new ForbiddenHttpException('Message is not editable');
+            $code = 0;
+            if( ($model->msg_flag == Msgflags::MFLG_SHOW_NOSOGL) || ($model->msg_flag == Msgflags::MFLG_INT_NOSOGL) ) {
+                $code = Message::EXCAPTION_CODE_MSG_ON_SOGL;
+            }
+            elseif( ($model->msg_flag == Msgflags::MFLG_SHOW_NEWANSWER) || ($model->msg_flag == Msgflags::MFLG_INT_NEWANSWER) ) {
+                $code = Message::EXCAPTION_CODE_MSG_ON_MODARATE;
+            }
+            throw new ForbiddenHttpException('Message is not editable', $code);
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {

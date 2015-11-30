@@ -75,6 +75,9 @@ class Message extends \yii\db\ActiveRecord
     const USERTYPE_SOANSWER = 'soanswer';
     const USERTYPE_CURATOR = 'curator';
 
+    const EXCAPTION_CODE_MSG_ON_SOGL = 1;
+    const EXCAPTION_CODE_MSG_ON_MODARATE = 2;
+
     public $employer; // Ответчик
     public $asker; // Проситель
     public $askid; // Номер и дата
