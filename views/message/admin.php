@@ -151,7 +151,7 @@ EOT;
                             $sColor = '#2e8b57';
                             $sGlith = 'ok-sign';
                         }
-                        $sMark = '<a href="#" class="pull-right" data-toggle="tooltip" data-placement="top" title="Проситель '.( $model->msg_mark != 5 ? 'не ' : '' ).'удвлетворен ответом">'
+                        $sMark = '<a href="#" class="pull-right" data-toggle="tooltip" data-placement="top" title="Проситель '.( $model->msg_mark != 5 ? 'не ' : '' ).'удовлетворен ответом">'
                                . '<span class="glyphicon glyphicon-'
                                . $sGlith
                                . '" style="color: '
