@@ -338,7 +338,11 @@ class m151202_134702_change_tags_and_subjs extends Migration
         Yii::info(print_r($aConvertSubj, true));
         Yii::info(print_r($aConvertTags, true));
 
-        $bErrorFinal = $this->updateSubjects($aConvertSubj, $nMaxTagId);
+        $bErrorFinal = !$this->updateSubjects($aConvertSubj, $nMaxTagId);
+
+        if( !$bErrorFinal ) {
+            $bErrorFinal = !$this->updateTags($aConvertTags, $nMaxTagId);
+        }
 
         if( $bErrorFinal ) {
             echo 'Migration not finished' . "\n";
@@ -364,7 +368,6 @@ class m151202_134702_change_tags_and_subjs extends Migration
     {
         // msg_subject
         // Tags::find()->where(['tag_type' => Tags::TAGTYPE_SUBJECT, 'tag_title' => array_keys($aConvertSubj)])->all();
-        $sSql = 'Update ' . Tags::tableName() . ' Set tag_active = 0 Where tag_id <= ' . $nMaxTagId . ' And tag_type = ' . Tags::TAGTYPE_SUBJECT;
         foreach($aConvertSubj As $sOldSubj => $aData) {
             if( $sOldSubj != '' ) {
                 $oNew = Tags::find()->where(['And', ['=', 'tag_type', Tags::TAGTYPE_SUBJECT], ['=', 'tag_title', $aData['new_subj_name']], ['>', 'tag_id', $nMaxTagId]])->one();
@@ -404,6 +407,63 @@ class m151202_134702_change_tags_and_subjs extends Migration
                 }
             }
         }
+        $sSql = 'Update ' . Tags::tableName() . ' Set tag_active = 0 Where tag_id <= ' . $nMaxTagId . ' And tag_type = ' . Tags::TAGTYPE_SUBJECT;
+        $nRes = Yii::$app->db->createCommand($sSql)->execute();
+        $this->printStr('Set no use subj: ' . $nRes . "\n");
+        return true;
+    }
+
+    public function updateTags($aConvertTags, $nMaxTagId)
+    {
+        foreach($aConvertTags As $sOldTag => $aData) {
+            if( $sOldTag != '' ) {
+                if( $aData['old_tag_id'] === null ) {
+                    $this->printStr('Not exists old tag: ' . $sOldTag . ' new = ' . $aData['new_tag_name'] . "\n");
+                    continue;
+                }
+                // $aConvertTags[mb_strtolower($v)] = ['old_tag_id' => null, 'new_tag_name' => $newTag];
+                $oNew = Tags::find()->where(['And', ['=', 'tag_type', Tags::TAGTYPE_TAG], ['=', 'tag_title', $aData['new_tag_name']], ['>', 'tag_id', $nMaxTagId]])->one();
+                if( $oNew === null ) {
+                    $oNew = new Tags();
+                    $oNew->attributes = [
+                        'tag_active' => 1,
+                        'tag_title' => $aData['new_tag_name'],
+                        'tag_type' => Tags::TAGTYPE_TAG,
+                    ];
+                    if( !$oNew->save() ) {
+                        $this->printStr('Error save new tag: ' . $aData['new_tag_name'] . ' ' . print_r($oNew->getErrors(), true));
+                        return false;
+                    }
+                }
+                $aConvertSubj[$sOldTag]['new_tag_id'] = $oNew->tag_id;
+                $sSql = 'Update ' . Msgtags::tableName() . ' Set mt_tag_id = :newid Where mt_tag_id = :oldid';
+                $nRes = Yii::$app->db->createCommand($sSql, [':newid' => $oNew->tag_id, ':oldid' => $aData['old_tag_id']])->execute();
+                $this->printStr('Update tag (' . $nRes . ') ' . $aData['old_tag_id'] . ' -> ' . $oNew->tag_id . "\n");
+            }
+            else {
+                $nCouNew = 0;
+                foreach($aData as $v) {
+                    $oNew = Tags::find()->where(['And', ['=', 'tag_type', Tags::TAGTYPE_TAG], ['=', 'tag_title', $v], ['>', 'tag_id', $nMaxTagId]])->one();
+                    if( $oNew === null ) {
+                        $oNew = new Tags();
+                        $oNew->attributes = [
+                            'tag_active' => 1,
+                            'tag_title' => $v,
+                            'tag_type' => Tags::TAGTYPE_TAG,
+                        ];
+                        if( !$oNew->save() ) {
+                            $this->printStr('Error save new empty tag: ' . $v . ' ' . print_r($oNew->getErrors(), true));
+                            return false;
+                        }
+                    }
+                    $nCouNew++;
+                }
+                $this->printStr('New add tags: ' . $nCouNew . "\n");
+            }
+        }
+        $sSql = 'Update ' . Tags::tableName() . ' Set tag_active = 0 Where tag_id <= ' . $nMaxTagId . ' And tag_type = ' . Tags::TAGTYPE_TAG;
+        $nRes = Yii::$app->db->createCommand($sSql)->execute();
+        $this->printStr('Set no use tags: ' . $nRes . "\n");
         return true;
     }
 
