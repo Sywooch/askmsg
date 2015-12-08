@@ -8,6 +8,8 @@ use app\models\TagsSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
+use yii\web\Response;
 
 /**
  * TagsController implements the CRUD actions for Tags model.
@@ -41,6 +43,31 @@ class TagsController extends Controller
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
+    }
+
+    /**
+     * Lists all Tags for subject.
+     * @return mixed
+     */
+    public function actionList($id = 0)
+    {
+        if( $id == 0 ) {
+            $a = ArrayHelper::map(
+                Tags::getTagslist(Tags::TAGTYPE_TAG),
+                'tag_id',
+                'tag_title'
+            );
+        }
+        else {
+            $a = ArrayHelper::map(
+                Tags::getTagslist(Tags::TAGTYPE_TAG, $id),
+                'tag_id',
+                'tag_title'
+            );
+        }
+
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return $a;
     }
 
     /**

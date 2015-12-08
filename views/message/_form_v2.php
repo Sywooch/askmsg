@@ -64,6 +64,8 @@ $sCommandId = Html::getInputId($model, 'msg_empl_command');
 $sRemarkId = Html::getInputId($model, 'msg_empl_remark');
 $sMsgTextId = Html::getInputId($model, 'msg_pers_text');
 $nMsgTextLen = Message::MAX_PERSON_TEXT_LENGTH;
+$sSubjectId = Html::getInputId($model, 'msg_subject');
+$sTagsstringId = Html::getInputId($model, 'tagsstring');
 
 // Показываем количество символов в сообщении
 $sJs =  <<<EOT
@@ -192,6 +194,37 @@ var formatSelect = function(item, text, description) {
 }
 
 EOT;
+
+// Получение новых тегов в зависимости от темы
+// $sTagStr = json_encode(array_values(ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG, $model->msg_subject), 'tag_id', function($ob){  return ['text' => $ob->tag_title]; })));
+$sTagStr = json_encode(array_values(ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG, $model->msg_subject), 'tag_id', 'tag_title')));
+$sOptSeparator = '"' . (isset(Yii::$app->params['tag.separator']) ? Yii::$app->params['tag.separator'] : '|') . '"';
+$sOpttokenSeparators = '["' . (isset(Yii::$app->params['tag.separator']) ? Yii::$app->params['tag.separator'] : '|') . '"]';
+$sOptallowClear = 'true';
+
+$sJs .=  <<<EOT
+var aTagsList = {$sTagStr};
+
+function getSubjectTags() {
+    var idSubject = jQuery("#{$sSubjectId}").select2("val");
+    console.log("getSubjectTags("+idSubject+")");
+    jQuery.getJSON(
+        '/tags/list',
+        {id: idSubject},
+        function(data, textStatus, jqXHR){
+            console.log("data = ", data);
+            aTagsList = [];
+            $("#{$sTagsstringId}").select2("val", "");
+            for(var i in data) {
+                console.log("push("+data[i] + ") ["+i+"]");
+                aTagsList.push(data[i]);
+                jQuery("#{$sTagsstringId}").select2("val", "").select2({tags:aTagsList, separator: {$sOptSeparator}, tokenSeparators: {$sOpttokenSeparators}, allowClear: {$sOptallowClear}});
+            }
+        }
+    );
+}
+EOT;
+
 $this->registerJs($sJs, View::POS_END , 'showselectpart');
 
 // https://github.com/CreativeDream/jquery.filer
@@ -359,6 +392,7 @@ $aFieldParam = [
             }'),
         ],
     ],
+/*
     'tags' => [
         'data' => ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_title'),
         'language' => 'ru',
@@ -371,6 +405,20 @@ $aFieldParam = [
             'allowClear' => true,
         ],
     ],
+    'tags' => [
+        'data' => ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG, $model->msg_subject), 'tag_id', 'tag_title'),
+        'language' => 'ru',
+        'options' => [
+            'multiple' => true,
+//           'tags' => true,
+            'placeholder' => 'Выберите теги ...',
+        ],
+        'pluginOptions' => [
+            'allowClear' => true,
+        ],
+    ],
+*/
+
     'tagsstring' => [
         'language' => 'ru',
         'options' => [
@@ -379,7 +427,10 @@ $aFieldParam = [
             'placeholder' => 'Выберите теги ...',
         ],
         'pluginOptions' => [
-            'tags' => array_values(ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_title')),
+            'tags' => array_values(ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG, $model->msg_subject), 'tag_id', 'tag_title')),
+            'separator' => isset(Yii::$app->params['tag.separator']) ? Yii::$app->params['tag.separator'] : '|',
+            'tokenSeparators' => [isset(Yii::$app->params['tag.separator']) ? Yii::$app->params['tag.separator'] : '|'],
+//            'data' => new JsExpression('function() { console.log("aTagsList = ", aTagsList); return {results: aTagsList}; }'),
             'allowClear' => true,
         ],
     ],
@@ -394,6 +445,9 @@ $aFieldParam = [
         'pluginOptions' => [
             'allowClear' => true,
         ],
+        'pluginEvents' => [
+            "change" => "function() { console.log('change ' + jQuery('#".$sSubjectId."').val()); getSubjectTags(); }",
+        ]
     ],
     'subjectfield' => [
         'horizontalCssClasses' => [

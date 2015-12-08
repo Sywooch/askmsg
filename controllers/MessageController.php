@@ -433,6 +433,10 @@ class MessageController extends Controller
                     if( !isset($_POST['savebutton']) ) {
                         return $this->redirect(['moderatelist']);
                     }
+                    $this->refresh();
+                    return;
+//                    Yii::info("model->refresh()");
+//                    $model->refresh();
                 }
             }
 

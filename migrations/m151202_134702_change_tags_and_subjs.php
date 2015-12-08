@@ -248,6 +248,7 @@ class m151202_134702_change_tags_and_subjs extends Migration
 
     public function up()
     {
+        return true;
         mb_internal_encoding('UTF-8');
 
         $aConvertSubj = [];
@@ -377,7 +378,7 @@ class m151202_134702_change_tags_and_subjs extends Migration
         $this->updateParents($nMaxTagId);
 
         echo 'Migration finished' . "\n";
-        return false;
+//        return false;
 
     }
 

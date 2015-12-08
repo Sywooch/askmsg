@@ -82,15 +82,23 @@ class Tags extends \yii\db\ActiveRecord
         if( is_string($aNames) ) {
             $aNames = [$aNames];
         }
+
         $aId = [];
         $aOb = ArrayHelper::map(
             self::getTagslist($nType),
             function($item) { return mb_strtolower($item->tag_title, 'UTF-8'); },
             'tag_id'
         );
+
+        $bAddnewTags = isset(Yii::$app->params['tag.addusertags']) ? Yii::$app->params['tag.addusertags'] : true;
+
         foreach($aNames As $v) {
             $st = mb_strtolower($v, 'UTF-8');
+
             if( !isset($aOb[$st]) ) {
+                if( !$bAddnewTags ) {
+                    continue;
+                }
                 $model = new Tags();
                 $model->attributes = [
                     'tag_active' => 1,
@@ -108,32 +116,43 @@ class Tags extends \yii\db\ActiveRecord
             }
             $aId[] = $id;
         }
+//        Yii::info(self::className() . '::getIdByNames() aId = ' . print_r($aId, true));
         return $aId;
     }
 
     /**
      * Возвращаем записи определенного типа
      * @param int $nType тип возвращаемых значений
+     * @param int $nParents для тегов - родительская тема
      * @return array
      *
      */
-    public static function getTagslist($nType)
+    public static function getTagslist($nType, $nParentsId = 0)
     {
         if( self::$_cache === null ) {
             self::$_cache = [];
         }
-        if( isset(self::$_cache[$nType]) ) {
-            return self::$_cache[$nType];
+
+        $sKey = $nType . '_' . $nParentsId;
+        Yii::info('getTagslist('.$nType.', '.$nParentsId.') = ' . $sKey);
+        if( isset(self::$_cache[$sKey]) ) {
+            return self::$_cache[$sKey];
         }
 
         $aRet = [];
         if( isset(self::$_aTypes[$nType]) ) {
+            $aFilter = ['And', ['=', 'tag_type', $nType], ['=', 'tag_active', 1]];
+            if( $nParentsId > 0 ) {
+                $aFilter[] = ['=', 'tag_parent_id', $nParentsId];
+            }
+            Yii::info('getTagslist('.$nType.', '.$nParentsId.') = ' . print_r($aFilter, true));
             $aRet = self::find()
-                ->where(['tag_type' => $nType, 'tag_active' => 1,])
+                ->where($aFilter)
                 ->orderBy('tag_title')
                 ->all();
+            Yii::info('getTagslist('.$nType.', '.$nParentsId.') count aRet' . count($aRet));
         }
-        self::$_cache[$nType] = $aRet;
+        self::$_cache[$sKey] = $aRet;
         return $aRet;
     }
 }

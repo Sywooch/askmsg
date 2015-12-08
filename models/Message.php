@@ -291,7 +291,7 @@ class Message extends \yii\db\ActiveRecord
             [['msg_flag'], 'required'],
 //            [['answers'], 'safe'],
             [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, ['us_active' => User::STATUS_ACTIVE], '{{val}}')), 'allowArray' => true],
-            [['alltags'], 'in', 'range' => ($this->scenario != 'importdata') ? array_keys(ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_title')) : [], 'allowArray' => true],
+            [['alltags'], 'in', 'range' => ($this->scenario != 'importdata') ? array_keys(ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG, $this->msg_subject), 'tag_id', 'tag_title')) : [], 'allowArray' => true],
             [['file'], 'safe'],
             [['file'], 'file', 'maxFiles' => $fileCount, 'maxSize' => Yii::$app->params['message.file.maxsize'], 'extensions' => Yii::$app->params['message.file.ext']],
 //            [['answers'], 'in', 'range' => array_keys(User::getGroupUsers(Rolesimport::ROLE_ANSWER_DOGM, '', '{{val}}')), 'allowArray' => true],
@@ -662,24 +662,30 @@ class Message extends \yii\db\ActiveRecord
     }
 
     /**
-     *  Связь сообщения и его тегов строкой с разделителями ','
+     *  Связь сообщения и его тегов строкой с разделителями Yii::$app->params['tag.separator']
      */
     public function getTagsstring() {
-        return implode(',', ArrayHelper::map($this->alltags, 'tag_id', 'tag_title'));
+        Yii::info(self::className() . '::getTagstring() this->alltags = ' . print_r(ArrayHelper::map($this->alltags, 'tag_id', 'tag_title'), true));
+        $sSeparator = isset(Yii::$app->params['tag.separator']) ? Yii::$app->params['tag.separator'] : '|';
+//        return implode(',', ArrayHelper::map($this->alltags, 'tag_id', 'tag_title'));
+        return implode($sSeparator, ArrayHelper::map($this->alltags, 'tag_id', 'tag_title'));
     }
 
     /**
-     *  Установка тегов по строке с разделителями ','
+     *  Установка тегов по строке с разделителями Yii::$app->params['tag.separator']
      * @param string $val
      */
     public function setTagsstring($val) {
-        $a = explode(',', $val);
+        $sSeparator = isset(Yii::$app->params['tag.separator']) ? Yii::$app->params['tag.separator'] : '|';
+        Yii::info(self::className() . '::setTagstring() val = ' . $val);
+        $a = explode($sSeparator, $val);
         foreach($a As $k => $v) {
             $v = trim($v);
             if( $v === '' ) {
                 unset($a[$k]);
             }
         }
+        Yii::info(self::className() . '::setTagstring() a = ' . print_r($a, true));
         $this->_tagsstring = $a;
     }
 
