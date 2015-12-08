@@ -324,7 +324,7 @@ class m151202_134702_change_tags_and_subjs extends Migration
 
         // выгребаем старые теги
         $aTagsData = ArrayHelper::map(
-            Tags::find()->where(['tag_type' => Tags::TAGTYPE_TAG, ])->all(),
+            Tags::find()->where(['and', ['=', 'tag_type', Tags::TAGTYPE_TAG], ['<=', 'tag_id', $nMaxTagId]])->all(),
             'tag_id',
             function($ob) { return ['title' => $ob->tag_title, 'used' => false,]; }
         );
@@ -372,8 +372,9 @@ class m151202_134702_change_tags_and_subjs extends Migration
         Yii::info(print_r($aConvertSubj, true));
         Yii::info(print_r($aConvertTags, true));
 
-        $this->addColumn('{{%tags}}', 'tag_parent_id', Schema::TYPE_INTEGER . ' Default NULL');
-        $this->refreshCache();
+//        $this->addColumn('{{%tags}}', 'tag_parent_id', Schema::TYPE_INTEGER . ' Default NULL');
+//        $this->refreshCache();
+//        return false;
 
         $this->updateParents($nMaxTagId);
 
