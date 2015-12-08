@@ -248,7 +248,7 @@ class m151202_134702_change_tags_and_subjs extends Migration
 
     public function up()
     {
-        return true;
+//        return true;
         mb_internal_encoding('UTF-8');
 
         $aConvertSubj = [];
@@ -295,8 +295,8 @@ class m151202_134702_change_tags_and_subjs extends Migration
         }
 
         $bErrorFinal = false;
-//        $nMaxTagId = 249; // на утро 03.12.2015
-        $nMaxTagId = Tags::find()->orderBy('tag_id DESC')->select('tag_id')->scalar();
+        $nMaxTagId = 249; // на 08.12.2015
+//        $nMaxTagId = Tags::find()->orderBy('tag_id DESC')->select('tag_id')->scalar();
         echo "\n\nnMaxTagId = {$nMaxTagId}\n\n";
 
         // выгребаем старые темы
