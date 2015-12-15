@@ -39,7 +39,7 @@ include dirname(__FILE__) . DIRECTORY_SEPARATOR . 'mail_styles_data.php';
     если вы удовлетворены ответом, выберите <a href="<?= Url::to(array_merge($aMarkLink, ['mark'=>5]), true) ?>">Да</a>,<br />
     если не удовлетворены - <a href="<?= Url::to(array_merge($aMarkLink, ['mark'=>0]), true) ?>">Нет</a>.</p>
 
-<p>Для выставления оценки Вам понадбится проверочный код: <?= $model->getTestCode() ?> .</p>
+<p>Для выставления оценки Вам понадобится проверочный код: <?= $model->getTestCode() ?> .</p>
 
 <p>&nbsp;</p>
 <p>&nbsp;</p>
