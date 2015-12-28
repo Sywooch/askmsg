@@ -6,10 +6,32 @@ use yii\widgets\Breadcrumbs;
 use app\assets\AppvideoAsset;
 use app\components\widgets\Alert;
 use app\models\Rolesimport;
+use yii\web\View;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
 
+/*
+.container-fluid {
+    min-width: 1200px; - отключить
+}
+
+#alf {
+    min-width: 1200px; - отключить
+}
+
+#top_logo_block - class="col-xs-12"
+#top_menu_block - class="col-xs-12"
+
+#head ul.menu li.active {
+    background-image: url("../images/beak.png"); - отключить
+}
+
+<span class="logo-box"> - в top_logo_block display: none;
+
+id="site" padding-left: 0, padding-right: 0,
+
+*/
 AppvideoAsset::register($this);
 $sHost = $_SERVER['HTTP_HOST'];
 ?>
@@ -72,6 +94,7 @@ if( $isAdmin || $isModerate ) {
         'items' => [
             ['label' => 'Список оповещений', 'url' => ['notificateact/index'], 'options' => ['class' => 'nocommonclass'], ],
             ['label' => 'Оповестить исполнителей', 'url' => ['notificateact/process'], 'options' => ['class' => 'nocommonclass'], ],
+            ['label' => 'Перенаправления тем', 'url' => ['subjredirect/index'], 'options' => ['class' => 'nocommonclass'], ],
 //            '<li class="divider"></li>',
 //            '<li class="dropdown-header">Dropdown Header</li>',
 //            ['label' => 'Level 1 - Dropdown B', 'url' => '#'],
@@ -116,7 +139,7 @@ $aMenuItems[] = Yii::$app->user->isGuest ?
 */        ?>
 
 <div id="site" class="container-fluid">
-    <div class="row minheight">
+    <div class="row minheight" id="info-page-block">
         <div class="col-xs-12 minheight">
             <div id="alf" class="container-fluid shadow">
                 <div class="row underline">
@@ -124,7 +147,7 @@ $aMenuItems[] = Yii::$app->user->isGuest ?
                         <div class="row alf-margin-box">
                             <div class="col-xs-12">
                                 <div id="head" class="row">
-                                    <div class="col-xs-5">
+                                    <div class="col-xs-5" id="top_logo_block">
                                         <a href="<?= $sLogoLink /* Yii::$app->homeUrl */ ?>" class="dogm-logo" target="_blank"></a>
                                 <span class="logo-box">
                                     <div class="text">
@@ -146,7 +169,7 @@ $aMenuItems[] = Yii::$app->user->isGuest ?
                                     </div>
                                 </span>
                                     </div>
-                                    <div class="col-xs-7">
+                                    <div class="col-xs-7" id="top_menu_block">
                                         <div class="moduletable_menu">
                                             <?= Nav::widget([
                                                 'options' => ['class' => 'nav menu'],
@@ -261,6 +284,64 @@ $aMenuItems[] = Yii::$app->user->isGuest ?
     </footer>
 
 */
+/*
+.container-fluid {
+    min-width: 1200px; - отключить
+}
+
+#alf {
+    min-width: 1200px; - отключить
+}
+
+#top_logo_block - class="col-xs-12"
+#top_menu_block - class="col-xs-12"
+
+#head ul.menu li.active {
+    background-image: url("../images/beak.png"); - отключить
+}
+
+<span class="logo-box"> - в top_logo_block display: none;
+
+id="site" padding-left: 0, padding-right: 0,
+
+.alf-margin-box {
+    margin-left: 60px;
+    margin-right: 60px;
+}
+
+#head {
+    height: 79px;
+}
+*/
+/*
+// Это кусок для изменения стилей для мобильных телефонов
+$sJs = <<<EOT
+// if( /Android|webOS|Mobi|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+console.log("Test: " + jQuery(window).width());
+if( jQuery(window).width() < 600 ) {
+    jQuery(".container-fluid").attr("style", 'min-width : auto');
+    jQuery("#alf").attr("style", 'min-width : auto');
+
+    jQuery("#top_logo_block").addClass("col-xs-12").removeClass("col-xs-5");
+    jQuery("#top_menu_block").addClass("col-xs-12").removeClass("col-xs-7");
+
+    jQuery("#top_logo_block .logo-box").hide();
+
+    jQuery("#site").css({'padding-left': 0, 'padding-right': 0});
+    jQuery(".alf-margin-box").css({"margin-left": "10px", "margin-right": "10px"});
+
+    jQuery("#info-page-block").css({"margin-left": 0, "margin-right": 0});
+
+    jQuery(".message-index h1").css({clear: "both"});
+
+    jQuery("#head").css({height: "auto"});
+    jQuery("#head ul.menu li.active").css({"background-image": "none"});
+}
+EOT;
+
+$this->registerJs($sJs, View::POS_READY, 'mobilecorrectjs');
+*/
+
 ?>
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
