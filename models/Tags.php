@@ -145,12 +145,12 @@ class Tags extends \yii\db\ActiveRecord
             if( $nParentsId > 0 ) {
                 $aFilter[] = ['=', 'tag_parent_id', $nParentsId];
             }
-            Yii::info('getTagslist('.$nType.', '.$nParentsId.') = ' . print_r($aFilter, true));
+//            Yii::info('getTagslist('.$nType.', '.$nParentsId.') = ' . print_r($aFilter, true));
             $aRet = self::find()
                 ->where($aFilter)
                 ->orderBy('tag_title')
                 ->all();
-            Yii::info('getTagslist('.$nType.', '.$nParentsId.') count aRet' . count($aRet));
+//            Yii::info('getTagslist('.$nType.', '.$nParentsId.') count aRet' . count($aRet));
         }
         self::$_cache[$sKey] = $aRet;
         return $aRet;

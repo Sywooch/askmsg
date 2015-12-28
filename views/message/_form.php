@@ -565,7 +565,34 @@ $aFieldParam = [
 
     ],
 
+];
+
+if( false && ($model->scenario == 'person') ) {
+    $sSub = 'person';
+    $sLink = Url::to(['subjredirect/html'], true);
+
+    $aFieldParam['subject']['pluginEvents'] = [
+        'change' => 'function(event) {
+                        var oTempl = jQuery("#modaltemplate"),
+                            oMessage = oTempl.clone(),
+                            oParent = oTempl.parent();
+                        oParent.children(":visible").remove();
+                        jQuery.ajax({
+                            url: "'.$sLink.'",
+                            data: {subjid: event.val},
+                            success: function(data, textStatus, jqXHR){
+                                oMessage
+                                    .append(data)
+                                    .attr("id", "doplinks" + event.val)
+                                    .appendTo(oParent)
+                                    .fadeIn();
+                            },
+                            dataType: "html"
+                        });
+                }',
     ];
+}
+
 ?>
 
 <div class="message-form">
@@ -798,6 +825,15 @@ $aFieldParam = [
         </div>
     <?php
     endif; // if( $isModerate ):
+    if( $model->scenario == 'person' ):
+    ?>
+        <div class="col-sm-11 col-sm-offset-1">
+            <div class="alert alert-warning alert-dismissible" role="alert" id="modaltemplate" style="display: none;">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+        </div>
+    <?php
+    endif; // $model->scenario == 'person'
     ?>
 
     <div class="col-sm-4">
