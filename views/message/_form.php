@@ -567,7 +567,7 @@ $aFieldParam = [
 
 ];
 
-if( false && ($model->scenario == 'person') ) {
+if( $model->scenario == 'person' ) {
     $sSub = 'person';
     $sLink = Url::to(['subjredirect/html'], true);
 
