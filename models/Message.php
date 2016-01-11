@@ -28,6 +28,7 @@ use app\components\RustextValidator;
 use app\models\Notificatelog;
 use app\models\Orgsovet;
 use app\models\Sovet;
+use app\components\SwiftHeaders;
 
 /**
  * This is the model class for table "{{%message}}".
@@ -1129,6 +1130,9 @@ class Message extends \yii\db\ActiveRecord
         } // foreach($aType As $sType)
 
         if( count($aMessages) > 0 ) {
+            foreach($aMessages As $k=>$v) {
+                SwiftHeaders::setAntiSpamHeaders($aMessages[$k], ['email' => Yii::$app->params['supportEmail']]);
+            }
             Yii::$app->mailer->sendMultiple($aMessages);
         }
     }
