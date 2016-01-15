@@ -231,8 +231,8 @@ $aMenuItems[] = Yii::$app->user->isGuest ?
         <div class="container-fluid" style="max-width: 1300px;">
 
             <div class="col-xs-6">
-                <span class="text-url">&copy; 2015</span> <a class="text-url mr" href="http://dogm.mos.ru">Департамент образования города Москвы</a>
-                <span class="text-url">&copy; 2015 Разработка и поддержка </span><a class="text-url" href="http://temocenter.ru">ТемоЦентр</a>
+                <span class="text-url">&copy; <?= date('Y') ?></span> <a class="text-url mr" href="http://dogm.mos.ru">Департамент образования города Москвы</a>
+                <span class="text-url">&copy; <?= date('Y') ?> Разработка и поддержка </span><a class="text-url" href="http://temocenter.ru">ТемоЦентр</a>
             </div>
             <div class="col-xs-6" style="text-align: right;"><span class="text-url"></span>
                 <?=
