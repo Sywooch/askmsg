@@ -424,6 +424,8 @@ class Message extends \yii\db\ActiveRecord
                 [
                     Msgflags::MFLG_SHOW_NEWANSWER,
                     Msgflags::MFLG_INT_NEWANSWER,
+                    Msgflags::MFLG_SHOW_NOSOGL,
+                    Msgflags::MFLG_INT_NOSOGL,
                 ]
             ) ? ['msg_answer'] : []
         );

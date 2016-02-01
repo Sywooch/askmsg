@@ -327,6 +327,12 @@ class MessageSearch extends Message
                 ->andFilterWhere(['<', 'msg_createtime', $a[1]]);
         }
 
+        if( isset(Yii::$app->params['message.archiveperiod']) ) {
+            $sdate = time() - Yii::$app->params['message.archiveperiod'] * 24 * 3600;
+            $query
+                ->andFilterWhere(['>', 'msg_createtime', date('Y-m-d', $sdate)]);
+        }
+
         if (!$this->validate()) {
             // uncomment the following line if you do not want to any records when validation fails
             // $query->where('0=1');
