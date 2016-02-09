@@ -58,9 +58,10 @@ class ExportdataForm extends Model
     public $_aAllFields = [
             'msg_id',
             'msg_createtime',
-            'msg_pers_name',
-            'msg_pers_secname',
-            'msg_pers_lastname',
+            'fio',
+//            'msg_pers_name',
+//            'msg_pers_secname',
+//            'msg_pers_lastname',
             'msg_pers_email',
             'msg_pers_phone',
             'msg_pers_org',
@@ -77,7 +78,6 @@ class ExportdataForm extends Model
             'msg_empl_remark',
             'msg_answertime',
             'alltags',
-            'fio',
         ];
 
 
