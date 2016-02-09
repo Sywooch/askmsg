@@ -19,6 +19,7 @@ use app\models\Rolesimport;
 use app\models\Message;
 use app\models\MessageSearch;
 use app\components\WaitTrait;
+use app\components\ExportMessagesAction;
 
 /**
  * MessageController implements the CRUD actions for Message model.
@@ -48,7 +49,7 @@ class MessageController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['update', 'delete', 'moderatelist', 'upload', 'instruction', 'testmail'],
+                        'actions' => ['update', 'delete', 'moderatelist', 'upload', 'instruction', 'testmail', 'exportdata'],
                         'roles' => [Rolesimport::ROLE_MODERATE_DOGM],
                     ],
                     [
@@ -81,6 +82,7 @@ class MessageController extends Controller
                 'minLength' => 2,
                 'maxLength' => 3,
             ],
+            'exportdata' => ExportMessagesAction::className(),
         ];
     }
 

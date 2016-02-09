@@ -95,6 +95,7 @@ if( $isAdmin || $isModerate ) {
             ['label' => 'Список оповещений', 'url' => ['notificateact/index'], 'options' => ['class' => 'nocommonclass'], ],
             ['label' => 'Оповестить исполнителей', 'url' => ['notificateact/process'], 'options' => ['class' => 'nocommonclass'], ],
             ['label' => 'Перенаправления тем', 'url' => ['subjredirect/index'], 'options' => ['class' => 'nocommonclass'], ],
+            ['label' => 'Выгрузка', 'url' => ['message/exportdata'], 'options' => ['class' => 'nocommonclass'], ],
 //            '<li class="divider"></li>',
 //            '<li class="dropdown-header">Dropdown Header</li>',
 //            ['label' => 'Level 1 - Dropdown B', 'url' => '#'],
