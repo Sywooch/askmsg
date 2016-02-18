@@ -138,6 +138,8 @@ class Message extends \yii\db\ActiveRecord
                 Msgflags::MFLG_INT_REVIS_INSTR,
                 Msgflags::MFLG_SHOW_INSTR,
                 Msgflags::MFLG_SHOW_REVIS,
+                Msgflags::MFLG_SHOW_NOSOGL,
+                Msgflags::MFLG_INT_NOSOGL,
             ],
             Rolesimport::ROLE_ADMIN => [
                 Msgflags::MFLG_THANK,
@@ -776,6 +778,24 @@ class Message extends \yii\db\ActiveRecord
             );
         }
 */
+        $bRet = ((Yii::$app->user->can(Rolesimport::ROLE_ANSWER_DOGM)
+             && $this->msg_empl_id == Yii::$app->user->identity->getId())
+             || $bModerate)
+             && in_array($this->msg_flag, $aFlagAns)
+             ;
+        return $bRet;
+    }
+
+    /**
+     *  Возможность проверки контролером
+     */
+    public function getIsControlable() {
+        $bModerate = Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM);
+        $aFlagAns = [
+            Msgflags::MFLG_SHOW_NOSOGL,
+            Msgflags::MFLG_INT_NOSOGL,
+        ];
+
         $bRet = ((Yii::$app->user->can(Rolesimport::ROLE_ANSWER_DOGM)
              && $this->msg_empl_id == Yii::$app->user->identity->getId())
              || $bModerate)

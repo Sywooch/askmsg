@@ -245,7 +245,7 @@ EOT;
             [
                 'class' => 'yii\grid\ActionColumn',
                 'contentOptions' => ['class' => 'commandcell'],
-                'template'=>'{view} {update} {answer} {toword} {delete}', //  {send}
+                'template'=>'{view} {update} {answer} {curatortest} {toword} {delete}', //  {send}
                 'buttons'=>[
                     'view'=>function ($url, $model) {
                         return Html::a( '<span class="glyphicon glyphicon-eye-open"></span>', $url,
@@ -258,8 +258,15 @@ EOT;
                             '';
                    },
                     'answer'=>function ($url, $model) {
+                        /** @var Message $model */
                         return $model->isAnswerble ?
                             Html::a( '<span class="glyphicon glyphicon-refresh"></span>', $url, ['title' => 'Ответить на обращение ' . $model->msg_id]) :
+                            '';
+                    },
+                    'curatortest'=>function ($url, $model) {
+                        /** @var Message $model */
+                        return $model->isControlable ?
+                            Html::a( '<span class="glyphicon glyphicon-exclamation-sign"></span>', $url, ['title' => 'Проверить обращение ' . $model->msg_id]) :
                             '';
                     },
                     'toword'=>function ($url, $model) {

@@ -188,17 +188,39 @@ class MessageSearch extends Message
             }
         }
 
+        $aEmployFilter = [];
+        if( !empty($this->msg_empl_id) ) {
+            $aEmployFilter = [
+                'or',
+                [
+                    'and',
+                    ['msg_empl_id' => $this->msg_empl_id],
+                    ['msg_flag' => [
+                        Msgflags::MFLG_INT_INSTR,
+                        Msgflags::MFLG_INT_REVIS_INSTR,
+                        Msgflags::MFLG_SHOW_INSTR,
+                        Msgflags::MFLG_SHOW_REVIS,
+                        ]
+                    ]
+                ],
+                [
+                    'and',
+                    ['msg_curator_id' => $this->msg_empl_id],
+                    ['msg_flag' => [Msgflags::MFLG_SHOW_NOSOGL, Msgflags::MFLG_INT_NOSOGL, ]]
+                ],
+            ];
+        }
+
         if( !empty($this->answers) ) {
             $ansQuery = (new Query)
                 ->select('ma_message_id')
                 ->from(Msganswers::tableName())
                 ->where(['ma_user_id' => $this->answers])
                 ->distinct();
-            $query->andFilterWhere(['or', ['msg_id' => $ansQuery], ['msg_empl_id' => $this->msg_empl_id]]);
+            $query->andFilterWhere(['or', ['msg_id' => $ansQuery], $aEmployFilter]);
         }
         else {
-            $query->andFilterWhere(['or', ['msg_empl_id' => $this->msg_empl_id], ['msg_curator_id' => $this->msg_empl_id], ]);
-
+            $query->andFilterWhere($aEmployFilter);
         }
 
         if( !empty($this->alltags) ) {
