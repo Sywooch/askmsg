@@ -124,6 +124,7 @@ class Message extends \yii\db\ActiveRecord
                 Msgflags::MFLG_SHOW_ANSWER,
                 Msgflags::MFLG_SHOW_INSTR,
                 Msgflags::MFLG_SHOW_NEWANSWER,
+                Msgflags::MFLG_SHOW_NOSOGL,
             ],
             Rolesimport::ROLE_MODERATE_DOGM => [
                 Msgflags::MFLG_NEW,
