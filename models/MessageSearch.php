@@ -190,37 +190,25 @@ class MessageSearch extends Message
 
         $aEmployFilter = [];
         if( !empty($this->msg_empl_id) ) {
-            $aEmployFilter = [
-                'or',
-                [
-                    'and',
-                    ['msg_empl_id' => $this->msg_empl_id],
-                    ['msg_flag' => [
-                        Msgflags::MFLG_INT_INSTR,
-                        Msgflags::MFLG_INT_REVIS_INSTR,
-                        Msgflags::MFLG_SHOW_INSTR,
-                        Msgflags::MFLG_SHOW_REVIS,
-                        ]
-                    ]
-                ],
-                [
-                    'and',
-                    ['msg_curator_id' => $this->msg_empl_id],
-                    ['msg_flag' => [Msgflags::MFLG_SHOW_NOSOGL, Msgflags::MFLG_INT_NOSOGL, ]]
-                ],
-            ];
-        }
+//            $aEmployFilter = [
+//                'or',
+//                ['msg_empl_id' => $this->msg_empl_id],
+//                ['msg_curator_id' => $this->msg_empl_id],
+//            ];
 
-        if( !empty($this->answers) ) {
             $ansQuery = (new Query)
                 ->select('ma_message_id')
                 ->from(Msganswers::tableName())
-                ->where(['ma_user_id' => $this->answers])
+                ->where(['ma_user_id' => $this->msg_empl_id])
                 ->distinct();
-            $query->andFilterWhere(['or', ['msg_id' => $ansQuery], $aEmployFilter]);
-        }
-        else {
-            $query->andFilterWhere($aEmployFilter);
+//            $query->andFilterWhere(['or', ['msg_id' => $ansQuery], $aEmployFilter]);
+
+            $query->andFilterWhere([
+                'or',
+                ['msg_id' => $ansQuery],
+                ['msg_empl_id' => $this->msg_empl_id],
+                ['msg_curator_id' => $this->msg_empl_id],
+            ]);
         }
 
         if( !empty($this->alltags) ) {
@@ -382,6 +370,165 @@ class MessageSearch extends Message
 
 //        $query->andFilterWhere(['like', 'msg_pers_lastname', $this->msg_pers_lastname]);
 //        $query->andFilterWhere(['like', 'msg_pers_org', $this->msg_pers_org]);
+
+        return $dataProvider;
+    }
+
+    /**
+     * Creates data provider instance with search query applied
+     *
+     * @param array $params
+     *
+     * @return ActiveDataProvider
+     */
+    public function searchanswer($params)
+    {
+        if( $params !== null ) {
+            $this->load($params);
+        }
+
+        $aScenario = $this->scenarios();
+
+        $query = Message::find()
+            ->with('employee')
+            ->with('curator')
+            ->with('answers')
+            ->with('alltags')
+            ->with('region')
+//            ->with('orgsovet')
+            ->with('sovet')
+//            ->with('attachments')
+            ->with('flag');
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'sort'=> [
+                'defaultOrder' => [
+                    'msg_createtime'=>SORT_DESC
+                ]
+            ],
+            'pagination' => [
+                'defaultPageSize' => 50,
+                'pageSize' => 50,
+            ],
+
+        ]);
+
+
+        // если указан id записи, все остальное сбрасываем
+        if( !empty($this->msg_id) ) {
+            $a = ['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_org', 'msg_flag', 'msgflags', 'msg_pers_region', 'msg_subject', 'answers', 'alltags', 'msg_createtime'];
+            foreach($a As $v) {
+                $this->$v = null;
+            }
+        }
+
+        $aEmployFilter = [];
+        if( !empty($this->msg_empl_id) ) {
+            $aEmployFilter = [
+                'or',
+                [
+                    'and',
+                    ['msg_empl_id' => $this->msg_empl_id],
+                    ['msg_flag' => [
+                        Msgflags::MFLG_INT_INSTR,
+                        Msgflags::MFLG_INT_REVIS_INSTR,
+                        Msgflags::MFLG_SHOW_INSTR,
+                        Msgflags::MFLG_SHOW_REVIS,
+                    ]
+                    ]
+                ],
+                [
+                    'and',
+                    ['msg_curator_id' => $this->msg_empl_id],
+                    ['msg_flag' => [Msgflags::MFLG_SHOW_NOSOGL, Msgflags::MFLG_INT_NOSOGL, ]]
+                ],
+            ];
+        }
+
+        if( !empty($this->answers) ) {
+            $ansQuery = (new Query)
+                ->select('ma_message_id')
+                ->from(Msganswers::tableName())
+                ->where(['ma_user_id' => $this->answers])
+                ->distinct();
+            $query->andFilterWhere(['or', ['msg_id' => $ansQuery], $aEmployFilter]);
+        }
+        else {
+            $query->andFilterWhere($aEmployFilter);
+        }
+
+        if( !empty($this->alltags) ) {
+            $tagsQuery = (new Query)
+                ->select('mt_msg_id')
+                ->from(Msgtags::tableName())
+                ->where(['mt_tag_id' => $this->alltags])
+                ->distinct();
+            $query->andFilterWhere(['msg_id' => $tagsQuery]);
+        }
+
+        if( !empty($this->_flagsstring) ) {
+            $this->msgflags = Msgflags::getIdByNames(explode(',', $this->_flagsstring));
+//            Yii::info('this->_flagsstring = ' . $this->_flagsstring . "\nthis->msgflags = " . implode(', ', $this->msgflags) . "\n this->msg_flag = " . ($this->msg_flag? 'use' : 'not use'));
+        }
+
+        $a = $this->getDatePeriod('msg_createtime');
+        if( count($a) > 1 ) {
+            $query
+                ->andFilterWhere(['>=', 'msg_createtime', $a[0]])
+                ->andFilterWhere(['<', 'msg_createtime', $a[1]]);
+        }
+        else {
+            $a = $this->makeDateRange('msg_createtime');
+            if (count($a) > 1) {
+                $query
+                    ->andFilterWhere(['>', 'msg_createtime', $a[0]])
+                    ->andFilterWhere(['<', 'msg_createtime', $a[1]]);
+            }
+        }
+
+        if( !empty($this->askid) ) {
+            $this->prepareDateFilter($query);
+        }
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+        $query->andFilterWhere([
+            'msg_id' => $this->msg_id,
+//            'msg_createtime' => $this->msg_createtime,
+            'msg_subject' => $this->msg_subject,
+            'msg_pers_region' => $this->msg_pers_region,
+//            'msg_answertime' => $this->msg_answertime,
+            'msg_flag' => $this->msg_flag ? $this->msg_flag : $this->msgflags,
+        ]);
+
+        if( !empty($this->msg_pers_lastname) ) {
+            $a = explode(' ', $this->msg_pers_lastname);
+            foreach($a As $v) {
+                $v = trim($v);
+                if( $v === '' ) {
+                    continue;
+                }
+                $query->andFilterWhere(['or', ['like', 'msg_pers_lastname', $v], ['like', 'msg_pers_name', $v], ['like', 'msg_pers_secname', $v]] );
+            }
+        }
+
+        $query->andFilterWhere(['like', 'msg_pers_name', $this->msg_pers_name])
+            ->andFilterWhere(['like', 'msg_pers_secname', $this->msg_pers_secname])
+//            ->andFilterWhere(['like', 'msg_pers_lastname', $this->msg_pers_lastname])
+            ->andFilterWhere(['like', 'msg_pers_email', $this->msg_pers_email])
+            ->andFilterWhere(['like', 'msg_pers_phone', $this->msg_pers_phone])
+            ->andFilterWhere(['like', 'msg_pers_org', $this->msg_pers_org]);
+//            ->andFilterWhere(['like', 'msg_pers_text', $this->msg_pers_text])
+//            ->andFilterWhere(['like', 'msg_comment', $this->msg_comment])
+//            ->andFilterWhere(['like', 'msg_empl_command', $this->msg_empl_command])
+//            ->andFilterWhere(['like', 'msg_empl_remark', $this->msg_empl_remark])
+//            ->andFilterWhere(['like', 'msg_answer', $this->msg_answer])
+//            ->andFilterWhere(['like', 'msg_oldcomment', $this->msg_oldcomment]);
 
         return $dataProvider;
     }

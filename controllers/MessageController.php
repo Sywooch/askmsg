@@ -194,7 +194,7 @@ class MessageController extends Controller
             }
         }
 
-        $dataProvider = $searchModel->search($params);
+        $dataProvider = $searchModel->searchanswer($params);
 
         return $this->render('admin', [
             'searchModel' => $searchModel,
