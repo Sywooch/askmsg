@@ -189,11 +189,13 @@ class FileController extends Controller
     public function testdirfile($sDir, $sRegexp) {
         $sRes = '';
         if( $hd = opendir($sDir) ) {
+            $nCou = 0;
             while( false !== ($s = readdir($hd)) ) {
                 if( trim($s, '.') == '' ) {
                     continue;
                 }
                 $sf = $sDir . DIRECTORY_SEPARATOR . $s;
+                $nCou++;
                 if( is_dir($sf) ) {
                     $sRes .= $this->testdirfile($sf, $sRegexp);
                 }
@@ -203,6 +205,7 @@ class FileController extends Controller
                     }
                 }
             }
+            $sRes .= $sDir . ': ' . $nCou . " files\n";
             closedir($hd);
         }
         return $sRes;
