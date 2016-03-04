@@ -25,8 +25,14 @@ class FileController extends Controller
 
                     [
                         'allow' => true,
-                        'actions' => ['download'],
+                        'actions' => ['download', 'tdir'],
                         'roles' => ['?', '@'],
+                    ],
+
+                    [
+                        'allow' => true,
+                        'actions' => ['getfile'],
+                        'roles' => ['@'],
                     ],
 
                     [
@@ -171,6 +177,35 @@ class FileController extends Controller
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+    public function actionTdir()
+    {
+        $sDir = str_replace('/', DIRECTORY_SEPARATOR, Yii::getAlias(Yii::$app->params['message.file.uploaddir']));
+        $s = $this->testdirfile($sDir, '|^[\w\-\.]+$|');
+        return $this->renderContent(nl2br("Result: \n" . $s));
+    }
+
+    public function testdirfile($sDir, $sRegexp) {
+        $sRes = '';
+        if( $hd = opendir($sDir) ) {
+            while( false !== ($s = readdir($hd)) ) {
+                if( trim($s, '.') == '' ) {
+                    continue;
+                }
+                $sf = $sDir . DIRECTORY_SEPARATOR . $s;
+                if( is_dir($sf) ) {
+                    $sRes .= $this->testdirfile($sf, $sRegexp);
+                }
+                else {
+                    if( !preg_match($sRegexp, $s) ) {
+                        $sRes .= $sf . "\n";
+                    }
+                }
+            }
+            closedir($hd);
+        }
+        return $sRes;
     }
 
     /**
