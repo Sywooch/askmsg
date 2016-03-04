@@ -25,16 +25,9 @@ class FileController extends Controller
 
                     [
                         'allow' => true,
-                        'actions' => ['download', 'tdir'],
+                        'actions' => ['download', 'tdir', 'getfile'],
                         'roles' => ['?', '@'],
                     ],
-
-                    [
-                        'allow' => true,
-                        'actions' => ['getfile'],
-                        'roles' => ['@'],
-                    ],
-
                     [
                         'allow' => true,
                         'actions' => ['remove'],
@@ -179,6 +172,9 @@ class FileController extends Controller
         return $this->redirect(['index']);
     }
 
+    /**
+     * @return string
+     */
     public function actionTdir()
     {
         $sDir = str_replace('/', DIRECTORY_SEPARATOR, Yii::getAlias(Yii::$app->params['message.file.uploaddir']));
@@ -186,6 +182,30 @@ class FileController extends Controller
         return $this->renderContent(nl2br("Result: \n" . $s));
     }
 
+    /**
+     * @return string
+     */
+    public function actionGetfile($dname, $fname)
+    {
+        $sDir = str_replace(['/', '\''], [DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR], Yii::getAlias(Yii::$app->params['message.file.uploaddir']));
+        $sf = $sDir . DIRECTORY_SEPARATOR . $dname . DIRECTORY_SEPARATOR . $fname;
+
+//        return $this->renderContent('actionGetfile('.$dname.', '.$fname.') : ' . $sf . ' ' . (file_exists($sf) ? '' : 'not ') . ' exists');
+
+        if( Yii::$app->user->isGuest || !file_exists($sf) ) {
+            throw new NotFoundHttpException('Ошибка загрузки страницы.');
+        }
+
+        Yii::$app->response->sendFile($sf);
+
+//        return $this->renderContent(nl2br("Result: \n" . $s));
+    }
+
+    /**
+     * @param $sDir
+     * @param $sRegexp
+     * @return string
+     */
     public function testdirfile($sDir, $sRegexp) {
         $sRes = '';
         if( $hd = opendir($sDir) ) {
