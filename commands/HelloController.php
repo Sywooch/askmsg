@@ -121,4 +121,36 @@ class HelloController extends Controller
             echo iconv('UTF-8', 'CP866', $s);
         }
     }
+
+    /**
+     * run: yii hello/hashpassword password email
+     * @param string $password
+     * @param string $email
+     */
+    public function actionHashpassword($password='', $email='') {
+        if( empty($password) ) {
+            echo "Password doesn't hashed !!!!!\n\nUsage: yii hello/hashpassword password [email]\n\n";
+            exit(0);
+        }
+        $sHash = Yii::$app->security->generatePasswordHash($password);
+        $oUser = User::find()->where(['us_email' => $email])->one();
+        if( empty($email) || ($oUser === null) ) {
+            echo "Password [{$password}] hash: {$sHash}\n";
+        }
+        else {
+            $sSql = 'Update ' . User::tableName() . ' Set us_password_hash = :hash Where us_email = :email Limit 1';
+            $nUpd = Yii::$app
+                ->db
+                ->createCommand(
+                    $sSql,
+                    [
+                        ':hash' => $sHash,
+                        ':email' => $email,
+                    ]
+                )
+                ->execute();
+            echo 'Updated records: ' . $nUpd . ' for email ' . $email . " set password = {$password}\n";
+        }
+        exit(0);
+    }
 }
