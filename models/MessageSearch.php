@@ -430,7 +430,7 @@ class MessageSearch extends Message
                 [
                     'and',
                     ['msg_empl_id' => $this->msg_empl_id],
-                    ['msg_flag' => [
+                    ['msg_flag' => $this->msg_flag ? $this->msg_flag : [
                         Msgflags::MFLG_INT_INSTR,
                         Msgflags::MFLG_INT_REVIS_INSTR,
                         Msgflags::MFLG_SHOW_INSTR,
