@@ -135,8 +135,8 @@ $oSheet->getColumnDimension('J')->setWidth(60);
 $oSheet->getColumnDimension('K')->setWidth(60);
 $oSheet->getColumnDimension('L')->setWidth(40);
 $oSheet->getColumnDimension('M')->setWidth(40);
-$oSheet->getColumnDimension('N')->setWidth(16);
-$sLastCol = 'N';
+//$oSheet->getColumnDimension('N')->setWidth(16);
+$sLastCol = 'M';
 //$oSheet->getColumnDimension('D')->setAutoSize(true);
 //$oSheet->getColumnDimension('E')->setWidth(80);
 $oSheet->setCellValue('A1', Yii::$app->name)
@@ -163,7 +163,7 @@ $oSheet->fromArray(
         'Ответ',
         'Поручение исполнителю',
         'Замечание исполнителю',
-        'Дата ответа',
+//        'Дата ответа',
     ],
     null,
     'A4'
@@ -199,9 +199,9 @@ for($page = 0; $page < $nPageCount; $page++) {
                 $model->getFullName(),
                 $model->msg_pers_text,
                 strip_tags($model->msg_answer),
-                $model->msg_empl_command,
+                strip_tags($model->msg_empl_command),
                 $model->msg_empl_remark,
-                date("d.m.Y", strtotime($model->msg_answertime)),
+//                date("d.m.Y", strtotime($model->msg_answertime)),
             ],
             null,
             'A' . $nRow
