@@ -112,9 +112,10 @@ class MessageController extends Controller
         $searchModel = new MessageSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $format = Yii::$app->request->getQueryParam('format', 'xlsx');
+        $allfields = Yii::$app->request->getQueryParam('allfields', 0);
 
         return $this->render(
-            (substr($format, 0, 3) == 'doc') ? 'export-doc' : 'export-wt-1',
+            (substr($format, 0, 3) == 'doc') ? 'export-doc' : ($allfields ? 'export-wt-all' : 'export-wt-1'),
             [
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,

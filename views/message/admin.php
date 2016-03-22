@@ -553,6 +553,17 @@ EOT;
                             ),
                             'icon' => 'fa-file-excel-o',
                         ],
+                        [
+                            'title' => 'Полная за текущий год (' . date('Y') . ')',
+                            'url' => Url::to(
+                                array_merge(
+                                    ['export'],
+                                    [$sFormName.'[msg_createtime]' => '01.01.' . date('Y') . '-' . date('d.m.Y')],
+                                    ['format' => 'xlsx', 'allfields' => 1, ]
+                                )
+                            ),
+                            'icon' => 'fa-file-excel-o',
+                        ],
                     ];
 
                     $aIem = [];
