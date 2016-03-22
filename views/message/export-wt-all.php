@@ -197,9 +197,9 @@ for($page = 0; $page < $nPageCount; $page++) {
                 $model->msg_mark !== null ? ($model->msg_mark == 5 ? '+' : '-') : '',
 
                 $model->getFullName(),
-                $model->msg_pers_text,
+                strip_tags($model->msg_pers_text),
                 strip_tags($model->msg_answer),
-                strip_tags($model->msg_empl_command),
+                $model->msg_empl_command,
                 $model->msg_empl_remark,
 //                date("d.m.Y", strtotime($model->msg_answertime)),
             ],
