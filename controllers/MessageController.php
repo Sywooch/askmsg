@@ -366,7 +366,11 @@ class MessageController extends Controller
             $model = new Message();
             $model->scenario = 'person';
 
-            $model->msg_subject = Yii::$app->request->getQueryParam('subid', null);
+            $nSubjectId = Yii::$app->request->getQueryParam('subid', null);
+            if( $nSubjectId == 254 ) {
+                $model->msg_subject = $nSubjectId;
+                $model->msg_pers_text = "Здравствуйте,\n\nЯ хотел бы задать вопрос по заработной плате педагогов:\n\n";
+            }
 /*
             if( Yii::$app->session->has('parent-msg-id') ) {
                 // была переадресация с оценки предыдущего сообщения
