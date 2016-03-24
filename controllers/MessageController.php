@@ -365,6 +365,8 @@ class MessageController extends Controller
         if( $id == 0 ) {
             $model = new Message();
             $model->scenario = 'person';
+
+            $model->msg_subject = Yii::$app->request->getQueryParam('subid', null);
 /*
             if( Yii::$app->session->has('parent-msg-id') ) {
                 // была переадресация с оценки предыдущего сообщения
