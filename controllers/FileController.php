@@ -25,12 +25,12 @@ class FileController extends Controller
 
                     [
                         'allow' => true,
-                        'actions' => ['download', 'tdir', 'getfile'],
+                        'actions' => ['tdir', 'getfile'],
                         'roles' => ['?', '@'],
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['remove'],
+                        'actions' => ['download', 'remove'],
                         'roles' => [Rolesimport::ROLE_MODERATE_DOGM, Rolesimport::ROLE_ANSWER_DOGM],
                     ],
                     [
