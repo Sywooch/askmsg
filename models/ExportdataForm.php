@@ -78,6 +78,7 @@ class ExportdataForm extends Model
             'msg_empl_remark',
             'msg_answertime',
             'alltags',
+            'sovetid',
         ];
 
 
