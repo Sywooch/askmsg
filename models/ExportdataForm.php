@@ -128,7 +128,7 @@ class ExportdataForm extends Model
             'finishdate' => 'Конечная дата',
             'fieldslist' => 'Поля для вывода',
             'fio' => 'ФИО посетителя',
-            'sovetid' => 'МСРД',
+            'sovetid' => 'МРСД',
         ];
         if( $this->_oMsg === null ) {
             $this->_oMsg = new Message();
