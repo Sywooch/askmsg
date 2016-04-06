@@ -127,6 +127,7 @@ class ExportdataForm extends Model
             'finishdate' => 'Конечная дата',
             'fieldslist' => 'Поля для вывода',
             'fio' => 'ФИО посетителя',
+            'sovetid' => 'МСРД',
         ];
         if( $this->_oMsg === null ) {
             $this->_oMsg = new Message();
@@ -309,6 +310,12 @@ class ExportdataForm extends Model
         }
         else if( $sField == 'fio' ) {
             return $ob->getFullName();
+        }
+        else if( $sField == 'sovetid' ) {
+            $sSovet = $ob->sovet ? $ob->sovet->sovet_title : '';
+            $a = explode(',', $sSovet);
+            $sSovet = array_pop($a);
+            return $sSovet;
         }
         else if( $sField == 'alltags' ) {
             return implode(",", ArrayHelper::map($ob->alltags, 'tag_id', function($o) { return $o->tag_title; }));
