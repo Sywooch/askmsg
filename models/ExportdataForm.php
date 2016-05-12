@@ -79,6 +79,7 @@ class ExportdataForm extends Model
             'msg_answertime',
             'alltags',
             'sovetid',
+            'ekis_id',
         ];
 
 
@@ -129,6 +130,7 @@ class ExportdataForm extends Model
             'fieldslist' => 'Поля для вывода',
             'fio' => 'ФИО посетителя',
             'sovetid' => 'МРСД',
+            'ekis_id' => 'Код ЕКИС',
         ];
         if( $this->_oMsg === null ) {
             $this->_oMsg = new Message();
@@ -173,8 +175,8 @@ class ExportdataForm extends Model
                 ]
             ],
             'pagination' => [
-                'defaultPageSize' => 50,
-                'pageSize' => 50,
+                'defaultPageSize' => 100,
+                'pageSize' => 100,
             ],
 
         ]);
