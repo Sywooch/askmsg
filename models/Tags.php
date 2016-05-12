@@ -13,6 +13,7 @@ use yii\helpers\ArrayHelper;
  * @property string $tag_title
  * @property integer $tag_type
  * @property integer $tag_parent_id
+ * @property integer $tag_rating_val
  */
 class Tags extends \yii\db\ActiveRecord
 {
@@ -41,7 +42,7 @@ class Tags extends \yii\db\ActiveRecord
     {
         return [
             [['tag_title', 'tag_type'], 'required'],
-            [['tag_active', 'tag_type', ], 'integer'],
+            [['tag_active', 'tag_type', 'tag_rating_val', ], 'integer'],
             [['tag_title'], 'unique', 'targetAttribute' => ['tag_title', 'tag_type']],
             [['tag_title'], 'string', 'max' => 255],
         ];
@@ -58,6 +59,7 @@ class Tags extends \yii\db\ActiveRecord
             'tag_title' => 'Заголовок',
             'tag_type' => 'Тип',
             'tag_parent_id' => 'Родитель',
+            'tag_rating_val' => 'В рейтинг',
         ];
     }
 

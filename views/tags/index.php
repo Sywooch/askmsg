@@ -17,7 +17,7 @@ GriddataAsset::register($this);
 /* <h1><?= Html::encode($this->title) ?></h1> */
 
 ?>
-<div class="tags-index col-sm-6">
+<div class="tags-index">
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -55,6 +55,14 @@ GriddataAsset::register($this);
                 },
             ],
             'tag_title',
+            [
+                'class' => 'yii\grid\DataColumn',
+                'filter' => ['Нет', 'Да'],
+                'attribute' => 'tag_rating_val',
+                'content' => function ($model, $key, $index, $column) {
+                    return $model->tag_rating_val ? '<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>' : '';
+                },
+            ],
 
             [
                 'class' => 'yii\grid\ActionColumn',

@@ -18,7 +18,7 @@ class TagsSearch extends Tags
     public function rules()
     {
         return [
-            [['tag_id', 'tag_active', 'tag_type'], 'integer'],
+            [['tag_id', 'tag_active', 'tag_type', 'tag_rating_val', ], 'integer'],
             [['tag_title'], 'safe'],
         ];
     }
@@ -59,6 +59,7 @@ class TagsSearch extends Tags
             'tag_id' => $this->tag_id,
             'tag_active' => $this->tag_active,
             'tag_type' => $this->tag_type,
+            'tag_rating_val' => $this->tag_rating_val,
         ]);
 
         $query->andFilterWhere(['like', 'tag_title', $this->tag_title]);

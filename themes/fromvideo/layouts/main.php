@@ -95,6 +95,7 @@ if( $isAdmin || $isModerate ) {
             ['label' => 'Список оповещений', 'url' => ['notificateact/index'], 'options' => ['class' => 'nocommonclass'], ],
             ['label' => 'Оповестить исполнителей', 'url' => ['notificateact/process'], 'options' => ['class' => 'nocommonclass'], ],
             ['label' => 'Перенаправления тем', 'url' => ['subjredirect/index'], 'options' => ['class' => 'nocommonclass'], ],
+            ['label' => 'Теги', 'url' => ['tags/index', 'TagsSearch[tag_type]' => 1, 'TagsSearch[tag_active]' => 1,], 'options' => ['class' => 'nocommonclass', 'style' => 'width: 80%;', ]],
             ['label' => 'Выгрузка', 'url' => ['message/exportdata'], 'options' => ['class' => 'nocommonclass'], ],
 //            '<li class="divider"></li>',
 //            '<li class="dropdown-header">Dropdown Header</li>',

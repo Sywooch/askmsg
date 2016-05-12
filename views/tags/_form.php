@@ -34,6 +34,8 @@ use app\models\Tags;
 
     <?= $form->field($model, 'tag_type')->dropDownList(Tags::$_aTypes) ?>
 
+    <?= $form->field($model, 'tag_rating_val')->checkbox([], false) ?>
+
     <div class="form-group">
         <label for="message-msg_pers_text" class="control-label col-sm-3">&nbsp;</label>
         <div class="col-sm-3">

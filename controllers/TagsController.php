@@ -98,7 +98,7 @@ class TagsController extends Controller
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+            return $this->redirect(['index', 'TagsSearch[tag_type]' => $model->tag_type, 'TagsSearch[tag_active]' => $model->tag_active, ]);
 //            return $this->redirect(['view', 'id' => $model->tag_id]);
         } else {
             return $this->render('create', [
@@ -118,7 +118,7 @@ class TagsController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+            return $this->redirect(['index', 'TagsSearch[tag_type]' => $model->tag_type, 'TagsSearch[tag_active]' => $model->tag_active, ]);
 //            return $this->redirect(['view', 'id' => $model->tag_id]);
         } else {
             return $this->render('update', [
