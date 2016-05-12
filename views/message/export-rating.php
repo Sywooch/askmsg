@@ -58,7 +58,7 @@ for($page = 0; $page < $nPageCount; $page++) {
     $dataProvider->refresh();
 
     foreach($dataProvider->getModels() As $ob) {
-        Yii::info(print_r($ob->attributes, true));
+//        Yii::info(print_r($ob->attributes, true));
         $a = [];
         foreach($model->fieldslist As $attrName) {
             $sVal = $model->prepareCsvValue($model->getFieldValue($ob, $attrName));
@@ -66,7 +66,7 @@ for($page = 0; $page < $nPageCount; $page++) {
                 $sVal = $ob->msg_flag;
             }
             $sAttr = isset($ob->attributes[$attrName]) ? $ob->$attrName : 'noattr';
-            Yii::info($attrName . ' = ' . (is_array($sAttr) ? 'array' : $sAttr) . ' -> ' . $sVal);
+//            Yii::info($attrName . ' = ' . (is_array($sAttr) ? 'array' : $sAttr) . ' -> ' . $sVal);
             $a[] = $sVal;
         }
         fwrite($fp, implode($sSeparator, $a) . $sLineEnd);
