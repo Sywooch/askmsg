@@ -67,6 +67,7 @@ GriddataAsset::register($this);
             [
                 'class' => 'yii\grid\ActionColumn',
                 'contentOptions' => ['class' => 'commandcell'],
+                'template' => '{update}',
             ],
         ],
     ]); ?>
