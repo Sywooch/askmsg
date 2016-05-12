@@ -72,7 +72,7 @@ for($page = 0; $page < $nPageCount; $page++) {
         fwrite($fp, implode($sSeparator, $a) . $sLineEnd);
         $cou++;
         if( in_array($ob->msg_flag, [Msgflags::MFLG_INT_FIN_INSTR, Msgflags::MFLG_SHOW_ANSWER]) ) {
-            $a[1] = $ob->msg_answertime;
+            $a[1] = ($ob->msg_answertime === null) ? $ob->msg_createtime : $ob->msg_answertime;
             fwrite($fp, implode($sSeparator, $a) . $sLineEnd);
             $cou++;
         }

@@ -190,13 +190,14 @@ class Message extends \yii\db\ActiveRecord
                     [
                         'class' => AttributewalkBehavior::className(),
                         'attributes' => [
-                            ActiveRecord::EVENT_BEFORE_VALIDATE => ['msg_answertime'],
+//                            ActiveRecord::EVENT_BEFORE_VALIDATE => ['msg_answertime'],
+                            ActiveRecord::EVENT_BEFORE_UPDATE => ['msg_answertime'],
                         ],
                         'value' => function ($event, $attribute) {
                             /** @var Message $model */
-                            if( $this->scenario != 'moderator' ) {
-                                return;
-                            }
+//                            if( $this->scenario != 'moderator' ) {
+//                                return;
+//                            }
                             $model = $event->sender;
                             $a = [Msgflags::MFLG_SHOW_ANSWER, Msgflags::MFLG_INT_FIN_INSTR];
                             if( in_array($model->msg_flag, $a)
