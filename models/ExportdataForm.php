@@ -80,6 +80,7 @@ class ExportdataForm extends Model
             'alltags',
             'sovetid',
             'ekis_id',
+            'raitngvalue',
         ];
 
 
@@ -131,6 +132,7 @@ class ExportdataForm extends Model
             'fio' => 'ФИО посетителя',
             'sovetid' => 'МРСД',
             'ekis_id' => 'Код ЕКИС',
+            'raitngvalue' => 'В рейтинге',
         ];
         if( $this->_oMsg === null ) {
             $this->_oMsg = new Message();
@@ -313,6 +315,9 @@ class ExportdataForm extends Model
         }
         else if( $sField == 'fio' ) {
             return $ob->getFullName();
+        }
+        else if( $sField == 'msg_mark' ) {
+            return ($ob->msg_mark === null) ? 0 : ($ob->msg_mark > 2 ? 1 : -1);
         }
         else if( $sField == 'sovetid' ) {
             $sSovet = $ob->sovet ? $ob->sovet->sovet_title : '';

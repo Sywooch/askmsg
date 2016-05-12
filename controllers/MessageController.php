@@ -20,6 +20,7 @@ use app\models\Message;
 use app\models\MessageSearch;
 use app\components\WaitTrait;
 use app\components\ExportMessagesAction;
+use app\models\ExportdataForm;
 
 /**
  * MessageController implements the CRUD actions for Message model.
@@ -39,7 +40,7 @@ class MessageController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'list', 'create', 'view', 'export', 'captcha', 'mark', ],
+                        'actions' => ['index', 'list', 'create', 'view', 'export', 'captcha', 'mark', 'rating', ],
                         'roles' => ['?', '@'],
                     ],
                     [
@@ -631,6 +632,35 @@ class MessageController extends Controller
             'model' => $model,
         ]);
 
+    }
+
+    /**
+     * @return array|string
+     */
+    public function actionRating() {
+        $this->layout = 'empty';
+        $model = new ExportdataForm();
+        $model->_aAllFields[] = 'msg_mark';
+
+//        if( $model->load(Yii::$app->request->getQueryParams()) ) {
+//            Yii::$app->response->format = Response::FORMAT_JSON;
+//            $aValidate = ActiveForm::validate($model);
+//            return $aValidate;
+//        }
+
+        if ( $model->load(Yii::$app->request->getQueryParams()) && $model->validate() ) {
+            $model->fieldslist = ['msg_id', 'msg_createtime', 'msg_subject', 'alltags', 'ekis_id', 'raitngvalue', 'fio', 'msg_pers_email', 'msg_pers_phone', 'msg_flag', 'msg_mark'];
+
+            return $this->render(
+                'export-rating',
+                [
+                    'model' => $model,
+                ]
+            );
+        }
+
+
+        return $this->renderContent($model->hasErrors() ? ('Errors: ' . print_r($model->getErrors(), true)) : 'Action need some parameters');
     }
 
     /**

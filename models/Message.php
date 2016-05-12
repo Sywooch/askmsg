@@ -714,6 +714,21 @@ class Message extends \yii\db\ActiveRecord
     }
 
     /**
+     * Получение флага участия в рейтинге
+     * @return mixed
+     */
+    public function getRaitngvalue() {
+        return array_reduce(
+            $this->alltags,
+            function($carry, $el){
+                /** @var Tags $el */
+                return $carry || $el->tag_rating_val;
+            },
+            false
+        );
+    }
+
+    /**
      *  Получение всех исполнителей
      * @return array
      */
