@@ -17,4 +17,7 @@ return [
     'import.host' => 'map.production.mskobr.ru',
     'tag.separator' => '|',
     'tag.addusertags' => false,
+    'message.period.answer' => 30, // в днях, период, за который нужно дать ответ
+    'message.period.warning' => 15, // в днях, срок от создания обращения до начала желтого предупреждения ответчика
+    'message.period.alert' => 25, // в днях, срок от создания обращения до начала красного предупреждения ответчика
 ];

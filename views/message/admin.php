@@ -123,13 +123,25 @@ EOT;
                 'header' => 'Номер и дата',
                 'filter' => false,
                 'filterOptions' => ['class' => 'gridwidth7'],
-                'content' => function ($model, $key, $index, $column) {
+                'content' => function ($model, $key, $index, $column) use ($action) {
                     $url = Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM) ?
                         ['message/update', 'id'=>$model->msg_id] :
                         ['message/answer', 'id'=>$model->msg_id];
+
+                    $sRound = '';
+                    if( $action[0] == 'answerlist' ) {
+                        $nDays = intval((time() - strtotime(date('Y-m-d 00:00:00', strtotime($model->msg_createtime)))) / (24 * 3600));
+                        if( $nDays >= Yii::$app->params['message.period.alert'] ) {
+                            $sRound = '<span class="glyphicon glyphicon-exclamation-sign" style="float: right; font-size: 14px; color: #ff0000;"></span>';
+                        }
+                        else if( $nDays >= Yii::$app->params['message.period.warning'] ) {
+                            $sRound = '<span class="glyphicon glyphicon-exclamation-sign" style="float: right; font-size: 14px; color: #ffdd00;"></span>';
+                        }
+                    }
+
 // ['title' => 'Изменить Обращение ' . $model->msg_id])
 //                    update} {answer
-                    return Html::a('№ ' . $model->msg_id, $url) . '<span>' . date('d.m.Y H:i', strtotime($model->msg_createtime)) . '</span>';
+                    return $sRound . Html::a('№ ' . $model->msg_id, $url) . '<span>' . date('d.m.Y H:i', strtotime($model->msg_createtime)) . '</span>';
                 },
                 'contentOptions' => [
                     'class' => 'griddate',
@@ -143,6 +155,7 @@ EOT;
 //                'filter' => ArrayHelper::map(Msgflags::getStateData(), 'fl_id', 'fl_sname'),
                 'filterOptions' => ['class' => 'gridwidth7'],
                 'content' => function ($model, $key, $index, $column) {
+                    /** @var Message $model */
                     $sMark = '';
                     if( $model->msg_mark !== null ) {
                         $sColor = '#ee2222';
