@@ -76,6 +76,7 @@ for($page = 0; $page < $nPageCount; $page++) {
         fwrite($fp, implode($sSeparator, $a) . $sLineEnd);
         $cou++;
         if( $bFinished ) {
+            $a[9] = $ob->msg_flag;
             $a[1] = ($ob->msg_answertime === null) ? $ob->msg_createtime : $ob->msg_answertime;
             fwrite($fp, implode($sSeparator, $a) . $sLineEnd);
             $cou++;
