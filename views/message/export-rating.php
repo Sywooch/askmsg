@@ -69,9 +69,9 @@ for($page = 0; $page < $nPageCount; $page++) {
             $sAttr = isset($ob->attributes[$attrName]) ? $ob->$attrName : 'noattr';
 //            Yii::info($attrName . ' = ' . (is_array($sAttr) ? 'array' : $sAttr) . ' -> ' . $sVal);
             $a[] = $sVal;
-            if( $bFinished ) {
-                $a[9] = Msgflags::MFLG_NEW;
-            }
+        }
+        if( $bFinished ) {
+            $a[9] = Msgflags::MFLG_NEW;
         }
         fwrite($fp, implode($sSeparator, $a) . $sLineEnd);
         $cou++;
