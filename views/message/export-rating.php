@@ -60,6 +60,7 @@ for($page = 0; $page < $nPageCount; $page++) {
     foreach($dataProvider->getModels() As $ob) {
 //        Yii::info(print_r($ob->attributes, true));
         $a = [];
+        $bFinished = in_array($ob->msg_flag, [Msgflags::MFLG_INT_FIN_INSTR, Msgflags::MFLG_SHOW_ANSWER]);
         foreach($model->fieldslist As $attrName) {
             $sVal = $model->prepareCsvValue($model->getFieldValue($ob, $attrName));
             if( $attrName == 'msg_flag' ) {
@@ -68,10 +69,13 @@ for($page = 0; $page < $nPageCount; $page++) {
             $sAttr = isset($ob->attributes[$attrName]) ? $ob->$attrName : 'noattr';
 //            Yii::info($attrName . ' = ' . (is_array($sAttr) ? 'array' : $sAttr) . ' -> ' . $sVal);
             $a[] = $sVal;
+            if( $bFinished ) {
+                $a[9] = Msgflags::MFLG_NEW;
+            }
         }
         fwrite($fp, implode($sSeparator, $a) . $sLineEnd);
         $cou++;
-        if( in_array($ob->msg_flag, [Msgflags::MFLG_INT_FIN_INSTR, Msgflags::MFLG_SHOW_ANSWER]) ) {
+        if( $bFinished ) {
             $a[1] = ($ob->msg_answertime === null) ? $ob->msg_createtime : $ob->msg_answertime;
             fwrite($fp, implode($sSeparator, $a) . $sLineEnd);
             $cou++;
