@@ -1,5 +1,6 @@
 <?php
 
+use yii;
 use yii\helpers\Html;
 use yii\web\View;
 
@@ -18,6 +19,20 @@ $oSubj = $model->subject;
 $isShowAnswer = !empty($model->msg_answer)
     && (($model->msg_flag == Msgflags::MFLG_SHOW_ANSWER) || Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM));
 $bShowFooter = false;
+
+$aHiddenMessageFlags = [
+    Msgflags::MFLG_NEW,
+    Msgflags::MFLG_INT_NOSOGL,
+    Msgflags::MFLG_INT_NEWANSWER,
+    Msgflags::MFLG_INT_FIN_INSTR,
+    Msgflags::MFLG_INT_INSTR,
+    Msgflags::MFLG_INT_REVIS_INSTR,
+    Msgflags::MFLG_NOSHOW,
+];
+if( Yii::$app->user->isGuest && in_array($model->msg_flag, $aHiddenMessageFlags) ) {
+    // не показываем неавторизованным ниего из ненужного
+    return;
+}
 
 $nMaxTextHeight = 280;
 
