@@ -1,6 +1,5 @@
 <?php
 
-//use Yii;
 use yii\helpers\Html;
 use yii\web\View;
 
@@ -29,7 +28,8 @@ $aHiddenMessageFlags = [
     Msgflags::MFLG_INT_REVIS_INSTR,
     Msgflags::MFLG_NOSHOW,
 ];
-if( Yii::$app->user->isGuest && in_array($model->msg_flag, $aHiddenMessageFlags) ) {
+
+if( Yii::$app->user->isGuest && $model->isHidden() ) {
     // не показываем неавторизованным ниего из ненужного
     return;
 }

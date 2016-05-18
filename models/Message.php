@@ -1363,7 +1363,12 @@ class Message extends \yii\db\ActiveRecord
         return $model;
     }
 
-
+    /**
+     *
+     * Проба на определение пола по имени
+     *
+     * @return string
+     */
     public function tryGender() {
         $sEnc = 'UTF-8';
         $sname = mb_strtolower($this->msg_pers_name, $sEnc);
@@ -1397,5 +1402,26 @@ class Message extends \yii\db\ActiveRecord
         }
 
         return $g;
+    }
+
+
+    /**
+     *
+     * Нужно ли показывать неавторизированным пользователям
+     *
+     * @return bool
+     */
+    public function isHidden() {
+        $aHiddenMessageFlags = [
+            Msgflags::MFLG_NEW,
+            Msgflags::MFLG_INT_NOSOGL,
+            Msgflags::MFLG_INT_NEWANSWER,
+            Msgflags::MFLG_INT_FIN_INSTR,
+            Msgflags::MFLG_INT_INSTR,
+            Msgflags::MFLG_INT_REVIS_INSTR,
+            Msgflags::MFLG_NOSHOW,
+        ];
+
+        return in_array($this->msg_flag, $aHiddenMessageFlags);
     }
 }

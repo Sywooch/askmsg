@@ -11,6 +11,11 @@ $this->title = 'Обращение № ' . $model->msg_id;
 $this->params['breadcrumbs'][] = ['label' => 'Сообщения', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
+if( Yii::$app->user->isGuest && $model->isHidden() ) {
+    // не показываем неавторизованным ниего из ненужного
+    return;
+}
+
 ListdataAsset::register($this);
 
 ?>
