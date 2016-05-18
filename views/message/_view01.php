@@ -20,7 +20,7 @@ $isShowAnswer = !empty($model->msg_answer)
 $bShowFooter = false;
 
 if( Yii::$app->user->isGuest && $model->isHidden() ) {
-    // не показываем неавторизованным ниего из ненужного
+    // не показываем неавторизованным ничего из ненужного
     return;
 }
 
