@@ -1,6 +1,6 @@
 <?php
 
-use yii;
+use Yii;
 use yii\helpers\Html;
 use yii\web\View;
 
