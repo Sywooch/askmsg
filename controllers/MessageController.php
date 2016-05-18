@@ -230,7 +230,6 @@ class MessageController extends Controller
     public function actionView($id)
     {
         $model = $this->findModel($id);
-        return $this->renderContent('v');
         if( Yii::$app->request->isAjax ) {
             return $this->renderPartial('_view01', [
                     'model' => $model,
