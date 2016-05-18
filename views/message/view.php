@@ -17,7 +17,7 @@ ListdataAsset::register($this);
 <div class="message-view">
 
     <h1><?= Html::encode($this->title) ?></h1>
-    <?=
+    <?= ''
 //        $this->render(
 //            '_view01',
 //            [
