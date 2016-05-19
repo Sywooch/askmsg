@@ -105,12 +105,12 @@ class NotificateactController extends Controller
         $searchModel = new MessageSearch();
         $dataProvider = $searchModel->searchNotificate(Yii::$app->request->queryParams, $this->findMessages($aActions));
 
-//        $sKeyName = 'lastclearnotifylog';
-//        $sToday = date('Ymd');
-//        if( !Yii::$app->session->has($sKeyName) || (Yii::$app->session->get($sKeyName, 0) < $sToday) ) {
-//            Notificatelog::clearNotify();
-//            Yii::$app->session->set($sKeyName, $sToday);
-//        }
+        $sKeyName = 'lastclearnotifylog';
+        $sToday = date('Ymd');
+        if( !Yii::$app->session->has($sKeyName) || (Yii::$app->session->get($sKeyName, 0) < $sToday) ) {
+            Notificatelog::clearNotify();
+            Yii::$app->session->set($sKeyName, $sToday);
+        }
 
         return $this->render('//message/notifylist', [
             'searchModel' => $searchModel,
