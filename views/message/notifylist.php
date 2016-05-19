@@ -67,6 +67,7 @@ jQuery("#сlearnotifylog").on(
     }
 );
 EOT;
+$this->registerJs($sJs, View::POS_READY, 'сlearnotifylog');
 
 ?>
 <p>
