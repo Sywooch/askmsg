@@ -71,7 +71,7 @@ EOT;
 ?>
 <p>
     <?= Html::a('Провести действия', ['notificateact/send'], ['class' => 'btn btn-success', 'id' => 'doprocess', ]) ?>
-    <?= Html::a('Очистить лог', ['notificateact/сlearnotifylog'], ['class' => 'btn btn-success', 'id' => 'сlearnotifylog', ]) ?>
+    <?= Html::a('Очистить лог', ['notificateact/clearnotifylog'], ['class' => 'btn btn-success', 'id' => 'сlearnotifylog', ]) ?>
 </p>
 
 <div class="message-index">
