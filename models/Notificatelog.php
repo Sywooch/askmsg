@@ -61,11 +61,14 @@ class Notificatelog extends \yii\db\ActiveRecord
     }
 
     /**
+     *
      * @throws \yii\db\Exception
+     * @return integer Number of cleared records
+     * 
      */
     public static function clearNotify() {
         $sSql = 'Update ' . self::tableName() . ' Set ntflg_msg_id = 0, ntflg_notiftime = NULL Where ntflg_notiftime <> DATE(NOW()) And ntflg_msg_id Is Not Null';
-        Yii::$app->db->createCommand($sSql)->execute();
+        return Yii::$app->db->createCommand($sSql)->execute();
     }
 
 }

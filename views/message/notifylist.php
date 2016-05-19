@@ -41,9 +41,37 @@ $this->registerCssFile('/themes/font-awesome-4.3.0/css/font-awesome.min.css', ['
 $aTags = ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_TAG), 'tag_id', 'tag_title');
 $sGridId = 'natificateMessageList';
 
+$sJs = <<<EOT
+jQuery("#сlearnotifylog").on(
+    "click",
+    function(event){
+        event.preventDefault();
+        var oLink = jQuery(this),
+            sAdr = oLink.attr("href");
+        jQuery.ajax({
+            type: "POST",
+            url: sAdr,
+            data: {},
+            success: function(data, textStatus, jqXHR ){
+                oLink.text("Очищено в логе " + data["clear"] + " записей");
+                oLink.attr("href", "#");
+            },
+            error: function(jqXHR, textStatus, errorThrown ) {
+                oLink.text("Ошибка очистки " + textStatus);
+                oLink.attr("href", "#");
+            },
+            dataType: "json"
+        });
+
+        return false;
+    }
+);
+EOT;
+
 ?>
 <p>
     <?= Html::a('Провести действия', ['notificateact/send'], ['class' => 'btn btn-success', 'id' => 'doprocess', ]) ?>
+    <?= Html::a('Очистить лог', ['notificateact/сlearnotifylog'], ['class' => 'btn btn-success', 'id' => 'сlearnotifylog', ]) ?>
 </p>
 
 <div class="message-index">

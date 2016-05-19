@@ -2,18 +2,20 @@
 
 namespace app\controllers;
 
-use app\models\Message;
 use Yii;
-use app\models\Notificateact;
-use app\models\NotificateactSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\web\Response;
+
+use mosedu\multirows\MultirowsBehavior;
+
+use app\models\Message;
+use app\models\Notificateact;
+use app\models\NotificateactSearch;
 use app\models\Rolesimport;
 use app\models\Msgflags;
-use mosedu\multirows\MultirowsBehavior;
 use app\models\MessageSearch;
 use app\components\SwiftHeaders;
 use app\models\Notificatelog;
@@ -31,7 +33,7 @@ class NotificateactController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'process', 'send', /*'create', 'view', 'update', 'delete', 'admin', */],
+                        'actions' => ['index', 'process', 'send', 'clearnotifylog', /*'create', 'view', 'update', 'delete', 'admin', */],
                         'roles' => [Rolesimport::ROLE_MODERATE_DOGM],
                     ],
                 ],
@@ -103,10 +105,27 @@ class NotificateactController extends Controller
         $searchModel = new MessageSearch();
         $dataProvider = $searchModel->searchNotificate(Yii::$app->request->queryParams, $this->findMessages($aActions));
 
+//        $sKeyName = 'lastclearnotifylog';
+//        $sToday = date('Ymd');
+//        if( !Yii::$app->session->has($sKeyName) || (Yii::$app->session->get($sKeyName, 0) < $sToday) ) {
+//            Notificatelog::clearNotify();
+//            Yii::$app->session->set($sKeyName, $sToday);
+//        }
+
         return $this->render('//message/notifylist', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function actionClearnotifylog()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return ['clear' => Notificatelog::clearNotify()];
     }
 
     /**
