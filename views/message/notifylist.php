@@ -69,9 +69,33 @@ $sGridId = 'natificateMessageList';
 //EOT;
 //$this->registerJs($sJs, View::POS_READY, 'сlearnotifylog');
 
+$sFormName = $searchModel->formName();
+$aExportParam = [
+    'title' => 'Экспорт просроченных сообщений',
+    'url' => Url::to(
+        array_merge(
+            ['exportnotify'],
+            ['format' => 'xlsx', ]
+//            $searchModel->getSearchArray()
+        )
+    ),
+//    'icon' => 'fa-file-excel-o',
+];
+
+
 ?>
 <p>
     <?= Html::a('Провести действия', ['notificateact/send'], ['class' => 'btn btn-success', 'id' => 'doprocess', ]) ?>
+    <?= Html::a(
+        '<i class="fa fa-file-excel-o fa-fw"></i> Экспорт в Excel',
+        Url::to(
+            array_merge(
+                ['exportnotify'],
+                ['format' => 'xlsx', ]
+            )
+        ),
+        ['class' => 'btn btn-success', 'id' => 'doprocess', ]
+    ) ?>
     <?= '' // Html::a('Очистить лог', ['notificateact/clearnotifylog'], ['class' => 'btn btn-success', 'id' => 'сlearnotifylog', ]) ?>
 </p>
 

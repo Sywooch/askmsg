@@ -13,6 +13,7 @@ use app\models\Regions;
 use app\models\Rolesimport;
 use app\models\Tags;
 use app\models\Msgtags;
+use app\components\SearchappendBehavior;
 
 /**
  * MessageSearch represents the model behind the search form about `app\models\Message`.
@@ -21,6 +22,16 @@ class MessageSearch extends Message
 {
     public $msgflags = [];
     public $_flagsstring = '';
+
+    /**
+     * @return array
+     */
+//    public function behaviors() {
+//        return [
+//            'searchBehavior' => SearchappendBehavior::className(),
+//        ];
+//    }
+
     /**
      * @inheritdoc
      */
@@ -160,6 +171,7 @@ class MessageSearch extends Message
             ->with('answers')
             ->with('alltags')
             ->with('region')
+            ->with('subject')
 //            ->with('orgsovet')
             ->with('sovet')
 //            ->with('attachments')

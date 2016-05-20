@@ -19,6 +19,7 @@ use app\models\Msgflags;
 use app\models\MessageSearch;
 use app\components\SwiftHeaders;
 use app\models\Notificatelog;
+use app\components\ExcelexportBehavior;
 
 /**
  * NotificateactController implements the CRUD actions for Notificateact model.
@@ -33,7 +34,7 @@ class NotificateactController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'process', 'send', 'clearnotifylog', /*'create', 'view', 'update', 'delete', 'admin', */],
+                        'actions' => ['index', 'process', 'send', 'clearnotifylog', 'exportnotify', /*'create', 'view', 'update', 'delete', 'admin', */],
                         'roles' => [Rolesimport::ROLE_MODERATE_DOGM],
                     ],
                 ],
@@ -49,6 +50,74 @@ class NotificateactController extends Controller
             'validatePrmissions' => [
                 'class' => MultirowsBehavior::className(),
                 'model' => Notificateact::className(),
+            ],
+
+            /*
+             * Экспорт в Excel
+             */
+            'excelExport' => [
+                'class' => ExcelexportBehavior::className(),
+                'dataTitle' => 'Доклады',
+                'nStartRow' => 1,
+                'columnTitles' => [
+                    'Обращение',
+                    'Срок (дней)',
+                    'Действие',
+                    'Создано',
+                    'Состояние',
+                    'Проситель',
+                    'Ответчик',
+                    'Контролер',
+                    'Тема',
+                    'Поручение',
+                ],
+                'columnWidth' => [
+                    20,
+                    20,
+                    30,
+                    20,
+                    10,
+                    30,
+                    30,
+                    30,
+                    30,
+                    30,
+                ],
+                'columnValues' => [
+                    'msg_id',
+                    function ($model, $index) { // Срок
+                        /** @var Message $model */
+                        $days = Notificateact::getAdge($model->msg_createtime); // intval(($tToday - strtotime($model->msg_createtime)) / $n24, 10);
+                        return $days;
+                    },
+                    function ($model, $index) { // Действие
+                        /** @var Message $model */
+                        return implode("\n", Notificateact::getDateAct($model->msg_createtime));
+                    },
+                    'msg_createtime', // Создано
+                    function ($model, $index) { // Состояние
+                        /** @var Message $model */
+                        return $model->flag->fl_sname;
+                    },
+                    function ($model, $index) { // Проситель
+                        /** @var Message $model */
+                        return $model->getFullName();
+                    },
+                    function ($model, $index) { // Ответчик
+                        /** @var Message $model */
+                        return $model->employee->getFullName();
+                    },
+                    function ($model, $index) { // Контролер
+                        /** @var Message $model */
+                        return ($model->curator !== null) ? $model->curator->getFullName() : '';
+                    },
+                    function ($model, $index) { // Тема
+                        /** @var Message $model */
+                        $oSubj = $model->subject;
+                        return ( $oSubj !== null ) ? $oSubj->tag_title : '';
+                    },
+                    'msg_empl_command',
+                ],
             ],
         ];
     }
@@ -127,6 +196,27 @@ class NotificateactController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
         return ['clear' => Notificatelog::clearNotify()];
     }
+
+    /**
+     * Export data to file
+     * @return mixed
+     */
+    public function actionExportnotify()
+    {
+        $aActions = Notificateact::find()->where('true')->orderBy('ntfd_message_age')->all();
+        $searchModel = new MessageSearch();
+        $dataProvider = $searchModel->searchNotificate(Yii::$app->request->queryParams, $this->findMessages($aActions));
+
+        $sDir = Yii::getAlias('@webroot/assets');
+        $sFileName = $sDir . DIRECTORY_SEPARATOR . 'message-notify-'.date('Y-m-d-H-i-s').'.xls';
+        $this->clearDestinationDir($sDir, 'xls', time() - 300);
+        $this->exportToFile($dataProvider, $sFileName);
+
+        Yii::$app->response->sendFile($sFileName);
+
+    }
+
+
 
     /**
      *
