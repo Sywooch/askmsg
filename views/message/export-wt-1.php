@@ -1,19 +1,12 @@
 <?php
-/**
- * User: KozminVA
- * Date: 07.04.2015
- * Time: 15:23
- *
- *
- * @var ActiveDataProvider $dataProvider
- * @var Message $model
- */
+
 
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use yii\helpers\ArrayHelper;
 
 use app\models\Message;
+// use app\models\ExportdataForm;
 use app\components\Exportutil;
 
 $mime = [

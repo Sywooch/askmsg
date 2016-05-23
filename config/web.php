@@ -80,7 +80,7 @@ $config = [
             'rules' => [
                 [
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => ['v1/user', 'v1/message'],
+                    'controller' => ['v1/user', 'v1/message', ],
                     'except' => ['delete'],
                     'extraPatterns' => [
                         'GET' => 'title',
