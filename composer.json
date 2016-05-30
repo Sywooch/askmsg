@@ -45,7 +45,8 @@
         "tecnick.com/tcpdf": "dev-master",
         "dompdf/dompdf": "dev-master",
         "phpoffice/phpword": "dev-master",
-        "mosedu/yii2-multirows": "*"
+        "mosedu/yii2-multirows": "*",
+        "phpunit/phpunit": "^5.3"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",
