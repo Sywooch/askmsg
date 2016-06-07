@@ -11,7 +11,7 @@ use yii\db\Query;
 use app\models\Message;
 use app\models\Msgflags;
 use app\models\User;
-
+use app\models\Tags;
 
 /**
  * LoginForm is the model behind the login form.
@@ -133,6 +133,7 @@ class ExportdataForm extends Model
             'sovetid' => 'МРСД',
             'ekis_id' => 'Код ЕКИС',
             'raitngvalue' => 'В рейтинге',
+            'ratingtags' => 'Теги',
         ];
         if( $this->_oMsg === null ) {
             $this->_oMsg = new Message();
@@ -327,6 +328,18 @@ class ExportdataForm extends Model
         }
         else if( $sField == 'alltags' ) {
             return implode(",", ArrayHelper::map($ob->alltags, 'tag_id', function($o) { return $o->tag_title; }));
+        }
+        else if( $sField == 'ratingtags' ) {
+            return array_reduce(
+                $ob->alltags,
+                function($carry, $el) {
+                    /** @var Tags $el */
+                    $sAdd = $el->tag_rating_val ? ((empty($carry) ? '' : ',' ) . $el->tag_title) : '';
+                    return $carry . $sAdd;
+                },
+                ''
+            );
+//            return implode(",", ArrayHelper::map($ob->alltags, 'tag_id', function($o) { return $o->tag_title; }));
         }
         return $ob->$sField;
     }
