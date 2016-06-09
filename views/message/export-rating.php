@@ -46,6 +46,7 @@ $sf = $oUtil->getFilePath($sFilename);
 $fp = fopen($sf, 'w');
 
 $aFldNames = $model->prepareFieldNames();
+
 $a = [];
 foreach($model->fieldslist As $attrName) {
     $a[] = $model->prepareCsvValue($aFldNames[$attrName]);

@@ -81,6 +81,7 @@ class ExportdataForm extends Model
             'sovetid',
             'ekis_id',
             'raitngvalue',
+            'ratingtags',
         ];
 
 
@@ -138,6 +139,7 @@ class ExportdataForm extends Model
         if( $this->_oMsg === null ) {
             $this->_oMsg = new Message();
         }
+
         return array_merge($this->_oMsg->attributeLabels(), $a);
     }
 
@@ -152,6 +154,7 @@ class ExportdataForm extends Model
             $aret[$v] = $this->getAttributeLabel($v);
         }
 //        asort($aret);
+
         return $aret;
     }
 
