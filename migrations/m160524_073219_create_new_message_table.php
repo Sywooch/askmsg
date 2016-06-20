@@ -35,6 +35,7 @@ class m160524_073219_create_new_message_table extends Migration
         $this->createIndex('idx_ap_created', '{{%appeal}}', 'ap_created');
         $this->createIndex('idx_ap_empl_id', '{{%appeal}}', 'ap_empl_id');
         $this->createIndex('idx_ap_state', '{{%appeal}}', 'ap_state');
+        $this->createIndex('idx_ap_ekis_id', '{{%appeal}}', 'ekis_id');
 
         $this->createTable('{{%answer}}', [
             'ans_id' => Schema::TYPE_PK . ' COMMENT \'Номер\'',
