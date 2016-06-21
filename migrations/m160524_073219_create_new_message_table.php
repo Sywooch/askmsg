@@ -13,7 +13,6 @@ class m160524_073219_create_new_message_table extends Migration
             'ap_id' => Schema::TYPE_PK . ' COMMENT \'Номер\'',
             'ap_created' => Schema::TYPE_DATETIME . ' COMMENT \'Создано\'',
             'ap_next_act_date' => Schema::TYPE_DATETIME . ' COMMENT \'Срок действия\'', // ненулевое значение показывает, когда должно произойти следующее действие - ответ, проверка, назначение отвествтенных и т.д., когда нет даты, то нет дальнейших действий - обращение обработано
-            'ap_finished' => Schema::TYPE_DATETIME . ' COMMENT \'Завершено\'', // ненулевое значение здесь показывает, что обработка завершена
 
             'ap_pers_name' => Schema::TYPE_STRING . ' COMMENT \'Имя\'',
             'ap_pers_secname' => Schema::TYPE_STRING . ' COMMENT \'Отчество\'',
@@ -33,13 +32,13 @@ class m160524_073219_create_new_message_table extends Migration
             'ekis_id' => Schema::TYPE_INTEGER . ' COMMENT \'Учреждение\'',
 
             'ap_state' => Schema::TYPE_SMALLINT . ' Default 0 COMMENT \'Состояние\'',
-            'ap_is_archive' => Schema::TYPE_SMALLINT . ' Default 0 COMMENT \'В архиве\'', // здесь будем ставить флажок, чтобы не смотреть старые сообщения в выборках
+            'ap_ans_state' => Schema::TYPE_SMALLINT . ' Default 0 COMMENT \'Состояние ответа\'', // сюда дублируем флаг ответа, чтобы выгребыть вопросы сразу с флагами ответа, без использования таблицы ответов
         ], $tableOptionsMyISAM);
 
         $this->createIndex('idx_ap_empl_id', '{{%appeal}}', 'ap_empl_id');
         $this->createIndex('idx_ap_state', '{{%appeal}}', 'ap_state');
         $this->createIndex('idx_ap_ekis_id', '{{%appeal}}', 'ekis_id');
-        $this->createIndex('idx_ap_is_archive', '{{%appeal}}', 'ap_is_archive');
+        $this->createIndex('idx_ap_ans_state', '{{%appeal}}', 'ap_ans_state');
 
         $this->createTable('{{%answer}}', [
             'ans_id' => Schema::TYPE_PK . ' COMMENT \'Номер\'',
@@ -48,6 +47,7 @@ class m160524_073219_create_new_message_table extends Migration
             'ans_text' => Schema::TYPE_TEXT . ' COMMENT \'Ответ\'',
             'ans_remark' => Schema::TYPE_TEXT . ' COMMENT \'Замечание\'',
 
+            'ans_type' => Schema::TYPE_SMALLINT . ' Default 0 COMMENT \'Вид ответа\'', // промежуточный или окончательный
             'ans_state' => Schema::TYPE_SMALLINT . ' Default 0 COMMENT \'Состояние\'',
             'ans_ap_id' => Schema::TYPE_INTEGER . ' COMMENT \'Обращение\'',
             'ans_us_id' => Schema::TYPE_INTEGER . ' COMMENT \'Ответчик\'',

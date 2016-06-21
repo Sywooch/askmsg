@@ -14,17 +14,21 @@ use yii\base\InvalidParamException;
  *
  */
 class Stateflag {
-    const STATE_APPEAL_NEW = 0;      // Новое сообщение
-    const STATE_APPEAL_DELETED = 1;  // Удаленное
+    const STATE_APPEAL_DELETED = 0;  // Удаленное
+    const STATE_APPEAL_NEW = 1;      // Новое сообщение
     const STATE_APPEAL_PUBLIC = 2;   // Видимое всем
     const STATE_APPEAL_PRIVATE = 3;  // Видимо только внутри системы
 
-    const STATE_ANSWER_NEW = 0;        // Новый ответ
-    const STATE_ANSWER_APPROVED = 1;  // Ответ, проверен контролером
-    const STATE_ANSWER_MODERATED = 2;  // Ответ, проверен модератором
-    const STATE_ANSWER_PUBLISHED = 3;  // Принят
-    const STATE_ANSWER_TOFIX = 4;      // На исправлении
-    const STATE_ANSWER_REVISED = 5;    // Доработан
+    const STATE_ANSWER_NOT_NEED = 0;   // Ответ не требуется
+    const STATE_ANSWER_NONE = 1;       // Нет ответа
+    const STATE_ANSWER_NEW = 2;        // Новый ответ
+    const STATE_ANSWER_APPROVED = 3;   // Ответ проверен контролером
+    const STATE_ANSWER_MODERATED = 4;  // Ответ проверен модератором
+    const STATE_ANSWER_TOFIX = 5;      // На исправлении
+    const STATE_ANSWER_REVISED = 6;    // Доработан
+
+    const TYPE_ANSWER_TEMPORARY = 0;    // промежуточный
+    const TYPE_ANSWER_FINAL = 1;        // окончательный
 
     public static $aAppealFlags = [
         self::STATE_APPEAL_NEW => [
@@ -58,6 +62,23 @@ class Stateflag {
     ];
 
     public static $aAnswerFlags = [
+        self::STATE_ANSWER_NOT_NEED => [
+            'title' => 'Ответ не требуется',
+            'stitle' => 'Не нужен',
+            'glyth' => 'ok',
+            'color' => '#14ff93',
+            'hint' => 'Не нужен',
+        ],
+        self::STATE_ANSWER_NONE => [
+            // ответ нужен, но его пока нет.
+            // После дачи промежуточного ответа, этот флажок ставится,
+            // чтобы показать, что нужен окончательный ответ
+            'title' => 'Без ответа',
+            'stitle' => 'Без ответа',
+            'glyth' => 'pencil',
+            'color' => '#ff1493',
+            'hint' => 'Без ответа',
+        ],
         self::STATE_ANSWER_NEW => [
             'title' => 'Новый ответ',
             'stitle' => 'Новый',
@@ -75,16 +96,9 @@ class Stateflag {
         self::STATE_ANSWER_MODERATED => [
             'title' => 'Проверен модератором',
             'stitle' => 'Модерат.',
-            'glyth' => 'plus-sign',
-            'color' => '#ff1493',
-            'hint' => 'Проверен модератором',
-        ],
-        self::STATE_ANSWER_PUBLISHED => [
-            'title' => 'Принят',
-            'stitle' => 'Принят',
             'glyth' => 'ok-sign',
             'color' => '#2e8b57',
-            'hint' => 'Принят',
+            'hint' => 'Проверен модератором',
         ],
         self::STATE_ANSWER_TOFIX => [
             'title' => 'На доработке',
