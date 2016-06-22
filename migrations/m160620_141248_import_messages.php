@@ -134,7 +134,7 @@ class m160620_141248_import_messages extends Migration
         $t2 = time() - $t1;
         $this->printStr("Time: " . sprintf("%02d:%02d", $t2 / 60, $t2 % 60) . "\n");
 
-        return false;
+//        return false;
     }
 
     public function down()
