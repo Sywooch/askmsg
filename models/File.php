@@ -117,9 +117,10 @@ class File extends \yii\db\ActiveRecord
      * @param $isnew boolean is new record
      */
     public function addFile($ob, $mid, $isnew) {
+        $id = 0;
         if( !$this->isUploadDirExists() ) {
             Yii::info("Error: Upload dir not exists");
-            return;
+            return $id;
         }
         $a = explode(".", $ob->name);
         $ext = array_pop($a);
@@ -133,7 +134,10 @@ class File extends \yii\db\ActiveRecord
         $this->file_msg_id = $mid;
         if( $this->save() ) {
             $ob->saveAs($this->getFullpath());
+            $id = $this->file_id;
         }
+
+        return $id;
 
     }
 }

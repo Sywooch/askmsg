@@ -1378,7 +1378,7 @@ class Message extends \yii\db\ActiveRecord
         $g = '';
         if( ($slast == 'а') || ($slast == 'я') ) {
             $g = 'ж';
-            if( in_array($sname, ['ваня', 'петя', 'саня', 'сеня', 'илья', ]) ) {
+            if( in_array($sname, ['ваня', 'петя', 'саня', 'сеня', 'илья', 'вова', ]) ) {
                 $g = 'м';
             }
         }
@@ -1396,7 +1396,7 @@ class Message extends \yii\db\ActiveRecord
             if( (mb_substr($ssecname, -1, 1, $sEnc) == 'а') || (mb_substr($slastname, -1, 1, $sEnc) == 'а') ) {
                 $g = 'ж';
             }
-            else if( in_array($sname, ['айсель', 'мелине', 'набат', 'наринэ', 'армине', 'гузель', 'биргюль', 'марине', ]) ) {
+            else if( in_array($sname, ['айсель', 'мелине', 'набат', 'наринэ', 'армине', 'гузель', 'биргюль', 'марине', 'атикат', ]) ) {
                 $g = 'ж';
             }
         }

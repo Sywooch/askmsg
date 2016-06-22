@@ -2,9 +2,12 @@
 
 namespace app\models;
 
+use yii;
 use yii\base\InvalidCallException;
 use yii\base\InvalidParamException;
+use yii\db\Query;
 
+use app\models\Rolesimport;
 
 /**
  * Class Stateflag
@@ -210,6 +213,32 @@ class Stateflag {
             throw new InvalidCallException('Error not found function to use in flag data');
         }
         return $aRet;
+    }
+
+    /**
+     *
+     * Получение дополнительных ограничений для запросов к обращениям
+     *
+     * @return array
+     */
+    public static function getRestrictionToAppealQuery() {
+        $oUser = Yii::$app->user;
+        $aWhere = [];
+        if( $oUser->can(Rolesimport::ROLE_ADMIN) || $oUser->can(Rolesimport::ROLE_MODERATE_DOGM) ) {
+        }
+        else if( $oUser->can(Rolesimport::ROLE_ANSWER_DOGM) ) {
+            $aWhere = [
+                'ap_empl_id' => $oUser->getId(),
+//                'ap_ans_state' => [self::STATE_ANSWER_NONE, self::STATE_ANSWER_TOFIX, self::STATE_ANSWER],
+            ];
+        }
+        else {
+            $aWhere = [
+                'ap_state' => self::STATE_APPEAL_PUBLIC,
+            ];
+        }
+
+        return $aWhere;
     }
 
 

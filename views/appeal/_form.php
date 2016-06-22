@@ -2,10 +2,12 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use app\models\Appeal;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Appeal */
 /* @var $form yii\widgets\ActiveForm */
+
 ?>
 
 <div class="appeal-form">
