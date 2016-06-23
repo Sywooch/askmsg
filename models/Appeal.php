@@ -395,7 +395,8 @@ class Appeal extends \yii\db\ActiveRecord
         return $this
             ->hasMany(
                 Answer::className(),
-                ['ans_ap_id' => 'ap_id']);
+                ['ans_ap_id' => 'ap_id']
+            );
     }
 
     /**
@@ -451,7 +452,6 @@ class Appeal extends \yii\db\ActiveRecord
         }
         return $aRet;
     }
-
 
     /**
      * @return null|Answer
