@@ -28,6 +28,7 @@ use app\components\RustextValidator;
 use app\models\Notificatelog;
 use app\models\Orgsovet;
 use app\models\Sovet;
+use app\models\Mediateanswer;
 use app\components\SwiftHeaders;
 
 /**
@@ -56,6 +57,7 @@ use app\components\SwiftHeaders;
  * @property integer $ekis_id
  * @property integer $msg_curator_id
  * @property integer $msg_mark
+ * @property integer $msg_mediate_answer_id
  *
  *
  * @property string $employer
@@ -327,6 +329,7 @@ class Message extends \yii\db\ActiveRecord
             ['verifyCode', 'captcha'],
 
             [['msg_pers_email'], 'email', 'except' => ['importdata']],
+            [['msg_mediate_answer_id'], 'integer', ],
             [['employer', 'asker', 'askid', 'askcontacts', 'tags'], 'string', 'max' => 255],
             [['tagsstring'], 'string', 'max' => 1024],
             [['msg_empl_id', 'msg_empl_command'], 'required',
@@ -712,6 +715,16 @@ class Message extends \yii\db\ActiveRecord
                 ['sovet_id' => 'orgsov_sovet_id']
             )
             ->via('orgsovet');
+    }
+
+    /**
+     *  Связь сообщения и промежуточного ответа
+     */
+    public function getMediateanswer() {
+        return $this->hasOne(
+            Mediateanswer::className(),
+            ['ma_msg_id' => 'msg_id']
+        );
     }
 
     /**

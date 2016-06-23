@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Mediateanswer;
 use app\models\Msgflags;
 use app\models\SendmsgForm;
 use Yii;
@@ -45,17 +46,17 @@ class MessageController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['toword', 'send', 'curatortest'],
+                        'actions' => ['toword', 'send', 'curatortest', 'mediatecurator', ],
                         'roles' => ['@'],
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['update', 'delete', 'moderatelist', 'upload', 'instruction', 'testmail', 'exportdata'],
+                        'actions' => ['update', 'delete', 'moderatelist', 'upload', 'instruction', 'testmail', 'exportdata', 'mediatemoderate', ],
                         'roles' => [Rolesimport::ROLE_MODERATE_DOGM],
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['answerlist', 'answer'],
+                        'actions' => ['answerlist', 'answer', 'mediateanswer'],
                         'roles' => [Rolesimport::ROLE_ANSWER_DOGM],
                     ],
                     [
@@ -309,6 +310,50 @@ class MessageController extends Controller
     }
 
     /**
+     * Mediateanswer
+     *
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionMediateanswer($id)
+    {
+        $oMessage = $this->findModel($id);
+
+        if( !$oMessage->isAnswerble ) {
+            $code = 0;
+            if( ($oMessage->msg_flag == Msgflags::MFLG_SHOW_NOSOGL) || ($oMessage->msg_flag == Msgflags::MFLG_INT_NOSOGL) ) {
+                $code = Message::EXCAPTION_CODE_MSG_ON_SOGL;
+            }
+            elseif( ($oMessage->msg_flag == Msgflags::MFLG_SHOW_NEWANSWER) || ($oMessage->msg_flag == Msgflags::MFLG_INT_NEWANSWER) ) {
+                $code = Message::EXCAPTION_CODE_MSG_ON_MODARATE;
+            }
+            throw new ForbiddenHttpException('Message is not editable', $code);
+        }
+
+        $model = Mediateanswer::getMediateAnswer($oMessage);
+
+        if ($model->load(Yii::$app->request->post()) ) {
+            $model->ma_msg_id = $oMessage->msg_id;
+//            return $this->renderContent(nl2br(print_r($model->attributes, true)) . "<br />\n" . $model->msg_flag);
+            if( $model->save() ) {
+                // обновляем у сообщения флажок и ставим id промежуточного ответа
+                $b = $model->setMessageData($oMessage);
+
+                if( $b ) {
+                    Yii::$app->getSession()->setFlash('error', 'Ваш ответ отправлен на проверку модератору.');
+                }
+
+                return $this->redirect(['answerlist']);
+            }
+        }
+
+        return $this->render('//mediateanswer/update', [
+            'model' => $model,
+            'message' => $oMessage,
+        ]);
+    }
+
+    /**
      * Answer
      * @return mixed
      */
@@ -499,6 +544,100 @@ class MessageController extends Controller
                 'model' => $model,
             ]);
 //        }
+    }
+
+    /**
+     * Mediatecurator
+     *
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionMediatecurator($id)
+    {
+        $oMessage = $this->findModel($id);
+        $isAdmin = Yii::$app->user->can(Rolesimport::ROLE_ADMIN);
+        $notTest = !in_array(
+            $oMessage->msg_flag,
+            [Msgflags::MFLG_SHOW_NOSOGL, Msgflags::MFLG_INT_NOSOGL, ]
+        );
+        if( $notTest || (($oMessage->msg_curator_id !== Yii::$app->user->getId()) && !$isAdmin) ) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        if( $oMessage->msg_empl_id !== null ) {
+            $oMessage->employer = $oMessage->employee->getFullName();
+        }
+
+        $model = Mediateanswer::getMediateAnswer($oMessage);
+
+        if ($model->load(Yii::$app->request->post()) ) {
+            $model->ma_msg_id = $oMessage->msg_id;
+//            return $this->renderContent(nl2br(print_r($model->attributes, true)) . "<br />\n" . $model->msg_flag);
+            if( $model->save() ) {
+                // обновляем у сообщения флажок и ставим id промежуточного ответа
+                $b = $model->setMessageData($oMessage);
+
+                if( $b ) {
+                    Yii::$app->getSession()->setFlash('error', 'Ваш ответ отправлен на проверку модератору.');
+                }
+
+                return $this->render(
+                    'curatortested',
+                    [
+                        'model' => $oMessage,
+                    ]
+                );
+            }
+        }
+
+        return $this->render('//mediateanswer/moderate', [
+            'model' => $model,
+            'message' => $oMessage,
+        ]);
+    }
+
+    /**
+     * Mediatemoderate
+     *
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionMediatemoderate($id)
+    {
+        $oMessage = $this->findModel($id);
+        $notTest = !in_array(
+            $oMessage->msg_flag,
+            [Msgflags::MFLG_SHOW_NEWANSWER, Msgflags::MFLG_INT_NEWANSWER, ]
+        );
+        if( $notTest ) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        if( $oMessage->msg_empl_id !== null ) {
+            $oMessage->employer = $oMessage->employee->getFullName();
+        }
+
+        $model = Mediateanswer::getMediateAnswer($oMessage);
+
+        if ($model->load(Yii::$app->request->post()) ) {
+            $model->ma_msg_id = $oMessage->msg_id;
+//            return $this->renderContent(nl2br(print_r($model->attributes, true)) . "<br />\n" . $model->msg_flag);
+            if( $model->save() ) {
+                // обновляем у сообщения флажок и ставим id промежуточного ответа
+                $b = $model->setMessageData($oMessage);
+
+                if( $b ) {
+                    Yii::$app->getSession()->setFlash('error', 'Ваш ответ отправлен на проверку модератору.');
+                }
+
+                return $this->redirect(['moderatelist']);
+            }
+        }
+
+        return $this->render('//mediateanswer/moderate', [
+            'model' => $model,
+            'message' => $oMessage,
+        ]);
     }
 
     /**
