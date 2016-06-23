@@ -25,11 +25,11 @@ class AppealActions {
      *
      * @param array $aFiles
      * @param int $nMessageId
-     * @param int $nUserId
+     * @param int $nAnswerId
      *
      * @return integer id of new file
      */
-    public function appendFiles($aFiles = [], $nMessageId = 0, $nUserId = 0) {
+    public function appendFiles($aFiles = [], $nMessageId = 0, $nAnswerId = 0) {
         $aId = [];
         if( empty($aFiles) ) {
             return $aId;
@@ -44,7 +44,7 @@ class AppealActions {
             }
 
             $oFile = new File();
-            $id = $oFile->addFile($ob, $nMessageId, $nUserId == 0);
+            $id = $oFile->addAppealFile($ob, $nMessageId, $nAnswerId);
 
             if( $oFile->hasErrors() ) {
                 Yii::info('uploadFiles(): File error: ' . print_r($oFile->getErrors(), true));

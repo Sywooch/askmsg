@@ -95,7 +95,7 @@ class Appeal extends \yii\db\ActiveRecord
                 'value' => function ($event, $attribute) {
                     $aVal = [
                         'ap_state' => Stateflag::STATE_APPEAL_NEW,          // поставим флаг нового сообщения
-                        'ap_ans_state' => Stateflag::STATE_ANSWER_NOT_NEED, // поставим флаг ответа
+                        'ap_ans_state' => Stateflag::STATE_ANSWER_NONE, // поставим флаг ответа
                         'ap_created' => new Expression('NOW()'),
                     ];
                     if( isset($aVal[$attribute]) ) {
@@ -273,24 +273,30 @@ class Appeal extends \yii\db\ActiveRecord
     }
 
     /**
+     *
      * Подсчет возможного количества загружаемых файлов
+     * @param boolean $bAppeal ситать файлы в обращении, false - в ответе
      *
      * @return int
      */
-    public function countAvalableFile() {
-        $n = Yii::$app->params['message.file.newcount'];
-        if( !$this->isNewRecord ) {
-            $n = Yii::$app->params['message.file.answercount'];
-            foreach($this->attachments As $ob) {
-                /** @var File  $ob */
-                if( $ob->file_user_id !== null ) {
+    public function countAvalableFile($bAppeal = true) {
+        $n = $bAppeal ? Yii::$app->params['message.file.newcount'] : Yii::$app->params['message.file.answercount'];
+        foreach($this->attachments As $ob) {
+            /** @var File  $ob */
+            if( $bAppeal ) {
+                if( $ob->file_user_id == 0 ) {
                     $n -= 1;
                 }
+            }
+            else {
+                if( $ob->file_user_id > 0 ) {
+                    $n -= 1;
+                }
+            }
 //                Yii::info("countAvalableFile() [{$n}]" . print_r($ob->attributes, true));
-            }
-            if( $n < 0 ) {
-                $n = 0;
-            }
+        }
+        if( $n < 0 ) {
+            $n = 0;
         }
 //        Yii::info("countAvalableFile() return {$n}");
         return $n;

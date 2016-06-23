@@ -120,7 +120,7 @@ $this->registerJs($sJs, View::POS_READY, 'toggleuserpart');
         <?php $bShowFooter = true; ?>
         <div class="col-sm-3"><strong>Поручение</strong></div>
         <div class="col-sm-9">
-            <?= Html::encode($model->ap_empl_command) ?>
+            <?= Html::encode($model->msg_empl_command) ?>
         </div>
         <div class="clearfix"></div>
     <?php endif; ?>
@@ -129,7 +129,7 @@ $this->registerJs($sJs, View::POS_READY, 'toggleuserpart');
         <div class="col-sm-12">
             <div class="alert alert-info" role="alert">
                 <span aria-hidden="true" class="glyphicon glyphicon-info-sign"></span>
-                <?= Html::encode($model->ap_comment) ?>
+                <?= Html::encode($model->msg_comment) ?>
             </div>
         </div>
     <?php endif; ?>

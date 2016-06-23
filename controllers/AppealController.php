@@ -14,6 +14,7 @@ use yii\web\UploadedFile;
 use app\models\Appeal;
 use app\models\AppealSearch;
 use app\components\AppealActions;
+use app\models\Rolesimport;
 
 /**
  * AppealController implements the CRUD actions for Appeal model.
@@ -28,7 +29,7 @@ class AppealController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'create', 'view', 'captcha', ],
+                        'actions' => ['list', 'create', 'view', 'captcha', ],
                         'roles' => ['?', '@'],
                     ],
 //                    [
@@ -36,11 +37,11 @@ class AppealController extends Controller
 //                        'actions' => ['toword', 'send', 'curatortest'],
 //                        'roles' => ['@'],
 //                    ],
-//                    [
-//                        'allow' => true,
-//                        'actions' => ['update', 'delete', 'moderatelist', 'upload', 'instruction', 'testmail', 'exportdata'],
-//                        'roles' => [Rolesimport::ROLE_MODERATE_DOGM],
-//                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['update', 'delete', 'moderatelist', 'upload', 'instruction', 'testmail', 'exportdata'],
+                        'roles' => [Rolesimport::ROLE_MODERATE_DOGM],
+                    ],
 //                    [
 //                        'allow' => true,
 //                        'actions' => ['answerlist', 'answer'],
@@ -68,13 +69,7 @@ class AppealController extends Controller
      */
     public function actionList()
     {
-        $searchModel = new AppealSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('list', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+        return $this->actionIndex();
     }
 
     /**
@@ -91,6 +86,28 @@ class AppealController extends Controller
             'dataProvider' => $dataProvider,
         ]);
     }
+
+    /**
+     * Lists all Message models for
+     * @return mixed
+     */
+    public function actionModeratelist()
+    {
+        $searchModel = new AppealSearch();
+        $dataProvider = $searchModel->moderateSearch(Yii::$app->request->queryParams);
+//        $searchModel = new MessageSearch();
+//        $searchModel->msgflags = Message::getMessageFilters()[Rolesimport::ROLE_MODERATE_DOGM];
+//        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+//        $dataProvider = $searchModel->moderateSearch(Yii::$app->request->queryParams);
+
+        return $this->render('moderatelist', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'action' => ['moderatelist'],
+        ]);
+    }
+
+
 
     /**
      * Displays a single Appeal model.

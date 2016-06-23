@@ -131,8 +131,43 @@ class File extends \yii\db\ActiveRecord
         $this->file_type = $ob->type;
         $this->file_name = Yii::$app->security->generateRandomString().".{$ext}";
         $this->file_user_id = Yii::$app->user->isGuest || $isnew ? 0 : Yii::$app->user->id;
-        $this->file_table_name = Yii::$app->user->isGuest || $isnew ? 'appeal' : 'answer';
+//        $this->file_answer_id = 0;
+//        $this->file_table_name = Yii::$app->user->isGuest || $isnew ? 'appeal' : 'answer';
         $this->file_msg_id = $mid;
+        if( $this->save() ) {
+            $ob->saveAs($this->getFullpath());
+            $id = $this->file_id;
+        }
+
+        return $id;
+
+    }
+
+    /**
+     * @param $ob UploadedFile
+     * @param $appealId integer Message id
+     * @param $answerId integer Answer Id
+     */
+    public function addAppealFile($ob, $appealId, $answerId) {
+        $id = 0;
+        if( !$this->isUploadDirExists() ) {
+            Yii::info("Error: Upload dir not exists");
+            return $id;
+        }
+        $a = explode(".", $ob->name);
+        $ext = array_pop($a);
+
+        $isAppealFile = Yii::$app->user->isGuest || ($answerId == 0);
+
+        $this->file_time = new Expression('NOW()');
+        $this->file_orig_name = $ob->name;
+        $this->file_size = $ob->size;
+        $this->file_type = $ob->type;
+        $this->file_name = Yii::$app->security->generateRandomString().".{$ext}";
+        $this->file_msg_id = $appealId;
+        $this->file_answer_id = $isAppealFile ? 0 : $answerId;
+        $this->file_user_id = $isAppealFile ? 0 : Yii::$app->user->id;
+
         if( $this->save() ) {
             $ob->saveAs($this->getFullpath());
             $id = $this->file_id;
