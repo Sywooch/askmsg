@@ -131,6 +131,7 @@ class File extends \yii\db\ActiveRecord
         $this->file_type = $ob->type;
         $this->file_name = Yii::$app->security->generateRandomString().".{$ext}";
         $this->file_user_id = Yii::$app->user->isGuest || $isnew ? 0 : Yii::$app->user->id;
+        $this->file_table_name = Yii::$app->user->isGuest || $isnew ? 'appeal' : 'answer';
         $this->file_msg_id = $mid;
         if( $this->save() ) {
             $ob->saveAs($this->getFullpath());

@@ -13,7 +13,7 @@ class m160622_150623_add_file_owner extends Migration
             Schema::TYPE_STRING
         );
 
-        $sSql = 'Update {{%file}} Set file_table_name = \'appeal\' Where file_id > 0';
+        $sSql = 'Update {{%file}} Set file_table_name = If(file_user_id = 0, \'appeal\', \'answer\') Where file_id > 0';
         $this->db->createCommand($sSql)->execute();
 
         $this->createIndex('idx_file_table_name', '{{%file}}', 'file_table_name');
