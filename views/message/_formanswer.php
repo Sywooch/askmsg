@@ -83,7 +83,14 @@ $aFieldParam = [
     ?>
 
 
-    <p>Текущее состояние: <?= Html::encode($model->flag->getStateTitle($model->msg_flag)) ?></p>
+    <p>Текущее состояние: <?= Html::encode($model->flag->getStateTitle($model->msg_flag)) ?>
+        <?php
+        // если нет промежуточного ответа и постоянного - предлагаем написать промежуточный
+        ?>
+        <?= ( !$model->hasMediateanswer() && ($model->msg_answer == '') ) ?
+            Html::a('Написать промежуточный ответ', ['mediateanswer', 'id'=>$model->msg_id], ['class' => 'btn btn-success']) :
+            '' ?></p>
+
     <?php
     if( strlen($model->msg_empl_command) > 0 ):
         ?>

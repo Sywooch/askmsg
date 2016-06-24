@@ -12,6 +12,7 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use app\models\User;
+use app\models\Msgflags;
 
 include dirname(__FILE__) . DIRECTORY_SEPARATOR . 'mail_styles_data.php';
 
@@ -41,7 +42,7 @@ $aLinkCurator = ['message/curatortest', 'id'=>$model->msg_id]
 <p><?= Html::encode($model->employee->getFullName()) ?>, <?= Html::encode($model->employee->us_workposition) ?>, <?= Html::encode($model->employee->us_email) ?></p>
 
 <p<?= $aMailTextStyles['large_text_01'] ?>>Текст ответа:</p>
-<p><?= $model->msg_answer ?></p>
+<p><?= empty($model->msg_answer) && $model->hasMediateanswer() ? $model->mediateanswer->ma_text : $model->msg_answer ?></p>
 
 <?php
 if( count($allusers) > 1 ) {
@@ -61,7 +62,15 @@ if( count($allusers) > 1 ) {
 
 <p<?= $aMailTextStyles['large_text_01'] ?>><b>Информация Вам направлена для осуществления контроля исполнения данного поручения</b></p>
 
+<?php
+if( !in_array($model->msg_flag, [Msgflags::MFLG_INT_FIN_INSTR, Msgflags::MFLG_SHOW_ANSWER, ]) ):
+?>
+
 <p><b>Осуществить проверку сообщения необходимо по ссылке <?= Html::a(Url::to($aLinkCurator, true), Url::to($aLinkCurator, true)) ?></b></p>
+
+<?php
+endif;
+?>
 
 <p>&nbsp;</p>
 <p>&nbsp;</p>

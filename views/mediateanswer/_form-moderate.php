@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use yii\web\View;
 use yii\bootstrap\Modal;
+use app\models\Rolesimport;
 
 use app\assets\HelperscriptAsset;
 use app\assets\ListdataAsset;
@@ -34,6 +35,7 @@ HelperscriptAsset::register($this);
                 'label' => 'col-sm-2',
                 'offset' => 'col-sm-offset-2',
                 'wrapper' => 'col-sm-10',
+                'hint' => 'col-sm-10 col-sm-offset-2'
             ],
         ],
     ]);
@@ -96,6 +98,15 @@ HelperscriptAsset::register($this);
                 ]
             ]
         ]) ?>
+
+<!--    <div class="col-sm-6">-->
+        <?= $form
+            ->field($model, 'ma_remark')
+            ->textarea()
+            ->hint('Текст замечания будет виден только исполнителям и модератору');
+        ?>
+<!--    </div>-->
+
     <?= $form->field($model, 'msg_flag', ['template' => "{input}", 'options' => ['tag' => 'span']])->hiddenInput();  ?>
 
     <div class="form-group">
@@ -115,7 +126,9 @@ HelperscriptAsset::register($this);
         <?php
 
         $aOp = array_reduce(
-            Msgflags::getStateTransModer($message->msg_flag),
+            Yii::$app->user->can(Rolesimport::ROLE_MODERATE_DOGM) ?
+                Msgflags::getStateTransModer($message->msg_flag) :
+                Msgflags::getStateTransCurator($message->msg_flag),
             function ( $carry , $item ) {
                 $sTitle = Msgflags::getStateTitle($item, 'fl_command');
                 if( $sTitle != '' ) {

@@ -37,13 +37,13 @@ $aLink = ['message/answer', 'id'=>$model->msg_id];
 <p><?= Html::encode($model->msg_empl_command) ?></p>
 
 <p<?= $aMailTextStyles['large_text_01'] ?>>Текст замечания:</p>
-<p><?= Html::encode($model->msg_empl_remark) ?></p>
+<p><?= empty($model->msg_empl_remark) && $model->hasMediateanswer() ? Html::encode($model->mediateanswer->ma_remark) : Html::encode($model->msg_empl_remark) ?></p>
 
 <p<?= $aMailTextStyles['large_text_01'] ?>><b>Ответственный за публикацию ответа:</b></p>
 <p><?= Html::encode($model->employee->getFullName()) ?>, <?= Html::encode($model->employee->us_workposition) ?>, <?= Html::encode($model->employee->us_email) ?></p>
 
 <p<?= $aMailTextStyles['large_text_01'] ?>>Текст ответа:</p>
-<p><?= $model->msg_answer ?></p>
+<p><?= empty($model->msg_answer) && $model->hasMediateanswer() ? $model->mediateanswer->ma_text : $model->msg_answer ?></p>
 
 <?php
 if( count($allusers) > 1 ) {

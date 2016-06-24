@@ -785,6 +785,39 @@ class Message extends \yii\db\ActiveRecord
     }
 
     /**
+     *  Существует ли промежуточный ответ
+     */
+    public function hasMediateanswer() {
+        return $this->mediateanswer !== null;
+    }
+
+    /**
+     *  Завершен ли промежуточный ответ
+     */
+    public function isMediateanswerFinished() {
+        return $this->hasMediateanswer() && ($this->mediateanswer->ma_finished !== null);
+    }
+
+    /**
+     *  Завершен ли промежуточный ответ
+     */
+    public function getFinalAnswer() {
+        $s = '';
+
+        if( $this->hasMediateanswer() ) {
+            $s = $this->mediateanswer->ma_text;
+        }
+
+        if( ($this->isMediateanswerFinished() || !$this->hasMediateanswer()) && in_array($this->msg_flag, []) ) {
+            $s = $this->msg_answer;
+        }
+
+        Yii::info('getFinalAnswer(): ['.$this->msg_id.'] hasMediateanswer() = ' . ($this->hasMediateanswer() ? 'true' : 'false') . ' isMediateanswerFinished() = ' . ($this->isMediateanswerFinished() ? 'true' : 'false') . ' s = ' . $s);
+        return $s;
+    }
+
+
+    /**
      *  Возможность ответа
      */
     public function getIsAnswerble() {
@@ -1391,7 +1424,7 @@ class Message extends \yii\db\ActiveRecord
         $g = '';
         if( ($slast == 'а') || ($slast == 'я') ) {
             $g = 'ж';
-            if( in_array($sname, ['ваня', 'петя', 'саня', 'сеня', 'илья', ]) ) {
+            if( in_array($sname, ['ваня', 'петя', 'саня', 'сеня', 'илья', 'гаврила', ]) ) {
                 $g = 'м';
             }
         }

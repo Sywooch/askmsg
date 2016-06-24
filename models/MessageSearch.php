@@ -172,6 +172,7 @@ class MessageSearch extends Message
             ->with('alltags')
             ->with('region')
             ->with('subject')
+            ->with('mediateanswer')
 //            ->with('orgsovet')
             ->with('sovet')
 //            ->with('attachments')
@@ -312,6 +313,7 @@ class MessageSearch extends Message
             ->with('answers')
             ->with('curator')
             ->with('subject')
+            ->with('mediateanswer')
 //            ->with('alltags')
             ->with('attachments')
             ->with('flag');

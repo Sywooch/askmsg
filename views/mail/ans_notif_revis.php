@@ -24,7 +24,7 @@ $aLink = ['message/answer', 'id'=>$model->msg_id];
 
 <p>Ваш ответ на поручение №<?= Html::encode($model->msg_id) ?> был рассмотрен Департаментом образования города Москвы.</p>
 
-<p>Необходимо внести изменения: <?= Html::encode($model->msg_empl_remark) ?></p>
+<p>Необходимо внести изменения: <?= empty($model->msg_empl_remark) && $model->hasMediateanswer() ? Html::encode($model->mediateanswer->ma_remark) : Html::encode($model->msg_empl_remark) ?></p>
 
 <p>Для просмотра обращения перейдите по ссылке: <?= Html::a(Url::to($aLink, true), Url::to($aLink, true)) ?></p>
 

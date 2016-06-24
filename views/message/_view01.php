@@ -240,6 +240,18 @@ $this->registerJs($sJs, View::POS_READY, 'toggleuserpart');
                 }
                 ?>
             </div>
+        <?php elseif( $model->isMediateanswerFinished() ): ?>
+            <div id="id_answer<?= $model->msg_id ?>" class="breadcrumb answerblock">
+                <h4>Промежуточный ответ</h4>
+                <?= $model->mediateanswer->ma_text ?>
+                <?php
+                if( $model->mediateanswer->ma_finished !== null ) {
+                    ?>
+                    <span class="dopline"><?= date('d.m.Y', strtotime($model->mediateanswer->ma_finished)) ?></span>
+                <?php
+                }
+                ?>
+            </div>
         <?php endif; ?>
 
     </div>

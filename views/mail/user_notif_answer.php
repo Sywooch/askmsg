@@ -22,6 +22,8 @@ $aMarkLink = $model->getMarkUrl();
 
 include dirname(__FILE__) . DIRECTORY_SEPARATOR . 'mail_styles_data.php';
 
+$bIsMediateAnswer = $model->hasMediateanswer() && $model->isMediateanswerFinished() && empty($model->msg_answer);
+
 /* <?= $aMailTextStyles['large_text_01'] ?> */
 
 ?>
@@ -29,14 +31,27 @@ include dirname(__FILE__) . DIRECTORY_SEPARATOR . 'mail_styles_data.php';
 <p>Здравствуйте, <?= Html::encode($model->getShortName()) ?>.</p>
 
 <p>Департамент образования города Москвы подготовил ответ на ваше обращение №<?= Html::encode($model->msg_id) ?>.</p>
+<?php
+if( $bIsMediateAnswer ) {
+?>
+    <p>Это промежуточный ответ. Окончательный ответ будет дан позднее.</p>
+<?php
+}
+?>
 
 <p>Для просмотра обращения перейдите по ссылке: <?= Html::a(Url::to($aLink, true), Url::to($aLink, true)) ?></p>
 
-<p>Вы можете оценить этот ответ на сайте по ссылке <?= Html::a(Url::to($aMarkLink, true), Url::to($aMarkLink, true)) ?> :<br />
-    если вы удовлетворены ответом, выберите <a href="<?= Url::to(array_merge($aMarkLink, ['mark'=>5]), true) ?>">Да</a>,<br />
-    если не удовлетворены - <a href="<?= Url::to(array_merge($aMarkLink, ['mark'=>0]), true) ?>">Нет</a>.</p>
+<?php
+if( !$bIsMediateAnswer ) {
+?>
+    <p>Вы можете оценить этот ответ на сайте по ссылке <?= Html::a(Url::to($aMarkLink, true), Url::to($aMarkLink, true)) ?> :<br />
+        если вы удовлетворены ответом, выберите <a href="<?= Url::to(array_merge($aMarkLink, ['mark'=>5]), true) ?>">Да</a>,<br />
+        если не удовлетворены - <a href="<?= Url::to(array_merge($aMarkLink, ['mark'=>0]), true) ?>">Нет</a>.</p>
 
-<p>Для выставления оценки Вам понадобится проверочный код: <?= $model->getTestCode() ?> .</p>
+    <p>Для выставления оценки Вам понадобится проверочный код: <?= $model->getTestCode() ?> .</p>
+<?php
+}
+?>
 
 <p>&nbsp;</p>
 <p>&nbsp;</p>

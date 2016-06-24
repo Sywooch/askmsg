@@ -298,9 +298,15 @@ class MessageController extends Controller
             throw new ForbiddenHttpException('Message is not editable', $code);
         }
 
+        if( $model->hasMediateanswer() && !$model->isMediateanswerFinished() ) {
+            return $this->redirect(['message/mediateanswer', 'id'=>$model->msg_id, ]);
+        }
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $model->uploadFiles();
-            Yii::$app->getSession()->setFlash('error', 'Ваш ответ отправлен на проверку модератору.');
+            if( !$model->isAnswerble ) {
+                Yii::$app->getSession()->setFlash('error', 'Ваш ответ отправлен на проверку модератору.');
+            }
 
             return $this->redirect(['answerlist']);
         }
@@ -331,6 +337,7 @@ class MessageController extends Controller
         }
 
         $model = Mediateanswer::getMediateAnswer($oMessage);
+        $model->msg_flag = $oMessage->msg_flag;
 
         if ($model->load(Yii::$app->request->post()) ) {
             $model->ma_msg_id = $oMessage->msg_id;
@@ -339,7 +346,7 @@ class MessageController extends Controller
                 // обновляем у сообщения флажок и ставим id промежуточного ответа
                 $b = $model->setMessageData($oMessage);
 
-                if( $b ) {
+                if( $b && !$oMessage->isAnswerble ) {
                     Yii::$app->getSession()->setFlash('error', 'Ваш ответ отправлен на проверку модератору.');
                 }
 
@@ -458,6 +465,9 @@ class MessageController extends Controller
         }
         else {
             $model = $this->findModel($id);
+            if( $model->hasMediateanswer() && !$model->isMediateanswerFinished() ) {
+                return $this->redirect(['message/mediatemoderate', 'id' => $id, ]);
+            }
             $model->scenario = 'moderator';
             if( $model->msg_empl_id !== null ) {
                 $model->employer = $model->employee->getFullName();
@@ -520,6 +530,10 @@ class MessageController extends Controller
         if( $notTest || (($model->msg_curator_id !== Yii::$app->user->getId()) && !$isAdmin) ) {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+        if( $model->hasMediateanswer() && !$model->isMediateanswerFinished() ) {
+            return $this->redirect(['message/mediatecurator', 'id' => $id, ]);
+        }
+
 
         $model->scenario = 'curatortest';
         if( $model->msg_empl_id !== null ) {
@@ -572,14 +586,13 @@ class MessageController extends Controller
 
         if ($model->load(Yii::$app->request->post()) ) {
             $model->ma_msg_id = $oMessage->msg_id;
+
+//            $model->validate();
+//            return $this->renderContent(nl2br(print_r($model->getErrors(), true)));
 //            return $this->renderContent(nl2br(print_r($model->attributes, true)) . "<br />\n" . $model->msg_flag);
             if( $model->save() ) {
                 // обновляем у сообщения флажок и ставим id промежуточного ответа
                 $b = $model->setMessageData($oMessage);
-
-                if( $b ) {
-                    Yii::$app->getSession()->setFlash('error', 'Ваш ответ отправлен на проверку модератору.');
-                }
 
                 return $this->render(
                     'curatortested',
@@ -621,14 +634,11 @@ class MessageController extends Controller
 
         if ($model->load(Yii::$app->request->post()) ) {
             $model->ma_msg_id = $oMessage->msg_id;
+
 //            return $this->renderContent(nl2br(print_r($model->attributes, true)) . "<br />\n" . $model->msg_flag);
             if( $model->save() ) {
                 // обновляем у сообщения флажок и ставим id промежуточного ответа
                 $b = $model->setMessageData($oMessage);
-
-                if( $b ) {
-                    Yii::$app->getSession()->setFlash('error', 'Ваш ответ отправлен на проверку модератору.');
-                }
 
                 return $this->redirect(['moderatelist']);
             }

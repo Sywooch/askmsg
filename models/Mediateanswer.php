@@ -15,6 +15,7 @@ use yii\helpers\Html;
  *
  * @property integer $ma_id
  * @property string $ma_created
+ * @property string $ma_finished
  * @property string $ma_text
  * @property string $ma_remark
  * @property integer $ma_msg_id
@@ -57,7 +58,7 @@ class Mediateanswer extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['ma_created'], 'safe'],
+            [['ma_created', 'ma_finished', ], 'safe'],
             [['ma_text', 'ma_remark'], 'string'],
             [['ma_msg_id', 'msg_flag', ], 'integer'],
             [['ma_remark'], 'required',
@@ -76,6 +77,7 @@ class Mediateanswer extends \yii\db\ActiveRecord
         return [
             'ma_id' => 'Номер',
             'ma_created' => 'Создан',
+            'ma_finished' => 'Завершен',
             'ma_text' => 'Ответ',
             'ma_remark' => 'Замечание',
             'ma_msg_id' => 'Обращение',
@@ -115,6 +117,21 @@ class Mediateanswer extends \yii\db\ActiveRecord
 
         $obMessage->msg_mediate_answer_id = $this->ma_id;
         $obMessage->msg_flag = $this->msg_flag;
+        if( $obMessage->msg_flag == Msgflags::MFLG_SHOW_ANSWER ) {
+            // если промежуточный ответ принимаем, то сбрасываем флаг сообщения,
+            // чтобы можно было работать с окончательным ответом
+            $this->ma_finished = new Expression('NOW()');
+            $obMessage->msg_flag = Msgflags::MFLG_SHOW_INSTR;
+            $this->save(false);
+        }
+        else if( $obMessage->msg_flag == Msgflags::MFLG_INT_FIN_INSTR ) {
+            $this->ma_finished = new Expression('NOW()');
+            $obMessage->msg_flag = Msgflags::MFLG_INT_INSTR;
+            $this->save(false);
+        }
+        else if( $obMessage->msg_flag == Msgflags::MFLG_NEW ) {
+            $this->delete();
+        }
 
         $bSave = $obMessage->save(false);
 
