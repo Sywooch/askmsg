@@ -675,7 +675,7 @@ class Message extends \yii\db\ActiveRecord
      *  Связь сообщения и его тегов строкой с разделителями Yii::$app->params['tag.separator']
      */
     public function getTagsstring() {
-        Yii::info(self::className() . '::getTagstring() this->alltags = ' . print_r(ArrayHelper::map($this->alltags, 'tag_id', 'tag_title'), true));
+//        Yii::info(self::className() . '::getTagstring() this->alltags = ' . print_r(ArrayHelper::map($this->alltags, 'tag_id', 'tag_title'), true));
         $sSeparator = isset(Yii::$app->params['tag.separator']) ? Yii::$app->params['tag.separator'] : '|';
 //        return implode(',', ArrayHelper::map($this->alltags, 'tag_id', 'tag_title'));
         return implode($sSeparator, ArrayHelper::map($this->alltags, 'tag_id', 'tag_title'));

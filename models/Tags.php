@@ -136,7 +136,7 @@ class Tags extends \yii\db\ActiveRecord
         }
 
         $sKey = $nType . '_' . $nParentsId;
-        Yii::info('getTagslist('.$nType.', '.$nParentsId.') = ' . $sKey);
+//        Yii::info('getTagslist('.$nType.', '.$nParentsId.') = ' . $sKey);
         if( isset(self::$_cache[$sKey]) ) {
             return self::$_cache[$sKey];
         }
