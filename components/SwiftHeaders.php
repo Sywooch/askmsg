@@ -42,7 +42,7 @@ class SwiftHeaders {
         if( $email !== '' ) {
             $headers->addTextHeader('Error-to', '<' . $email . '>');
             $headers->addTextHeader('List-Owner', '<' . $email . '>');
-            $headers->addTextHeader('List-Unsubscribe', '<mailto:' . $email . '>,<http://' . $site .'/>');
+//            $headers->addTextHeader('List-Unsubscribe', '<mailto:' . $email . '>,<http://' . $site .'/>');
         }
     }
 }
