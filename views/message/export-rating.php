@@ -72,6 +72,9 @@ for($page = 0; $page < $nPageCount; $page++) {
             $a[] = $sVal;
         }
         if( $bFinished ) {
+            while(count($a) < 9) {
+                $a[] = '';
+            }
             $a[9] = Msgflags::MFLG_NEW;
         }
         fwrite($fp, implode($sSeparator, $a) . $sLineEnd);

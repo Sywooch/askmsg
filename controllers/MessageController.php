@@ -799,7 +799,12 @@ class MessageController extends Controller
 
         if ( $model->load(Yii::$app->request->getQueryParams()) && $model->validate() ) {
             // $model->fieldslist = ['msg_id', 'msg_createtime', 'msg_subject', 'alltags', 'ekis_id', 'raitngvalue', 'fio', 'msg_pers_email', 'msg_pers_phone', 'msg_flag', 'msg_mark', 'msg_pers_text', ];
-            $model->fieldslist = ['msg_id', 'msg_createtime', 'msg_subject', 'ratingtags', 'ekis_id', 'raitngvalue', 'fio', 'msg_pers_email', 'msg_pers_phone', 'msg_flag', 'msg_mark', 'msg_pers_text', ];
+            if( empty($model->fieldslist) ) {
+                $model->fieldslist = ['msg_id', 'msg_createtime', 'msg_subject', 'ratingtags', 'ekis_id', 'raitngvalue', 'fio', 'msg_pers_email', 'msg_pers_phone', 'msg_flag', 'msg_mark', ]; // 'msg_pers_text', ];
+            }
+            if( !isset($_REQUEST['notext']) ) {
+                $model->fieldslist[] = 'msg_pers_text';
+            }
 
             return $this->render(
                 'export-rating',
