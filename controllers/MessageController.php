@@ -51,7 +51,7 @@ class MessageController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['update', 'delete', 'moderatelist', 'upload', 'instruction', 'testmail', 'exportdata', 'mediatemoderate', ],
+                        'actions' => ['update', 'delete', 'moderatelist', 'upload', 'instruction', 'testmail', 'exportdata', 'mediatemoderate', 'setreason', ],
                         'roles' => [Rolesimport::ROLE_MODERATE_DOGM],
                     ],
                     [
@@ -424,44 +424,6 @@ class MessageController extends Controller
                 $model->msg_subject = $nSubjectId;
                 $model->msg_pers_text = "Здравствуйте,\n\nЯ хотел бы задать вопрос по заработной плате педагогов:\n\n";
             }
-/*
-            if( Yii::$app->session->has('parent-msg-id') ) {
-                // была переадресация с оценки предыдущего сообщения
-                // нужно заполнить данные просителя из предыдущего сообщения
-                try {
-                    $oldModel = $this->findModel(Yii::$app->session->get('parent-msg-id', 0));
-                    $aAtr = [
-                        'msg_pers_name',
-                        'msg_pers_lastname',
-                        'msg_pers_email',
-                        'msg_pers_phone',
-                        'msg_pers_secname',
-                        'msg_pers_org',
-                        'msg_pers_region',
-                        'msg_subject',
-                        'ekis_id',
-                    ];
-                    foreach($aAtr As $v) {
-                        $model->{$v} = $oldModel->{$v};
-                    }
-                    $n = 72;
-                    $model->msg_pers_text = "Здравствуйте.\nНа мое обращение № {$oldModel->msg_id} от "
-                        . date('d.m.Y', strtotime($oldModel->msg_createtime))
-                        . " был получен следующий ответ (автор ответа - "
-                        . $oldModel->employee->getFullName()
-                        . "):\n\n"
-                        . str_pad(' Начало ответа ', $n, "-", STR_PAD_BOTH)
-                        . "\n"
-                        . trim(strip_tags(str_replace(['</p>', '<br'], ["</p>\n", "\n<br"], $oldModel->msg_answer)))
-                        . "\n"
-                        . str_pad(' Окончание ответа ', $n, "-", STR_PAD_BOTH)
-                        . "\n";
-                }
-                catch(Exception $e) {
-                    //
-                }
-            }
-*/
         }
         else {
             $model = $this->findModel($id);
@@ -498,7 +460,7 @@ class MessageController extends Controller
                 }
                 else {
                     if( !isset($_POST['savebutton']) ) {
-                        return $this->redirect(['moderatelist']);
+                        return $this->redirect($model->isNeedSetReasonble() ? ['setreason', 'id' => $model->msg_id,] : ['moderatelist']);
                     }
                     $this->refresh();
                     return;
@@ -506,7 +468,6 @@ class MessageController extends Controller
 //                    $model->refresh();
                 }
             }
-
         }
 //        else {
 //            Yii::info('MESSAGE ERROR: ' . print_r($model->getErrors(), true));
@@ -819,6 +780,41 @@ class MessageController extends Controller
     }
 
     /**
+     *
+     * Устанавливаем флаг обоснованности обращения
+     *
+     * @param int $id
+     *
+     */
+    public function actionSetreason($id = 0) {
+        $model = $this->findModel($id);
+        $model->scenario = 'setreason';
+        $model->unzipFlags();
+
+        if( Yii::$app->request->isAjax && $model->load(Yii::$app->request->post()) ) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
+
+        $model->setMessageFlagForReason(false);
+        $model->save(false);
+
+        if ( $model->load(Yii::$app->request->post()) ) {
+//            if( $model->save() ) {
+            if( $model->validate() ) {
+                $model->setMessageFlagForReason(true);
+                $model->zipFlags();
+                $model->save(false);
+                return $this->redirect(['moderatelist']);
+            }
+        }
+
+        return $this->render('setreason', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
      * Finds the Message model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
@@ -836,4 +832,5 @@ class MessageController extends Controller
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
+
 }

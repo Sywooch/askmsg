@@ -82,6 +82,7 @@ class ExportdataForm extends Model
             'ekis_id',
             'raitngvalue',
             'ratingtags',
+            'reasonable',
         ];
 
 
@@ -331,6 +332,10 @@ class ExportdataForm extends Model
         }
         else if( $sField == 'alltags' ) {
             return implode(",", ArrayHelper::map($ob->alltags, 'tag_id', function($o) { return $o->tag_title; }));
+        }
+        else if( $sField == 'reasonable' ) {
+            $ob->unzipFlags();
+            return $ob->getReasonText();
         }
         else if( $sField == 'ratingtags' ) {
             return array_reduce(

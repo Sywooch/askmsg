@@ -58,6 +58,7 @@ use app\components\SwiftHeaders;
  * @property integer $msg_curator_id
  * @property integer $msg_mark
  * @property integer $msg_mediate_answer_id
+ * @property integer $msg_bitflag
  *
  *
  * @property string $employer
@@ -81,6 +82,12 @@ class Message extends \yii\db\ActiveRecord
     const EXCAPTION_CODE_MSG_ON_SOGL = 1;
     const EXCAPTION_CODE_MSG_ON_MODARATE = 2;
 
+    const FLAG_REASON_YES = 1;
+    const FLAG_REASON_NO = 2;
+
+    const BIT_REASON_YES = 1;
+    const BIT_REASON_NO = 2;
+
     public $employer; // Ответчик
     public $asker; // Проситель
     public $askid; // Номер и дата
@@ -89,6 +96,8 @@ class Message extends \yii\db\ActiveRecord
     public $_tagsstring; // теги строкой
     public $testemail = ''; // проверочный email для оценки
     public $marktext = ''; // текст для оценки
+
+    public $reasonable = null; // Флаг обосновано или нет обращение
 
     public $verifyCode;
 
@@ -184,7 +193,7 @@ class Message extends \yii\db\ActiveRecord
             ],
         ];
 
-        if( $this->scenario != 'importdata' ) {
+        if( !in_array($this->scenario, ['importdata', 'setreason']) ) {
             $a = array_merge(
                 $a,
                 [
@@ -285,7 +294,7 @@ class Message extends \yii\db\ActiveRecord
             [['msg_pers_text'], 'filter', 'on'=>'person', 'filter' => function($val){ return strip_tags($val, '<p><br>');  }, ], // в пользовательском вводе удаляем теги
             [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', ], 'filter', 'on'=>'person', 'filter' => function($val){ return strip_tags($val);  }, ],
 
-            [['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_region', 'msg_mark', 'testemail'], 'required'],
+            [['msg_pers_name', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_text', 'msg_pers_region', 'msg_mark', 'testemail', 'reasonable', ], 'required'],
             [['msg_answer'], 'required', 'on' => 'answer', ],
 
 //            [['testemail'], 'email', ],
@@ -339,7 +348,9 @@ class Message extends \yii\db\ActiveRecord
             [['msg_empl_remark'], 'required',
                 'when' => function($model) { return in_array($this->msg_flag, [Msgflags::MFLG_INT_REVIS_INSTR, Msgflags::MFLG_SHOW_REVIS]); },
                 'whenClient' => "function (attribute, value) { return [".implode(',', [Msgflags::MFLG_INT_REVIS_INSTR, Msgflags::MFLG_SHOW_REVIS])."].indexOf(parseInt($('#".Html::getInputId($this, 'msg_flag') ."').val())) != -1 ;}"
-            ]
+            ],
+
+            ['reasonable', 'in', 'range' => array_keys($this->getAllReasons()), 'skipOnEmpty' => false, ],
 
         ];
     }
@@ -458,6 +469,8 @@ class Message extends \yii\db\ActiveRecord
             'msg_empl_remark',
         ];
 
+        $scenarios['setreason'] = ['reasonable'];
+
         if( $this->isUseCaptcha() ) {
             $scenarios['person'][] = 'verifyCode';
         }
@@ -536,6 +549,7 @@ class Message extends \yii\db\ActiveRecord
             'msg_curator_id' => 'Контролер',
             'verifyCode' => 'Код',
             'msg_mark' => 'Удовлетворены ли Вы качеством ответа?',
+            'msg_bitflag' => 'Битовые флаги',
 
             'employer' => 'Исполнитель',
             'asker' => 'Проситель',
@@ -547,6 +561,7 @@ class Message extends \yii\db\ActiveRecord
             'file' => 'Файл',
             'testemail' => 'Проверочный код',
             'marktext' => 'Причина',
+            'reasonable' => 'Обоснованность обращения',
         ];
     }
 
@@ -1470,4 +1485,85 @@ class Message extends \yii\db\ActiveRecord
 
         return in_array($this->msg_flag, $aHiddenMessageFlags);
     }
+
+    /**
+     *
+     * Запаковать флаги в битовое поле сообщения
+     *
+     */
+    public function zipFlags() {
+        // биты флага Обосновано или нет
+        $this->msg_bitflag = ($this->reasonable === null ? 0 : ($this->reasonable == self::FLAG_REASON_YES ? self::BIT_REASON_YES : self::BIT_REASON_NO));
+    }
+
+    /**
+     *
+     * Распаковать битовое поле сообщения в флаги модели
+     *
+     */
+    public function unzipFlags() {
+        // Обосновано или нет
+        $this->reasonable = ($this->msg_bitflag & self::BIT_REASON_YES) ? self::FLAG_REASON_YES : (($this->msg_bitflag & self::BIT_REASON_NO) ? self::FLAG_REASON_NO : null);
+    }
+
+    /**
+     *
+     * Проверка - нужно ли устанвлисить флаг обоснованности обращения
+     *
+     * @return bool
+     */
+    public function isNeedSetReasonble() {
+        $a = [Msgflags::MFLG_SHOW_ANSWER, Msgflags::MFLG_INT_FIN_INSTR];
+        return in_array($this->msg_flag, $a)
+            && isset($this->_oldAttributes['msg_flag'])
+            && !in_array($this->_oldAttributes['msg_flag'], $a);
+    }
+
+    /**
+     *
+     * Получение списка всех варантов для обоснованности олбращения
+     *
+     * @return array
+     */
+    public function getAllReasons() {
+        return [
+            self::FLAG_REASON_YES => 'Обращение обосновано',
+            self::FLAG_REASON_NO => 'Обращение необосновано',
+        ];
+    }
+
+    /**
+     *
+     * Получение текста обоснованности
+     *
+     * @return string
+     *
+     */
+    public function getReasonText() {
+        $a = $this->getAllReasons();
+        return isset($a[$this->reasonable]) ? $a[$this->reasonable] : '';
+    }
+
+    /**
+     *
+     * Установка флагов сообщения при установке обоснованности
+     * @param boolean $bSetFinish устанавливать окончательные флаги - true, устанавливать предыдущие флаги - false
+     *
+     */
+    public function setMessageFlagForReason($bSetFinish = true) {
+        $a = [
+            Msgflags::MFLG_SHOW_ANSWER => Msgflags::MFLG_SHOW_NEWANSWER,
+            Msgflags::MFLG_INT_FIN_INSTR => Msgflags::MFLG_INT_NEWANSWER,
+        ];
+
+        if( $bSetFinish ) {
+            $a = array_flip($a);
+        }
+
+        if( isset($a[$this->msg_flag]) ) {
+            Yii::info('Set flag [' . $this->msg_id . ']: ' . $this->msg_flag . ' -> ' . $a[$this->msg_flag]);
+            $this->msg_flag = $a[$this->msg_flag];
+        }
+    }
+
 }
