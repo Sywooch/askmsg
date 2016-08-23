@@ -15,15 +15,13 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $model app\models\Message */
 
-$aLink = ['message/view', 'id'=>$model->msg_id];
+//$aLink = ['message/view', 'id'=>$model->msg_id];
 
 ?>
 
 <p>Здравствуйте, <?= Html::encode($model->getShortName()) ?>.</p>
 
-<p>Ваше обращение №<?= Html::encode($model->msg_id) ?> опубликовано на сайте Департамента образования города Москвы.</p>
-
-<p>Для просмотра обращения перейдите по ссылке: <?= Html::a(Url::to($aLink, true), Url::to($aLink, true)) ?></p>
+<p>Ваше обращение №<?= Html::encode($model->msg_id) ?> прошло модерацию на сайте Департамента образования города Москвы.</p>
 
 <p>Исполнителем по Вашему обращению назначен
     <?= Html::encode($model->employee->getFullName()) ?> (<?= Html::encode($model->employee->us_workposition) ?>)

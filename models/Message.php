@@ -1048,6 +1048,7 @@ class Message extends \yii\db\ActiveRecord
                 Msgflags::MFLG_SHOW_INSTR => [Msgflags::MFLG_NEW],
                 Msgflags::MFLG_SHOW_ANSWER => [Msgflags::MFLG_SHOW_INSTR, Msgflags::MFLG_SHOW_NEWANSWER, Msgflags::MFLG_SHOW_REVIS, Msgflags::MFLG_SHOW_NOSOGL, ],
                 Msgflags::MFLG_INT_FIN_INSTR => [],
+                Msgflags::MFLG_INT_INSTR => [Msgflags::MFLG_NEW],
             ],
             self::USERTYPE_ANSWER => [
                 Msgflags::MFLG_SHOW_INSTR => [],
@@ -1124,6 +1125,7 @@ class Message extends \yii\db\ActiveRecord
             self::USERTYPE_PERSON => [
                 Msgflags::MFLG_SHOW_NO_ANSWER => 'user_notif_show',
                 Msgflags::MFLG_SHOW_INSTR => 'user_notif_show',
+                Msgflags::MFLG_INT_INSTR => 'user_notif_int',
                 Msgflags::MFLG_SHOW_ANSWER => 'user_notif_answer',
                 Msgflags::MFLG_INT_FIN_INSTR => 'user_notif_intanswer',
             ],
