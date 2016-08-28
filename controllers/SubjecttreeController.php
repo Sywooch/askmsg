@@ -5,10 +5,14 @@ namespace app\controllers;
 use Yii;
 use app\models\SubjectTree;
 use app\models\SubjectTreeSearch;
+use yii\base\Model;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\components\Subjecttreeimport;
+use app\models\MessageTreeForm;
+use yii\widgets\ActiveForm;
+use yii\web\Response;
 
 /**
  * SubjecttreeController implements the CRUD actions for SubjectTree model.
@@ -56,8 +60,12 @@ class SubjecttreeController extends Controller
             $model = null;
             $id = 0;
         }
+
+        $formmodel = new MessageTreeForm();
+
         return $this->render('treelevel', [
             'model' => $model,
+            'formmodel' => $formmodel,
             'child' => $this->findChild($id),
             'parents' => $this->findParents($model),
         ]);
@@ -95,6 +103,60 @@ class SubjecttreeController extends Controller
                 'model' => $model,
             ]);
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function actionNewmsg($id = 0)
+    {
+        try {
+            $model = $this->findModel($id);
+        }
+        catch(NotFoundHttpException $e) {
+            $model = null;
+            $id = 0;
+        }
+
+        $formmodel = new MessageTreeForm();
+
+        if( Yii::$app->request->isAjax && $formmodel->load(Yii::$app->request->post()) ) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            if( $model === null ) {
+                $formmodel->on(
+                    Model::EVENT_AFTER_VALIDATE,
+                    function($event) {
+                        /** @var yii\base\Event $event */
+                        $event->sender->addError('msg_pers_text', 'Не выбрана тема обращения');
+                    }
+                );
+            }
+            $aErr = ActiveForm::validate($formmodel);
+
+            return $aErr;
+        }
+
+        if( $model === null ) {
+            return $this->redirect(['view']);
+        }
+
+        if( $formmodel->load(Yii::$app->request->post()) && $formmodel->validate() ) {
+            return $this->redirect(['view',]);
+        }
+
+        $nSatisfy = Yii::$app->request->get('satisfy', 0);
+        if( $nSatisfy != 0 ) {
+            $formmodel->is_satisfied = $nSatisfy;
+        }
+
+        return $this->render(
+            '_formmessage',
+            [
+                'model' => $model,
+                'formmodel' => $formmodel,
+            ]
+        );
+
     }
 
     /**

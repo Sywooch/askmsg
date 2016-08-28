@@ -5,6 +5,7 @@ use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\SubjectTree */
+/* @var $formmodel app\models\MessageTreeForm */
 /* @var $parents array of app\models\SubjectTree */
 /* @var $child array of app\models\SubjectTree */
 
@@ -45,11 +46,19 @@ use yii\widgets\DetailView;
     <p>
         <?php
         if( empty($child) ) {
-            echo "Показываем форму";
+//            echo "Показываем форму";
             echo $this->render(
                 '_infotext',
                 [
                     'model' => $model,
+                    'formmodel' => $formmodel,
+                ]
+            );
+            echo $this->render(
+                '_formmessage',
+                [
+                    'model' => $model,
+                    'formmodel' => $formmodel,
                 ]
             );
         }
