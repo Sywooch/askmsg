@@ -46,6 +46,12 @@ use yii\widgets\DetailView;
         <?php
         if( empty($child) ) {
             echo "Показываем форму";
+            echo $this->render(
+                '_infotext',
+                [
+                    'model' => $model,
+                ]
+            );
         }
         else {
             $aPrt = array_reduce(
