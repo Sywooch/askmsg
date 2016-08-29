@@ -183,11 +183,21 @@ class SubjecttreeController extends Controller
         $nSubjectId = 0;
         if( $formmodel->load(Yii::$app->request->post()) && $formmodel->validate() ) {
             if( $nStep >= 2 ) {
+                Yii::info('formmodel->attributes = ' . print_r($formmodel->attributes, true));
                 $nSubjectId = $formmodel->subject_id;
                 $model = $nSubjectId ? $this->findModel($nSubjectId): null;
                 $this->findChild($model);
+                if( $formmodel->is_satisfied == 1 ) {
+                    return $this->render(
+                        'information-ok',
+                        []
+                    );
+                }
+                if( (intval($formmodel->is_user_variant) > 0) ) {
+                    $nStep++;
+                }
 //                if( !empty($formmodel->is_satisfied) ) {
-                if( !$formmodel->isNeedSelectChild($model)
+                else if( !$formmodel->isNeedSelectChild($model)
                     && !$formmodel->isNeedSatisfy($model)
                     && !$formmodel->isNeedAskdirector($model) ) {
                     $nStep++;

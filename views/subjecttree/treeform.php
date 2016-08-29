@@ -49,6 +49,10 @@ use yii\widgets\DetailView;
     if( empty($child) ) {
 //            echo "Показываем форму";
         echo $form->field($formmodel, 'subject_id', ['template' => '{input}'])->hiddenInput() ;
+        if( $formmodel->subject_id > 0 ) {
+            echo $form->field($formmodel, 'is_user_variant', ['template' => '{input}'])->hiddenInput() ;
+        }
+
         echo $this->render(
             '_treeinfotext',
             [
@@ -84,6 +88,28 @@ use yii\widgets\DetailView;
                         ]) ?>
             </div>
         </div>
+
+        <?php
+        if( $formmodel->subject_id > 0 ) {
+        ?>
+            <div class="row">
+                <div class="col-sm-12" style="padding-left: <?= $nPadd * $n; ?>px;">
+                    <?= $form
+                        ->field($formmodel, 'is_user_variant', ['template' => '{input}{error}'])
+                        ->radioList(
+                            [1 => 'Иное',],
+                            [
+                                'separator' => '<br />',
+                                'itemOptions' => [
+                                    'class' => 'otherradiobutton',
+                                ],
+                            ]) ?>
+                </div>
+            </div>
+        <?php
+        }
+        ?>
+
     <?php
     }
     ?>

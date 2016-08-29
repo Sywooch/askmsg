@@ -11,6 +11,8 @@ use app\models\SubjectTree;
  */
 class MessageTreeForm extends Model
 {
+    const MAX_PERSON_TEXT_LENGTH = 4000;
+
     public $msg_pers_text;
     public $msg_file;
     public $is_satisfied;
@@ -23,6 +25,10 @@ class MessageTreeForm extends Model
     public $msg_pers_region;
     public $subject_id;
     public $is_ask_director;
+    public $ekis_id;
+    public $file;
+    public $is_user_variant;
+    public $msg_pers_subject;
 
     /**
      * @return array the validation rules.
@@ -30,13 +36,19 @@ class MessageTreeForm extends Model
     public function rules()
     {
         return [
-            [['msg_pers_text', 'msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', ], 'required'],
-            [['msg_pers_text'], 'string', 'min' => 100, ],
-            [['is_satisfied', 'is_ask_director', ], 'integer', ],
+            [['is_satisfied', 'is_ask_director', 'ekis_id', 'is_user_variant', ], 'integer', ],
             [['is_satisfied', 'is_ask_director', ], 'in', 'range' => [1, 2], ],
 
+            [['msg_pers_text', 'msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'subject_id', ], 'required'],
+            [['msg_pers_text'], 'string', 'min' => 100, 'max' => self::MAX_PERSON_TEXT_LENGTH, ],
+
+            [['msg_pers_subject', ], 'required', 'when' => function($model) { Yii::info('validator when: ' . print_r($model->attributes, true)); return (intval($model->is_user_variant) > 0); },],
+
+            [['file'], 'safe'],
+            [['file'], 'file', 'maxFiles' => 1, 'maxSize' => Yii::$app->params['message.file.maxsize'], 'extensions' => Yii::$app->params['message.file.ext']],
+
             [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', ], 'filter', 'filter' => 'trim'],
-            [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', ], 'string', 'max' => 255],
+            [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', 'msg_pers_region', 'msg_pers_org', 'msg_pers_subject', ], 'string', 'max' => 255],
             [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', ], 'match',
                 'pattern' => '|^[А-Яа-яЁё]{2}[-А-Яа-яЁё\\s]*$|u', 'message' => 'Допустимы символы русского алфавита',
             ],
@@ -81,7 +93,11 @@ class MessageTreeForm extends Model
             'msg_pers_email' => 'Email',
             'msg_pers_phone' => 'Телефон',
             'msg_pers_org' => 'Учреждение',
+            'ekis_id' => 'Учреждение',
             'is_ask_director' => 'Обращались ли к директору',
+            'file' => 'Файл',
+            'is_user_variant' => 'Свой вариант',
+            'msg_pers_subject' => 'Тема',
         ];
     }
 
@@ -98,7 +114,6 @@ class MessageTreeForm extends Model
             'is_satisfied',
         ];
 
-
         // Шаг 1: ввод персональной информации
         $scenarios['step_1'] = [
             'msg_pers_name',
@@ -106,6 +121,9 @@ class MessageTreeForm extends Model
             'msg_pers_lastname',
             'msg_pers_email',
             'msg_pers_phone',
+            'ekis_id',
+            'msg_pers_org',
+            'msg_pers_region',
         ];
 
         // Шаг 2: выбор темы
@@ -115,6 +133,7 @@ class MessageTreeForm extends Model
                 'subject_id',
                 'is_satisfied',
                 'is_ask_director',
+                'is_user_variant',
             ]
         );
 
@@ -122,6 +141,7 @@ class MessageTreeForm extends Model
         $scenarios['step_3'] = array_merge(
             $scenarios['step_2'],
             [
+                'msg_pers_subject',
                 'msg_pers_text',
             ]
         );
