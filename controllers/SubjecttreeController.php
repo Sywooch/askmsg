@@ -170,10 +170,12 @@ class SubjecttreeController extends Controller
 //        $nStep = 1;
         $nStep = Yii::$app->request->post('step', 1);
         $formmodel->scenario = 'step_' . $nStep;
+        Yii::info('step = ' . $formmodel->scenario);
 
         if( Yii::$app->request->isAjax && $formmodel->load(Yii::$app->request->post()) ) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             $aErr = ActiveForm::validate($formmodel);
+            Yii::info('ajax err = ' . print_r($aErr, true));
             return $aErr;
         }
 
@@ -183,6 +185,9 @@ class SubjecttreeController extends Controller
             if( $nStep >= 2 ) {
                 $nSubjectId = $formmodel->subject_id;
                 $model = $nSubjectId ? $this->findModel($nSubjectId): null;
+                if( !empty($formmodel->is_satisfied) ) {
+                    $nStep++;
+                }
             }
             else if( isset($_POST['next']) ) {
                 $nStep++;
@@ -193,6 +198,7 @@ class SubjecttreeController extends Controller
             $formmodel->scenario = 'step_' . $nStep;
 //            return $this->redirect(['view', 'id' => $model->subj_id]);
         }
+        Yii::info('attributes = ' . print_r($formmodel->attributes, true));
 
         return $this->render('_formmessage_v2', [
             'formmodel' => $formmodel,

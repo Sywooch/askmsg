@@ -8,11 +8,12 @@ use yii\widgets\ActiveForm;
 /* @var $formmodel app\models\MessageTreeForm */
 /* @var $form yii\widgets\ActiveForm */
 /* @var $step integer */
-
+/* @var $subjectid integer */
+Yii::info(__FILE__);
 ?>
 
 <div class="subject-tree-message-form">
-    <?= 'step = ' . $step ?>
+    <?= '' // 'step = ' . $step ?>
 
     <?php $form = ActiveForm::begin([
 //        'action' => ['subjecttree/stepmasg', 'id' => $model->subj_id],
@@ -40,7 +41,7 @@ use yii\widgets\ActiveForm;
     </div>
 
     <div class="step_2" style="display: <?= ($step == 2) ? 'block' : 'none' ?>;">
-        <?= 'subjectid = ' . $subjectid ?>
+        <?= '' // 'subjectid = ' . $subjectid ?>
         <?= $this->render(
             'treeform',
             [
@@ -52,7 +53,7 @@ use yii\widgets\ActiveForm;
             ]
         ) ?>
         <?= '' // $form->field($formmodel, 'subject_id', ['template' => '{input}', ])->hiddenInput() ?>
-        <?= $form->field($formmodel, 'is_satisfied', ['template' => '{input}', ])->hiddenInput() ?>
+        <?= '' // $form->field($formmodel, 'is_satisfied', ['template' => '{input}', ])->hiddenInput() ?>
     </div>
 
     <div class="step_3" style="display: <?= ($step == 3) ? 'block' : 'none' ?>;">
@@ -61,8 +62,8 @@ use yii\widgets\ActiveForm;
 
     <div class="form-group">
         <div class="row">
-            <div class="col-sm-2" style="display: <?= ($step > 1) ? 'block' : 'none' ?>;"><?= Html::submitButton('Назад', ['class' => 'btn btn-success', 'name' =>'prev', ]) ?></div>
-            <div class="col-sm-2"><?= Html::submitButton('Далее', ['class' => 'btn btn-success', 'name' =>'next', ]) ?></div>
+            <div class="col-sm-2" style="display: none;<?= '' // ($step > 1) ? 'block' : 'none' ?>;"><?= Html::submitButton('Назад', ['class' => 'btn btn-success', 'name' =>'prev', ]) ?></div>
+            <div class="col-sm-2"><?= Html::submitButton(($step < 3) ? 'Далее' : 'Отправить', ['class' => 'btn btn-success', 'name' =>'next', ]) ?></div>
         </div>
 
     </div>
