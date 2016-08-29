@@ -66,7 +66,7 @@ class SubjecttreeController extends Controller
         return $this->render('treelevel', [
             'model' => $model,
             'formmodel' => $formmodel,
-            'child' => $this->findChild($id),
+            'child' => ($model !== null) ? $this->findChild($model) : [],
             'parents' => $this->findParents($model),
         ]);
     }
@@ -163,7 +163,7 @@ class SubjecttreeController extends Controller
     /**
      * @return mixed
      */
-    public function actionStepmasg()
+    public function actionStepmsg()
     {
 //        $model = $this->findModel($id);
         $formmodel = new MessageTreeForm();
@@ -185,7 +185,11 @@ class SubjecttreeController extends Controller
             if( $nStep >= 2 ) {
                 $nSubjectId = $formmodel->subject_id;
                 $model = $nSubjectId ? $this->findModel($nSubjectId): null;
-                if( !empty($formmodel->is_satisfied) ) {
+                $this->findChild($model);
+//                if( !empty($formmodel->is_satisfied) ) {
+                if( !$formmodel->isNeedSelectChild($model)
+                    && !$formmodel->isNeedSatisfy($model)
+                    && !$formmodel->isNeedAskdirector($model) ) {
                     $nStep++;
                 }
             }
@@ -196,16 +200,21 @@ class SubjecttreeController extends Controller
                 $nStep--;
             }
             $formmodel->scenario = 'step_' . $nStep;
+
+            if( $nStep > 3 ) {
+                return $this->render('thankyou', []);
+            }
 //            return $this->redirect(['view', 'id' => $model->subj_id]);
         }
-        Yii::info('attributes = ' . print_r($formmodel->attributes, true));
+//        Yii::info('attributes = ' . print_r($formmodel->attributes, true));
+        Yii::info('step = ' . $formmodel->scenario);
 
         return $this->render('_formmessage_v2', [
             'formmodel' => $formmodel,
             'model' => $model,
             'step' => $nStep,
             'subjectid' => $nSubjectId,
-            'child' => ($nStep == 2) ? $this->findChild($nSubjectId) : [],
+            'child' => ($nStep == 2 ) ? $this->findChild($model) : [],
             'parents' => ($nStep == 2) ? $this->findParents($model) : [],
         ]);
     }
@@ -259,27 +268,26 @@ class SubjecttreeController extends Controller
     }
 
     /**
-     * @param integer $id
+     * @param SubjectTree $model
      * @return array of SubjectTree the loaded models
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findChild($id)
+    protected function findChild($model)
     {
-        return SubjectTree::find()
-            ->where(['subj_parent_id' => $id])
-            ->all();
+        $a = ($model === null) ? SubjectTree::getChildNodes(0) : $model->getChild();
+//        echo 'result = ' . print_r($a, true);
+//        echo 'model = ' . print_r($model, true);
+//        die();
+        return $a;
     }
 
     /**
-     * @param SubjectTree $oNode
+     * @param SubjectTree $model
      * @return array of SubjectTree the loaded models
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findParents($oNode)
+    protected function findParents($model)
     {
-        return $oNode === null ? [] : SubjectTree::find()
-            ->where(['and', ['<', 'subj_lft', $oNode->subj_lft], ['>', 'subj_rgt', $oNode->subj_rgt]])
-            ->orderBy(['subj_lft' => SORT_ASC,])
-            ->all();
+        return $model === null ? [] : $model->getParents();
     }
 }

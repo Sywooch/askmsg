@@ -62,12 +62,81 @@ Yii::info(__FILE__);
 
     <div class="form-group">
         <div class="row">
-            <div class="col-sm-2" style="display: none;<?= '' // ($step > 1) ? 'block' : 'none' ?>;"><?= Html::submitButton('Назад', ['class' => 'btn btn-success', 'name' =>'prev', ]) ?></div>
-            <div class="col-sm-2"><?= Html::submitButton(($step < 3) ? 'Далее' : 'Отправить', ['class' => 'btn btn-success', 'name' =>'next', ]) ?></div>
+            <?php /* <div class="col-sm-2" style="display: none;<?= '' // ($step > 1) ? 'block' : 'none' ?>;"><?= Html::submitButton('Назад', ['class' => 'btn btn-success', 'name' =>'prev', ]) ?></div> */ ?>
+            <div class="col-sm-2"><?= Html::submitButton(($step < 3) ? 'Далее' : 'Отправить', ['class' => 'btn btn-success', 'name' =>'next', 'id' => 'nextactionbutton', ]) ?></div>
         </div>
-
     </div>
 
     <?php ActiveForm::end(); ?>
 
 </div>
+
+<?php
+
+$sJs = <<<EOT
+var aRadioButtons = jQuery(".radiobutton"),
+    oNext = jQuery('#nextactionbutton');
+
+aRadioButtons.each(function(index, el) {
+    var oRadio = jQuery(this),
+        oLabel = oRadio.parent(),
+        sLinkClass = "radiolink",
+        sClass = "btn btn-default " + sLinkClass,
+        sActiveClass = "btn-success",
+        oLink = jQuery('<a href="#" class="' + sClass + '" data-value="' + oRadio.val() + '"></a>').text(oLabel.text());
+
+    oLabel.wrap( "<div class='buttonblock'></div>");
+    oLabel.before(oLink);
+    oLabel.hide();
+    oLink.on(
+        "click",
+        function(event) {
+            var ob = jQuery(this);
+            event.preventDefault();
+            aRadioButtons.prop("checked", false);
+            jQuery("." + sLinkClass).removeClass(sActiveClass);
+            oRadio.prop("checked", true);
+            ob.addClass(sActiveClass);
+            oNext.trigger('click');
+//            console.log("Set " + oRadio.val());
+            return false;
+        }
+    );
+});
+
+var setRadioButtons = function(classRadio, linkClass) {
+    var aRadioButtons = jQuery("." + classRadio); // radioask
+
+    aRadioButtons.each(function(index, el) {
+        var oRadio = jQuery(this),
+            oLabel = oRadio.parent(),
+            sLinkClass = linkClass, // "radioasklink"
+            sClass = "btn btn-default btn-block " + sLinkClass,
+            sActiveClass = "btn-success",
+            oLink = jQuery('<a href="#" class="' + sClass + (oRadio.prop("checked") ? (" " + sActiveClass) : "") + '"></a>').text(oLabel.text());
+
+        oLabel.wrap( "<div class='col-sm-6'></div>");
+        oLabel.before(oLink);
+        oLabel.hide();
+        oLink.on(
+            "click",
+            function(event) {
+                var ob = jQuery(this);
+                event.preventDefault();
+                aRadioButtons.prop("checked", false);
+                jQuery("." + sLinkClass).removeClass(sActiveClass);
+                oRadio.prop("checked", true);
+                ob.addClass(sActiveClass);
+//                console.log("Set " + oRadio.val());
+                oNext.trigger('click');
+                return false;
+            }
+        );
+    });
+};
+
+setRadioButtons("satisfyclass", "satrisfylink");
+setRadioButtons("askdirclass", "askdirlink");
+EOT;
+
+$this->registerJs($sJs, \yii\web\View::POS_READY);

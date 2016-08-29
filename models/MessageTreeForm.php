@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\base\Model;
+use app\models\SubjectTree;
 
 /**
  * ContactForm is the model behind the contact form.
@@ -21,6 +22,7 @@ class MessageTreeForm extends Model
     public $msg_pers_org;
     public $msg_pers_region;
     public $subject_id;
+    public $is_ask_director;
 
     /**
      * @return array the validation rules.
@@ -30,7 +32,8 @@ class MessageTreeForm extends Model
         return [
             [['msg_pers_text', 'msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', ], 'required'],
             [['msg_pers_text'], 'string', 'min' => 100, ],
-            [['is_satisfied'], 'integer', ],
+            [['is_satisfied', 'is_ask_director', ], 'integer', ],
+            [['is_satisfied', 'is_ask_director', ], 'in', 'range' => [1, 2], ],
 
             [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', ], 'filter', 'filter' => 'trim'],
             [['msg_pers_name', 'msg_pers_secname', 'msg_pers_lastname', 'msg_pers_email', 'msg_pers_phone', ], 'string', 'max' => 255],
@@ -78,7 +81,7 @@ class MessageTreeForm extends Model
             'msg_pers_email' => 'Email',
             'msg_pers_phone' => 'Телефон',
             'msg_pers_org' => 'Учреждение',
-
+            'is_ask_director' => 'Обращались ли к директору',
         ];
     }
 
@@ -111,6 +114,7 @@ class MessageTreeForm extends Model
             [
                 'subject_id',
                 'is_satisfied',
+                'is_ask_director',
             ]
         );
 
@@ -123,6 +127,50 @@ class MessageTreeForm extends Model
         );
 
         return $scenarios;
+    }
+
+    /**
+     * @param SubjectTree $model
+     * @return bool
+     */
+    public function isNeedSatisfy($model) {
+        $bRet = (count($model->getChild()) == 0)
+            && !empty($model->subj_info)
+            && (intval($this->is_satisfied) == 0);
+
+        Yii::info(
+            'isNeedSatisfy['.$model->subj_id.'] child: ' . count($model->getChild()) . "\n"
+            . ' subj_info = ' . $model->subj_info . "\n"
+            . ' is_satisfied = ' . intval($this->is_satisfied) . "\n"
+            . ' = ' . ($bRet ? 'true' : 'false')
+        );
+        return $bRet;
+    }
+
+    /**
+     * @param SubjectTree $model
+     * @return bool
+     */
+    public function isNeedAskdirector($model) {
+        $bRet = (count($model->getChild()) == 0)
+            && !empty($model->subj_final_question)
+            && (intval($this->is_ask_director) == 0);
+        Yii::info(
+            'isNeedAskdirector['.$model->subj_id.'] child: ' . count($model->getChild()) . "\n"
+            . ' subj_final_question = ' . $model->subj_final_question . "\n"
+            . ' is_ask_director = ' . intval($this->is_ask_director) . "\n"
+            . ' = ' . ($bRet ? 'true' : 'false')
+        );
+
+        return $bRet;
+    }
+
+    /**
+     * @param SubjectTree $model
+     * @return bool
+     */
+    public function isNeedSelectChild($model) {
+        return (count($model->getChild()) > 0);
     }
 
 }

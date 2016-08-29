@@ -20,6 +20,7 @@ use Yii;
  */
 class SubjectTree extends \yii\db\ActiveRecord
 {
+    public static $_cache = [];
     /**
      * @inheritdoc
      */
@@ -58,4 +59,40 @@ class SubjectTree extends \yii\db\ActiveRecord
             'subj_parent_id' => 'Tree Node Parent Id',
         ];
     }
+
+    /**
+     * @return array|\yii\db\ActiveRecord[]
+     */
+    public function getChild() {
+        return self::getChildNodes($this->subj_id);
+    }
+
+    /**
+     * @param int $idParent
+     * @return mixed
+     */
+    public static function getChildNodes($idParent = 0) {
+        $sKey = 'child_' . $idParent;
+        if( !isset(self::$_cache[$sKey]) ) {
+            self::$_cache[$sKey] = self::find()
+                ->where(['subj_parent_id' => $idParent])
+                ->all();
+        }
+        return self::$_cache[$sKey];
+    }
+
+    /**
+     * @return array|\yii\db\ActiveRecord[]
+     */
+    public function getParents() {
+        $sKey = 'parents_' . $this->subj_id;
+        if( !isset(self::$_cache[$sKey]) ) {
+            self::$_cache[$sKey] = self::find()
+                ->where(['and', ['<', 'subj_lft', $this->subj_lft], ['>', 'subj_rgt', $this->subj_rgt]])
+                ->orderBy(['subj_lft' => SORT_ASC,])
+                ->all();
+        }
+        return self::$_cache[$sKey];
+    }
+
 }

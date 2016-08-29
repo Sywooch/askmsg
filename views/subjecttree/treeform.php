@@ -72,7 +72,16 @@ use yii\widgets\DetailView;
         ?>
         <div class="row">
             <div class="col-sm-12" style="padding-left: <?= $nPadd * $n; ?>px;">
-                <?= $form->field($formmodel, 'subject_id', ['template' => '{input}'])->radioList($aOptions, ['separator' => '<br />',]) ?>
+                <?= $form
+                    ->field($formmodel, 'subject_id', ['template' => '{input}'])
+                    ->radioList(
+                        $aOptions,
+                        [
+                            'separator' => '<br />',
+                            'itemOptions' => [
+                                'class' => 'radiobutton',
+                            ],
+                        ]) ?>
             </div>
         </div>
     <?php
