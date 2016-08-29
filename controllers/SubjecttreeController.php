@@ -119,6 +119,7 @@ class SubjecttreeController extends Controller
         }
 
         $formmodel = new MessageTreeForm();
+        $formmodel->scenario = 'newmsg';
 
         if( Yii::$app->request->isAjax && $formmodel->load(Yii::$app->request->post()) ) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -157,6 +158,50 @@ class SubjecttreeController extends Controller
             ]
         );
 
+    }
+
+    /**
+     * @return mixed
+     */
+    public function actionStepmasg()
+    {
+//        $model = $this->findModel($id);
+        $formmodel = new MessageTreeForm();
+//        $nStep = 1;
+        $nStep = Yii::$app->request->post('step', 1);
+        $formmodel->scenario = 'step_' . $nStep;
+
+        if( Yii::$app->request->isAjax && $formmodel->load(Yii::$app->request->post()) ) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            $aErr = ActiveForm::validate($formmodel);
+            return $aErr;
+        }
+
+        $model = null;
+        $nSubjectId = 0;
+        if( $formmodel->load(Yii::$app->request->post()) && $formmodel->validate() ) {
+            if( $nStep >= 2 ) {
+                $nSubjectId = $formmodel->subject_id;
+                $model = $nSubjectId ? $this->findModel($nSubjectId): null;
+            }
+            else if( isset($_POST['next']) ) {
+                $nStep++;
+            }
+            else if( isset($_POST['prev']) && ($nStep > 1) ) {
+                $nStep--;
+            }
+            $formmodel->scenario = 'step_' . $nStep;
+//            return $this->redirect(['view', 'id' => $model->subj_id]);
+        }
+
+        return $this->render('_formmessage_v2', [
+            'formmodel' => $formmodel,
+            'model' => $model,
+            'step' => $nStep,
+            'subjectid' => $nSubjectId,
+            'child' => ($nStep == 2) ? $this->findChild($nSubjectId) : [],
+            'parents' => ($nStep == 2) ? $this->findParents($model) : [],
+        ]);
     }
 
     /**
